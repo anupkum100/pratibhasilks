@@ -1,24 +1,32 @@
 
 export default function Footer() {
   return (
-    <footer className="bg-black text-white mt-20 p-10">
+    <footer className="text-white mt-20 p-10" style={{ backgroundColor: 'var(--color-primary)' }}>
       <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-10">
         <div>
-          <h2 className="text-2xl mb-3">Pratibha Silks</h2>
-          <p>Luxury sarees inspired by Indian craftsmanship.</p>
+          <h2 className="text-2xl mb-3 text-white">Pratibha Silks</h2>
+          <p>Timeless heritage, handcrafted for you.</p>
         </div>
         <div>
-          <h3 className="text-xl mb-2">Collections</h3>
+          <h3 className="text-xl mb-2" style={{ color: 'var(--color-accent)' }}>Collections</h3>
           <ul className="space-y-2">
-            <li>Banarasi</li>
-            <li>Kanjivaram</li>
-            <li>Bandhani</li>
+            <li className="hover:opacity-80 cursor-pointer transition-opacity">Banarasi</li>
+            <li className="hover:opacity-80 cursor-pointer transition-opacity">Kanjivaram</li>
+            <li className="hover:opacity-80 cursor-pointer transition-opacity">Bandhani</li>
           </ul>
         </div>
         <div>
-          <h3 className="text-xl mb-2">Newsletter</h3>
-          <input className="p-3 rounded text-black w-full" placeholder="Enter email" />
+          <h3 className="text-xl mb-2" style={{ color: 'var(--color-accent)' }}>Newsletter</h3>
+          <div className="flex gap-2">
+            <input className="p-3 rounded text-gray-800 flex-1" placeholder="Enter email" />
+            <button className="px-4 py-3 rounded font-semibold transition-colors hover:opacity-90" style={{ backgroundColor: 'var(--color-secondary)' }}>
+              Subscribe
+            </button>
+          </div>
         </div>
+      </div>
+      <div className="max-w-7xl mx-auto mt-8 pt-6 border-t border-white/20 text-center">
+        <p className="text-sm">© 2026 Pratibha Silks. Crafted with ❤️ in India</p>
       </div>
     </footer>
   )

@@ -6,22 +6,22 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#6D071A] text-white shadow-lg">
+    <nav className="sticky top-0 z-50 text-white shadow-lg" style={{ backgroundColor: 'var(--color-primary)' }}>
       <div className="max-w-7xl mx-auto flex justify-between items-center p-4">
-        <h1 className="text-2xl md:text-3xl font-bold">Pratibha Silks</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-white">Pratibha Silks</h1>
         
         {/* Desktop Menu */}
         <div className="hidden md:flex gap-6 items-center">
-          <Link to="/">Home</Link>
-          <Link to="/products">Collections</Link>
-          <Link to="/about">About</Link>
-          <Link to="/contact">Contact</Link>
-          <Link to="/cart"><ShoppingBag /></Link>
+          <Link to="/" className="hover:opacity-80 transition-opacity">Home</Link>
+          <Link to="/products" className="hover:opacity-80 transition-opacity">Collections</Link>
+          <Link to="/about" className="hover:opacity-80 transition-opacity">About</Link>
+          <Link to="/contact" className="hover:opacity-80 transition-opacity">Contact</Link>
+          <Link to="/cart" className="p-2 rounded-full transition-colors" style={{ backgroundColor: 'var(--color-secondary)' }}><ShoppingBag /></Link>
         </div>
 
         {/* Mobile Menu Button */}
         <div className="flex items-center gap-4 md:hidden">
-          <Link to="/cart"><ShoppingBag /></Link>
+          <Link to="/cart" className="p-2 rounded-full" style={{ backgroundColor: 'var(--color-secondary)' }}><ShoppingBag size={20} /></Link>
           <button onClick={() => setIsOpen(!isOpen)}>
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -30,11 +30,11 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden flex flex-col gap-4 p-4 bg-[#6D071A] border-t border-white/20">
-          <Link to="/" onClick={() => setIsOpen(false)}>Home</Link>
-          <Link to="/products" onClick={() => setIsOpen(false)}>Collections</Link>
-          <Link to="/about" onClick={() => setIsOpen(false)}>About</Link>
-          <Link to="/contact" onClick={() => setIsOpen(false)}>Contact</Link>
+        <div className="md:hidden flex flex-col gap-4 p-4 border-t border-white/20" style={{ backgroundColor: 'var(--color-primary)' }}>
+          <Link to="/" onClick={() => setIsOpen(false)} className="hover:opacity-80">Home</Link>
+          <Link to="/products" onClick={() => setIsOpen(false)} className="hover:opacity-80">Collections</Link>
+          <Link to="/about" onClick={() => setIsOpen(false)} className="hover:opacity-80">About</Link>
+          <Link to="/contact" onClick={() => setIsOpen(false)} className="hover:opacity-80">Contact</Link>
         </div>
       )}
     </nav>
