@@ -8,7 +8,7 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 text-white shadow-lg" style={{ backgroundColor: 'var(--color-primary)' }}>
       <div className="max-w-7xl mx-auto flex justify-between items-center p-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-white">Pratibha Silks</h1>
+        <h1 className="text-2xl md:text-3xl text-white">Pratibha Silks</h1>
         
         {/* Desktop Menu */}
         <div className="hidden md:flex gap-6 items-center">
