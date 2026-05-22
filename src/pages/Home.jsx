@@ -1,64 +1,14 @@
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
+import { useRef } from "react";
 import ProductCard from "../components/ProductCard";
+import HeroCarousel from "../components/Swiper";
 import { products } from "../data/products";
 
 export default function Home() {
   const heroRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"],
-  });
-
-  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
-  const textY = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
-
-  const images = [
-    `https://res.cloudinary.com/dkiauapz4/image/upload/f_auto,q_auto/ChatGPT_Image_May_22_2026_06_14_54_PM_z9pvkv.png`,
-    `https://res.cloudinary.com/dkiauapz4/image/upload/f_auto,q_auto/IMG_4574_ycdz7j.jpg`,
-    `https://res.cloudinary.com/dkiauapz4/image/upload/f_auto,q_auto/ChatGPT_Image_May_22_2026_06_19_14_PM_bd2asn.png`,
-    // "https://images.unsplash.com/photo-1618901185975-d59f7091bcfe?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  ];
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % images.length);
-    }, 10000);
-    return () => clearInterval(interval);
-  }, [currentIndex]);
 
   return (
     <div>
-      <section
-        ref={heroRef}
-        className="h-[20vh] sm:h-[70vh] md:h-[80vh] relative flex items-center justify-center md:justify-end text-white overflow-hidden"
-      >
-        {images.map((image, index) => (
-          <motion.div
-            key={index}
-            className="absolute inset-0 bg-cover bg-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: index === currentIndex ? 1 : 0 }}
-            transition={{ duration: 1 }}
-            style={{
-              backgroundImage: `url('${image}')`,
-              y: backgroundY,
-            }}
-          />
-        ))}
-        {/* Carousel Indicators */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
-          {images.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`w-3 h-3 rounded-full transition-all ${index === currentIndex ? "bg-white scale-125" : "bg-white/50"}`}
-            />
-          ))}
-        </div>
-      </section>
+      <HeroCarousel />
 
       <section className="max-w-7xl mx-auto py-10 sm:py-16 md:py-20 px-4 sm:px-5">
         <h2 className="text-3xl sm:text-4xl md:text-5xl mb-6 sm:mb-8 md:mb-10 text-center">

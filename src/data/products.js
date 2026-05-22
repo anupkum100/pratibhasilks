@@ -24,7 +24,7 @@ export const products = [
     blouseIncluded: true,
     blouseFabric: "Silk",
     blouseType: "Attached with Saree",
-    size: "Free Size",
+    length: "6.5 m",
     categories: ["Silk Sarees", "New Arrival"],
     color: "Golden",
     occasion: "Work",

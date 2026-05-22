@@ -187,11 +187,11 @@ export default function ProductDetail() {
             { label: 'Blouse Included', value: product.blouseIncluded ? 'Yes' : 'No' },
             { label: 'Blouse Fabric', value: product.blouseFabric },
             { label: 'Blouse Type', value: product.blouseType },
-            { label: 'Size', value: product.size },
+            { label: 'Length', value: product.length },
           ].filter(item => item.value).map((item, index) => (
             <div key={index} className="flex sm:flex-row">
               <div className="w-full sm:w-1/3 p-2 md:p-3 font-medium">{item.label}</div>
-              <div className="w-full sm:w-2/3 p-2 md:p-3 text-gray-600">{item.value}</div>
+              <div className="w-full sm:w-2/3 p-2 md:p-3 text-gray-600">{item.value || "NA"}</div>
             </div>
           ))}
         </div>

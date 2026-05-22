@@ -9,7 +9,7 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 text-white shadow-lg" style={{ backgroundColor: 'var(--color-primary)' }}>
       <div className="max-w-7xl mx-auto flex justify-between items-center p-4">
         <Link to="/" className="flex">
-          <img width={30} height={30} src="fevico.png" />
+          <img width={30} height={30} src="/fevico.png" />
           <h1 className="ms-2 text-xl md:text-2xl text-white">Pratibha Silks</h1>
         </Link>
 
