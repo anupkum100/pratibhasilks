@@ -1,6 +1,6 @@
 
-import { Instagram, Facebook, MessageCircleCode } from "lucide-react"
-import { PS_EMAIL, PS_PHONE } from "../data/constants"
+import { Instagram, MessageCircleCode } from "lucide-react"
+import { PS_EMAIL, PS_PHONE, PS_PHONE_WHATSAPP } from "../data/constants"
 
 export default function Footer() {
   return (
@@ -22,7 +22,7 @@ export default function Footer() {
             <Instagram size={22} color="orange" />
           </a>
 
-          <a
+          {/* <a
             href="https://www.instagram.com/pratibhasilkssarees"
             target="_blank"
             rel="noopener noreferrer"
@@ -30,16 +30,16 @@ export default function Footer() {
             className="flex justify-center align-center bg-white/10 p-2 rounded-full hover:bg-[#F58529] hover:text-black transition duration-300"
           >
             <Facebook size={22} />
-          </a>
+          </a> */}
 
           <a
-            href="https://www.instagram.com/pratibhasilkssarees"
+            href={`https://api.whatsapp.com/send?phone=${PS_PHONE_WHATSAPP}&text=Hello!`}
             target="_blank"
             rel="noopener noreferrer"
             style={{ height: 40, width: 40 }}
             className="flex justify-center align-center bg-white/10 p-2 rounded-full hover:bg-[#F58529] hover:text-black transition duration-300"
           >
-            <MessageCircleCode size={22} />
+            <MessageCircleCode size={22} color="green" />
           </a>
 
         </div>

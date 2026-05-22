@@ -46,7 +46,7 @@ export default function ProductDetail() {
                 key={selectedImage}
                 src={allImages[selectedImage]}
                 alt={`${product.name} - View ${selectedImage + 1}`}
-                className="w-full h-[300px] md:h-[500px] object-cover"
+                className="w-full h-[500px] md:h-[500px] object-cover"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -57,7 +57,7 @@ export default function ProductDetail() {
 
           {/* Thumbnail Images */}
           {allImages.length > 1 && (
-            <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2">
+            <div className="flex gap-2 md:gap-3 overflow-x-auto p-2 ps-0">
               {allImages.map((img, index) => (
                 <button
                   key={index}
@@ -99,10 +99,6 @@ export default function ProductDetail() {
             {product.limitedStock && (
               <span className="text-orange-500 font-semibold">Only 1 left</span>
             )}
-            <div>
-              <span className="text-gray-500">Product Id: </span>
-              <span className="font-medium">{product.id}</span>
-            </div>
           </div>
 
           {/* Price */}
@@ -181,6 +177,7 @@ export default function ProductDetail() {
         <h2 className="text-xl md:text-2xl p-3 border-b" style={{ color: 'var(--color-primary)' }}>More Information</h2>
         <div className="divide-y text-sm md:text-base">
           {[
+            { label: "Product Id", value: product.id },
             { label: 'Fabric', value: product.fabric },
             { label: 'Border Type', value: product.borderType },
             { label: 'Weave', value: product.weave },

@@ -8,11 +8,10 @@ export const products = [
     price: 7999,
     offerPrice: 5999,
     image:
-      `https://res.cloudinary.com/${cloudinaryDB}/image/upload/${imgResolution}/IMG_4572_dovznp.jpg`,
+      `https://res.cloudinary.com/${cloudinaryDB}/image/upload/${imgResolution}/ChatGPT_Image_May_22_2026_11_46_30_PM_t2hbvm.jpg`,
     images: [
       `https://res.cloudinary.com/${cloudinaryDB}/image/upload/${imgResolution}/IMG_4574_ycdz7j.jpg`,
       `https://res.cloudinary.com/${cloudinaryDB}/image/upload/${imgResolution}/IMG_9281_husfdv.jpg`,
-      `https://res.cloudinary.com/${cloudinaryDB}/image/upload/${imgResolution}/IMG_9273_jqpflb.jpg`,
       `https://res.cloudinary.com/${cloudinaryDB}/image/upload/${imgResolution}/IMG_9275_se90i8.jpg`,
 
     ],
