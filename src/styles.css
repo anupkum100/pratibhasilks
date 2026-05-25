@@ -6,33 +6,37 @@
    ======================================== */
 :root {
   /* Primary Colors */
-  --color-primary: #093C5D;        /* Deep Navy - navbar, footer, main buttons */
-  --color-secondary: #3B7597;      /* Ocean Blue - prices, CTA buttons, accents */
-  --color-accent: #5DF8D8;         /* Bright Cyan - hover states, highlights */
-  --color-background: #6FD1D7;     /* Turquoise - page background */
-  
+  --color-primary: #093C5D;
+  /* Deep Navy - navbar, footer, main buttons */
+  --color-secondary: #3B7597;
+  /* Ocean Blue - prices, CTA buttons, accents */
+  --color-accent: #5DF8D8;
+  /* Bright Cyan - hover states, highlights */
+  --color-background: #6FD1D7;
+  /* Turquoise - page background */
+
   /* Text Colors */
   --color-text-dark: #333333;
   --color-text-light: #ffffff;
   --color-text-muted: #6b7280;
-  
+
   /* UI Colors */
   --color-card-bg: #ffffff;
   --color-border: #e5e7eb;
-  
+
   /* Shadows */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
-  
+
   /* Border Radius */
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
   --radius-xl: 1.5rem;
   --radius-full: 9999px;
-  
+
   /* Transitions */
   --transition-fast: 150ms ease;
   --transition-normal: 300ms ease;
@@ -97,6 +101,7 @@ h4 {
   color: var(--color-text-light);
   transition: all var(--transition-normal);
 }
+
 .btn-primary:hover {
   background-color: var(--color-accent);
 }
@@ -106,19 +111,36 @@ h4 {
   color: var(--color-text-light);
   transition: all var(--transition-normal);
 }
+
 .btn-secondary:hover {
   background-color: var(--color-primary);
 }
 
 /* Text utilities */
-.text-primary { color: var(--color-primary); }
-.text-secondary { color: var(--color-secondary); }
-.text-accent { color: var(--color-accent); }
+.text-primary {
+  color: var(--color-primary);
+}
+
+.text-secondary {
+  color: var(--color-secondary);
+}
+
+.text-accent {
+  color: var(--color-accent);
+}
 
 /* Background utilities */
-.bg-primary { background-color: var(--color-primary); }
-.bg-secondary { background-color: var(--color-secondary); }
-.bg-accent { background-color: var(--color-accent); }
+.bg-primary {
+  background-color: var(--color-primary);
+}
+
+.bg-secondary {
+  background-color: var(--color-secondary);
+}
+
+.bg-accent {
+  background-color: var(--color-accent);
+}
 
 /* Gradient backgrounds */
 .gradient-primary-secondary {
@@ -126,3 +148,46 @@ h4 {
 }
 
 
+/* Invoice CSS  */
+.invoice-scale-wrapper {
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 8px;
+}
+
+.invoice-container {
+  width: 1200px;
+  background: white;
+  transform-origin: top center;
+  background: white;
+  padding: 0;
+}
+
+/* Desktop */
+.invoice-scale {
+  zoom: 1;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .invoice-scale {
+    zoom: 0.75;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .invoice-scale {
+    zoom: 0.52;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .invoice-scale {
+    zoom: 0.38;
+  }
+}

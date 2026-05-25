@@ -1,19 +1,14 @@
-const cloudinaryDB = "dkiauapz4"
-const imgResolution = "f_auto,q_auto"
-
 export const products = [
   {
     id: "SLK_1",
     name: "Tussar Silk",
     price: 7999,
     offerPrice: 5999,
-    image:
-      `https://res.cloudinary.com/${cloudinaryDB}/image/upload/${imgResolution}/ChatGPT_Image_May_22_2026_11_46_30_PM_t2hbvm.jpg`,
-    images: [
-      `https://res.cloudinary.com/${cloudinaryDB}/image/upload/${imgResolution}/IMG_4574_ycdz7j.jpg`,
-      `https://res.cloudinary.com/${cloudinaryDB}/image/upload/${imgResolution}/IMG_9281_husfdv.jpg`,
-      `https://res.cloudinary.com/${cloudinaryDB}/image/upload/${imgResolution}/IMG_9275_se90i8.jpg`,
-
+    mainImageId: "ChatGPT_Image_May_22_2026_11_46_30_PM_t2hbvm.jpg",
+    otherImageIds: [
+      "IMG_4574_ycdz7j.jpg",
+      "IMG_9281_husfdv.jpg",
+      "IMG_9275_se90i8.jpg"
     ],
     limitedStock: true,
     description: "Bhagalpuri tussar ghicha silk with madhubani painting.",
@@ -27,6 +22,174 @@ export const products = [
     categories: ["Silk Sarees", "New Arrival"],
     color: "Golden",
     occasion: "Work",
+  },
+
+  {
+    id: "SLK_2",
+    name: "Royal Blue Linen Silk",
+    price: 6499,
+    offerPrice: 4899,
+    mainImageId: "IMG_9281_husfdv.jpg",
+    otherImageIds: [
+      "IMG_9275_se90i8.jpg",
+      "ChatGPT_Image_May_22_2026_11_46_30_PM_t2hbvm.jpg"
+    ],
+    limitedStock: false,
+    description: "Elegant royal blue linen silk saree with subtle zari stripes.",
+    fabric: "Linen Silk",
+    borderType: "Minimal Zari",
+    weave: "Soft Handloom",
+    blouseIncluded: true,
+    blouseFabric: "Linen Silk",
+    blouseType: "Running Blouse",
+    length: "6.3 m",
+    categories: ["Office Wear", "Best Seller"],
+    color: "Blue",
+    occasion: "Office",
+  },
+
+  {
+    id: "SLK_3",
+    name: "Copper Tissue Silk",
+    price: 8999,
+    offerPrice: 6999,
+    mainImageId: "IMG_9275_se90i8.jpg",
+    otherImageIds: [
+      "IMG_4574_ycdz7j.jpg",
+      "IMG_9281_husfdv.jpg"
+    ],
+    limitedStock: true,
+    description: "Premium copper toned tissue silk saree with handcrafted border.",
+    fabric: "Tissue Silk",
+    borderType: "Temple Border",
+    weave: "Traditional",
+    blouseIncluded: true,
+    blouseFabric: "Silk",
+    blouseType: "Attached",
+    length: "6.5 m",
+    categories: ["Wedding Collection", "Luxury"],
+    color: "Copper",
+    occasion: "Wedding",
+  },
+
+  {
+    id: "SLK_4",
+    name: "Madhubani Heritage Silk",
+    price: 9999,
+    offerPrice: 7499,
+    mainImageId: "ChatGPT_Image_May_22_2026_11_46_30_PM_t2hbvm.jpg",
+    otherImageIds: [
+      "IMG_9275_se90i8.jpg",
+      "IMG_9281_husfdv.jpg"
+    ],
+    limitedStock: true,
+    description: "Authentic heritage silk saree inspired by traditional Madhubani art.",
+    fabric: "Pure Silk",
+    borderType: "Art Border",
+    weave: "Handcrafted",
+    blouseIncluded: true,
+    blouseFabric: "Silk",
+    blouseType: "Attached",
+    length: "6.5 m",
+    categories: ["Heritage", "Exclusive"],
+    color: "Beige",
+    occasion: "Festive",
+  },
+
+  {
+    id: "SLK_5",
+    name: "Golden Banarasi Silk",
+    price: 11999,
+    offerPrice: 8999,
+    mainImageId: "IMG_4574_ycdz7j.jpg",
+    otherImageIds: [
+      "IMG_9281_husfdv.jpg",
+      "ChatGPT_Image_May_22_2026_11_46_30_PM_t2hbvm.jpg"
+    ],
+    limitedStock: true,
+    description: "Traditional Banarasi silk saree with luxurious golden weaving.",
+    fabric: "Banarasi Silk",
+    borderType: "Heavy Zari",
+    weave: "Banarasi",
+    blouseIncluded: true,
+    blouseFabric: "Banarasi Silk",
+    blouseType: "Running Blouse",
+    length: "6.4 m",
+    categories: ["Wedding", "Premium"],
+    color: "Gold",
+    occasion: "Reception",
+  },
+
+  {
+    id: "SLK_6",
+    name: "Classic Handloom Saree",
+    price: 5499,
+    offerPrice: 3999,
+    mainImageId: "IMG_9281_husfdv.jpg",
+    otherImageIds: [
+      "IMG_4574_ycdz7j.jpg",
+      "IMG_9275_se90i8.jpg"
+    ],
+    limitedStock: false,
+    description: "Simple and elegant handloom saree for daily graceful styling.",
+    fabric: "Cotton Silk",
+    borderType: "Simple Border",
+    weave: "Handloom",
+    blouseIncluded: true,
+    blouseFabric: "Cotton Silk",
+    blouseType: "Attached",
+    length: "6.2 m",
+    categories: ["Daily Wear", "Affordable"],
+    color: "Turquoise",
+    occasion: "Casual",
+  },
+
+  {
+    id: "SLK_7",
+    name: "Festive Kanjivaram Silk",
+    price: 13999,
+    offerPrice: 10999,
+    mainImageId: "IMG_9275_se90i8.jpg",
+    otherImageIds: [
+      "IMG_9281_husfdv.jpg",
+      "IMG_4574_ycdz7j.jpg"
+    ],
+    limitedStock: true,
+    description: "Rich festive Kanjivaram silk saree crafted for grand celebrations.",
+    fabric: "Kanjivaram Silk",
+    borderType: "Heavy Temple Border",
+    weave: "Traditional South Silk",
+    blouseIncluded: true,
+    blouseFabric: "Silk",
+    blouseType: "Running",
+    length: "6.5 m",
+    categories: ["Festive", "Bridal"],
+    color: "Maroon",
+    occasion: "Festival",
+  },
+
+  {
+    id: "SLK_8",
+    name: "Elegant Beige Silk",
+    price: 7299,
+    offerPrice: 5699,
+    mainImageId: "ChatGPT_Image_May_22_2026_11_46_30_PM_t2hbvm.jpg",
+    otherImageIds: [
+      "IMG_4574_ycdz7j.jpg",
+      "IMG_9275_se90i8.jpg"
+    ],
+    limitedStock: false,
+    description: "Soft beige silk saree with elegant woven floral patterns.",
+    fabric: "Soft Silk",
+    borderType: "Designer Border",
+    weave: "Machine Handloom Finish",
+    blouseIncluded: true,
+    blouseFabric: "Soft Silk",
+    blouseType: "Attached",
+    length: "6.3 m",
+    categories: ["Elegant Wear", "Trending"],
+    color: "Beige",
+    occasion: "Party",
   }
 ];
 

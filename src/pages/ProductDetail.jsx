@@ -4,13 +4,14 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { PS_EMAIL, PS_PHONE, PS_PHONE_WHATSAPP } from "../data/constants";
 import { products } from "../data/products";
+import { getImageFromId } from "../data/util";
 
 export default function ProductDetail() {
   const { id } = useParams();
   const product = products.find(p => p.id === id);
 
   // Get all images (main image + additional images)
-  const allImages = [product?.image, ...(product?.images || [])];
+  const allImageIds = [product?.mainImageId, ...(product?.otherImageIds || [])];
   const [selectedImage, setSelectedImage] = useState(0);
 
   const discount = product?.offerPrice ? Math.round(((product?.price - product?.offerPrice) / product?.price) * 100) : 0;
@@ -44,9 +45,9 @@ export default function ProductDetail() {
             <AnimatePresence mode="wait">
               <motion.img
                 key={selectedImage}
-                src={allImages[selectedImage]}
+                src={getImageFromId(allImageIds[selectedImage])}
                 alt={`${product.name} - View ${selectedImage + 1}`}
-                className="w-full h-[500px] md:h-[500px] object-cover"
+                className="w-full h-[500px] md:h-[700px] object-cover"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -56,9 +57,9 @@ export default function ProductDetail() {
           </div>
 
           {/* Thumbnail Images */}
-          {allImages.length > 1 && (
-            <div className="flex gap-2 md:gap-3 overflow-x-auto p-2 ps-0">
-              {allImages.map((img, index) => (
+          {allImageIds.length > 1 && (
+            <div className="flex gap-2 md:gap-3 overflow-x-auto p-2">
+              {allImageIds.map((imgId, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
@@ -72,7 +73,7 @@ export default function ProductDetail() {
                 >
                   <img
                     loading="lazy"
-                    src={img}
+                    src={getImageFromId(imgId)}
                     alt={`${product.name} thumbnail ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
@@ -169,33 +170,34 @@ export default function ProductDetail() {
               </span>
             ))}
           </div>
+          {/* More Information Table */}
+          <div className="mt-4 md:mt-12 overflow-hidden">
+            {/* <h2 className="text-xl md:text-2xl p-3 border-b" style={{ color: 'var(--color-primary)' }}>More Information</h2> */}
+            <div className="divide-y text-sm md:text-base">
+              {[
+                { label: "Product Id", value: product.id },
+                { label: 'Fabric', value: product.fabric },
+                { label: 'Border Type', value: product.borderType },
+                { label: 'Weave', value: product.weave },
+                { label: 'Blouse Included', value: product.blouseIncluded ? 'Yes' : 'No' },
+                { label: 'Blouse Fabric', value: product.blouseFabric },
+                { label: 'Blouse Type', value: product.blouseType },
+                { label: 'Length', value: product.length },
+              ].filter(item => item.value).map((item, index) => (
+                <div key={index} className="flex sm:flex-row">
+                  <div className="w-full sm:w-1/3 p-2 md:p-2 font-medium">{item.label}</div>
+                  <div className="w-full sm:w-2/3 p-2 md:p-2 text-gray-600">{item.value || "NA"}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* More Information Table */}
-      <div className="mt-4 md:mt-12 rounded-xl md:rounded-2xl shadow-xl overflow-hidden">
-        <h2 className="text-xl md:text-2xl p-3 border-b" style={{ color: 'var(--color-primary)' }}>More Information</h2>
-        <div className="divide-y text-sm md:text-base">
-          {[
-            { label: "Product Id", value: product.id },
-            { label: 'Fabric', value: product.fabric },
-            { label: 'Border Type', value: product.borderType },
-            { label: 'Weave', value: product.weave },
-            { label: 'Blouse Included', value: product.blouseIncluded ? 'Yes' : 'No' },
-            { label: 'Blouse Fabric', value: product.blouseFabric },
-            { label: 'Blouse Type', value: product.blouseType },
-            { label: 'Length', value: product.length },
-          ].filter(item => item.value).map((item, index) => (
-            <div key={index} className="flex sm:flex-row">
-              <div className="w-full sm:w-1/3 p-2 md:p-3 font-medium">{item.label}</div>
-              <div className="w-full sm:w-2/3 p-2 md:p-3 text-gray-600">{item.value || "NA"}</div>
-            </div>
-          ))}
-        </div>
-      </div>
+
 
       {/* Contact & Help Section */}
-      <div className="mt-8 md:mt-12 bg-white rounded-xl md:rounded-2xl shadow-lg p-5 md:p-8">
+      <div className="mt-8 md:mt-12 p-5 md:p-8">
         <h2 className="text-xl md:text-2xl mb-4 md:mb-6" style={{ color: 'var(--color-primary)' }}>Have any Queries?</h2>
         <p className="text-gray-600 mb-4 md:mb-6 text-sm md:text-base">We're here to help! Feel free to reach out to our customer care executives</p>
 

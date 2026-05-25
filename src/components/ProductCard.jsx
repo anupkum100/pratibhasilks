@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { getImageFromId } from "../data/util";
 
 export default function ProductCard({ product }) {
   // Flag badge configuration
@@ -48,7 +49,7 @@ export default function ProductCard({ product }) {
 
         <img
           loading="lazy"
-          src={product.image}
+          src={getImageFromId(product.mainImageId)}
           className={`h-40 md:h-80 w-full object-cover ${product.sold ? 'grayscale' : ''}`}
           alt={product.name}
         />

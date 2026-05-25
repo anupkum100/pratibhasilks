@@ -9,6 +9,7 @@ import Cart from "./pages/Cart";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import PageNotFound from "./pages/PageNotFound";
+import InvoicePage from "./pages/InvoicePage";
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/invoice/:invoiceId" element={<InvoicePage />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
       <Footer />
