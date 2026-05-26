@@ -15,19 +15,19 @@ export default function InvoiceHeader({ invoice }) {
                     Drape Yourself in Elegance
                 </p>
 
-                <div className="mt-5 text-sm space-y-1 text-gray-200">
+                <div className="mt-2 text-sm space-y-1 text-gray-200">
                     <p>Pune, Maharashtra</p>
                     <p>{PS_EMAIL}</p>
                     <p>{PS_PHONE}</p>
                 </div>
             </div>
 
-            <div className="bg-white/10 rounded-2xl p-5 backdrop-blur-md">
-                <h2 className="text-2xl mb-3 text-white">
+            <div className="bg-white/10 rounded-xl p-2 backdrop-blur-md">
+                <h3 className="text-2xl text-white">
                     INVOICE
-                </h2>
+                </h3>
 
-                <div className="space-y-2 text-sm">
+                <div className="space-y-1 text-sm">
                     <p>
                         <span className="text-[var(--color-accent)]">
                             Invoice ID:
