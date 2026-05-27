@@ -47,7 +47,7 @@ export default function ProductDetail() {
                 key={selectedImage}
                 src={getImageFromId(allImageIds[selectedImage])}
                 alt={`${product.name} - View ${selectedImage + 1}`}
-                className="w-full h-[500px] md:h-[700px] object-cover"
+                className="w-full h-[auto] md:h-[600px] object-cover"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}

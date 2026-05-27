@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { Filter, X, ChevronDown, ChevronUp } from "lucide-react";
 import ProductCard from "../components/ProductCard";
-import { products, filterOptions } from "../data/products";
+import { products } from "../data/products";
+import { filterOptions } from "../data/util";
 
 export default function Products() {
   const [filters, setFilters] = useState({
@@ -169,18 +170,20 @@ export default function Products() {
                 <div className="flex flex-wrap gap-2 mt-2">
                   {filterOptions.colors.map(color => (
                     <button
+                      title={color.name}
                       key={color}
-                      onClick={() => toggleFilter('colors', color)}
+                      onClick={() => toggleFilter('colors', color.name)}
+                      style={{ backgroundColor: color.hex, height: 30, width: 30, padding: 0 }}
                       className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border-2 transition-all ${filters.colors.includes(color)
                         ? 'border-gray-800 bg-gray-100'
                         : 'border-gray-200 hover:border-gray-300'
                         }`}
                     >
-                      <span
+                      {/* <span
                         className="w-3 h-3 rounded-full border border-gray-300"
-                        style={{ backgroundColor: colorDisplay[color] }}
-                      />
-                      {color}
+                        style={{ backgroundColor: color }}
+                      /> */}
+                      {/* {color.name} */}
                     </button>
                   ))}
                 </div>
@@ -249,7 +252,7 @@ export default function Products() {
 
           {/* Products */}
           {filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               {filteredProducts.map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}

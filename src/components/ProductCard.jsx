@@ -50,11 +50,11 @@ export default function ProductCard({ product }) {
         <img
           loading="lazy"
           src={getImageFromId(product.mainImageId)}
-          className={`h-40 md:h-80 w-full object-cover ${product.sold ? 'grayscale' : ''}`}
+          className={` w-full object-cover ${product.sold ? 'grayscale' : ''}`}
           alt={product.name}
         />
         <div className="p-3 md:p-4">
-          <h3 className="text-base md:text-xl">{product.name}</h3>
+          <h3 className="text-base md:text-xl" style={{ color: 'var(--color-secondary)' }}>{product.name}</h3>
           <div className="mt-1">
             {product.offerPrice ? (
               <>
