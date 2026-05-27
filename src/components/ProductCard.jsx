@@ -11,9 +11,9 @@ export default function ProductCard({ product }) {
     if (product.lastChance) {
       return { text: "Last Chance!", bgColor: "var(--color-accent)", textColor: "#333" };
     }
-    if (product.limitedStock) {
-      return { text: "Limited Stock", bgColor: "var(--color-primary)", textColor: "#fff" };
-    }
+    // if (product.limitedStock) {
+    //   return { text: "Limited Stock", bgColor: "var(--color-primary)", textColor: "#fff" };
+    // }
     return null;
   };
 

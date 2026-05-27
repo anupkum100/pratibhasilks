@@ -4,10 +4,9 @@ export const products = [
     name: "Madhubani Heritage Silk",
     price: 9999,
     offerPrice: 7499,
-    mainImageId: "B6CB5BDF-E017-489F-903D-CB8E945A2249_yz9mrr.jpg",
+    mainImageId: "Blue_music_zaikn1.png",
     otherImageIds: [
-      // "IMG_9275_se90i8.jpg",
-      // "IMG_9281_husfdv.jpg"
+      "B6CB5BDF-E017-489F-903D-CB8E945A2249_yz9mrr.jpg",
     ],
     limitedStock: true,
     description: "Authentic heritage silk saree inspired by traditional Madhubani art.",
@@ -27,8 +26,9 @@ export const products = [
     name: "Royal Blue Linen Silk",
     price: 6499,
     offerPrice: 4899,
-    mainImageId: "B3759FEB-824A-404C-A3AE-31B518CE6499_m6x4qb.jpg",
+    mainImageId: "Black_Elephant_py4ovw.png",
     otherImageIds: [
+      "B3759FEB-824A-404C-A3AE-31B518CE6499_m6x4qb.jpg",
       "e62c543e-820c-471f-bd0d-9d3787c8a2fe_wemtxn.jpg",
     ],
     limitedStock: false,
@@ -51,9 +51,10 @@ export const products = [
     name: "Copper Tissue Silk",
     price: 8999,
     offerPrice: 6999,
-    mainImageId: "5A4C6B2F-B63F-4AFF-B17F-D83FEB27D73D_tyw8xq.jpg",
+    mainImageId: "Blue_red_bpiowl.png",
     otherImageIds: [
       "34a0e9f9-26f7-4b7a-9fe9-9c4df7eb808b_ypljem.jpg",
+      "5A4C6B2F-B63F-4AFF-B17F-D83FEB27D73D_tyw8xq.jpg",
     ],
     limitedStock: true,
     description: "Premium copper toned tissue silk saree with handcrafted border.",
@@ -74,10 +75,9 @@ export const products = [
     name: "Madhubani Heritage Silk",
     price: 9999,
     offerPrice: 7499,
-    mainImageId: "5148D76C-BD78-4364-83C6-D8FFA92DE7D3_m5gnwa.jpg",
+    mainImageId: "Red_Tussar_siifrt.png",
     otherImageIds: [
-      // "IMG_9275_se90i8.jpg",
-      // "IMG_9281_husfdv.jpg"
+      "5148D76C-BD78-4364-83C6-D8FFA92DE7D3_m5gnwa.jpg",
     ],
     limitedStock: true,
     description: "Authentic heritage silk saree inspired by traditional Madhubani art.",
@@ -119,7 +119,7 @@ export const products = [
     name: "Tussar Silk",
     price: 7999,
     offerPrice: 5999,
-    mainImageId: "ChatGPT_Image_May_22_2026_11_46_30_PM_t2hbvm.jpg",
+    mainImageId: "Tussar_zh8yfj.png", // "ChatGPT_Image_May_22_2026_11_46_30_PM_t2hbvm.jpg",
     otherImageIds: [
       "IMG_4574_ycdz7j.jpg",
       "IMG_9281_husfdv.jpg",
