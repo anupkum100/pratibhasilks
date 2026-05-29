@@ -2,12 +2,12 @@ import { PS_EMAIL, PS_PHONE } from "../data/constants";
 
 export default function InvoiceHeader({ invoice }) {
 
-    return <div className="bg-[var(--color-primary)] text-white p-4">
+    return <div className="bg-[var(--color-primary)] p-4">
 
         <div className="flex justify-between gap-6">
 
             <div>
-                <h3 className="text-2xl tracking-wide text-white">
+                <h3 className="text-2xl tracking-wide">
                     Pratibha Silks
                 </h3>
 
@@ -23,7 +23,7 @@ export default function InvoiceHeader({ invoice }) {
             </div>
 
             <div className="bg-white/10 rounded-xl p-2 backdrop-blur-md">
-                <h3 className="text-2xl text-white">
+                <h3 className="text-2xl">
                     INVOICE
                 </h3>
 

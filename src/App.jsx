@@ -15,16 +15,18 @@ export default function App() {
   return (
     <div>
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/products" element={<Products />} />
-        <Route path="/product/:id" element={<ProductDetail />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/invoice/:invoiceId" element={<InvoicePage />} />
-        <Route path="*" element={<PageNotFound />} />
-      </Routes>
+      <div className="pt-[60px]">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/invoice/:invoiceId" element={<InvoicePage />} />
+          <Route path="*" element={<PageNotFound />} />
+        </Routes>
+      </div>
       <Footer />
     </div>
   );

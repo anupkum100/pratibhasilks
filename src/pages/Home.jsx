@@ -1,74 +1,191 @@
-import { useRef } from "react";
+import { useEffect, useState } from "react";
+import {
+  ArrowRight,
+  ShieldCheck,
+  Truck,
+  Sparkles,
+  Heart,
+  Search,
+  Instagram,
+} from "lucide-react";
+
+import ProductModal from "../components/Modal/ProductModal";
 import ProductCard from "../components/ProductCard";
-import HeroCarousel from "../components/Swiper";
-import { products } from "../data/products";
+import { apiCall } from "../serice/api";
+import { getImageFromId } from "../data/util";
+import Hero from "../components/Landing/Hero";
+import Trust from "../components/Landing/Trust";
+import Intro from "../components/Landing/Intro";
+import ShopByOccasion from "../components/Landing/ShopByOccasion";
+import Story from "../components/Landing/Story";
+import OtherInfo from "../components/Landing/OtherInfo";
+
+const moods = [
+  {
+    title: "For the First Look",
+    text: "Soft silks, graceful borders and quiet elegance.",
+    src: "moods1_mf9jjx.png",
+  },
+  {
+    title: "For the Celebration",
+    text: "Festive drapes made for lights, laughter and portraits.",
+    src: "moods2_ta60ok.png",
+  },
+  {
+    title: "For Everyday Royalty",
+    text: "Comfortable weaves with a premium handpicked feel.",
+    src: "moods3_n2dbym.png"
+  },
+];
 
 export default function Home() {
-  const heroRef = useRef(null);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState("add");
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const openAddModal = () => {
+    setModalMode("add");
+    setSelectedProduct(null);
+    setModalOpen(true);
+  };
+
+  const openEditModal = (product) => {
+    setModalMode("edit");
+    setSelectedProduct(product);
+    setModalOpen(true);
+  };
+
+  const fetchProducts = () => {
+    setLoading(true);
+
+    apiCall("/api/products").then((res) => {
+      setLoading(false);
+      !res.error ? setProducts(res.data || []) : setProducts([]);
+    });
+  };
+
+  const handleProductSubmit = async (payload) => {
+    const isEdit = modalMode === "edit";
+
+    const url = isEdit
+      ? `/api/products/${selectedProduct._id}`
+      : `/api/products`;
+
+    const res = await apiCall(url, isEdit ? "PUT" : "POST", payload);
+
+    if (res?.error) {
+      alert(res.message || "Something went wrong");
+      return;
+    }
+
+    setModalOpen(false);
+    fetchProducts();
+  };
+
+  const deleteProduct = async (product) => {
+    const confirmDelete = window.confirm(`Delete ${product.name}?`);
+    if (!confirmDelete) return;
+
+    const res = await apiCall(`/api/products/${product._id}`, "DELETE");
+
+    if (res?.error) {
+      alert(res.message || "Failed to delete product");
+      return;
+    }
+
+    fetchProducts();
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const featuredProducts = products.slice(0, 4);
 
   return (
-    <div>
-      <HeroCarousel />
-
-      <section className="max-w-7xl mx-auto py-10 sm:py-16 md:py-20 px-4 sm:px-5">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl mb-6 sm:mb-8 md:mb-10 text-center">
-          <span style={{ color: "var(--color-primary)" }}>New</span>{" "}
-          <span style={{ color: "var(--color-secondary)" }}>Arrivals</span>
-        </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+    <main className="bg-[#F8F3EC] text-[#181818] overflow-hidden">
+      {/* MOBILE LUXURY TOP BAR */}
+      <div className="hidden sticky top-0 z-50 bg-[#F8F3EC]/90 backdrop-blur-xl border-b border-black/5 px-4 py-3 flex items-center justify-between">
+        <div>
+          <p className="text-[10px] tracking-[0.35em] uppercase text-[#9A7B4F]">
+            Pratibha
+          </p>
+          <h1 className="font-serif text-xl leading-none">Silks</h1>
         </div>
-      </section>
 
-      {/* Features Section */}
-      <section className="bg-white py-2 sm:py-12">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 px-4 sm:px-5">
-          <div className="text-center p-2 sm:p-6">
-            <div
-              className="w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4"
-              style={{ backgroundColor: "var(--color-accent)" }}
-            >
-              <span className="text-xl sm:text-2xl">✨</span>
-            </div>
-            <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">
-              Premium Quality
-            </h3>
-            <p className="text-sm sm:text-base text-gray-600">
-              Handpicked finest silk and fabrics
-            </p>
-          </div>
-          <div className="text-center p-2 sm:p-6">
-            <div
-              className="w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4"
-              style={{ backgroundColor: "var(--color-primary)" }}
-            >
-              <span className="text-xl sm:text-2xl">🎁</span>
-            </div>
-            <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">
-              Free Shipping
-            </h3>
-            <p className="text-sm sm:text-base text-gray-600">
-              On orders above ₹5000
-            </p>
-          </div>
-          <div className="text-center p-2 sm:p-6 sm:col-span-2 md:col-span-1">
-            <div
-              className="w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4"
-              style={{ backgroundColor: "var(--color-secondary)" }}
-            >
-              <span className="text-xl sm:text-2xl">💎</span>
-            </div>
-            <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">
-              Authentic Designs
-            </h3>
-            <p className="text-sm sm:text-base text-gray-600">
-              Traditional Indian craftsmanship
-            </p>
-          </div>
+        <div className="flex gap-3">
+          <Search size={20} />
+          <Instagram size={20} />
         </div>
-      </section>
-    </div>
+      </div>
+
+      <Hero />
+
+      <Trust />
+
+      <Intro />
+
+      <ShopByOccasion />
+
+      <Story />
+
+      <OtherInfo />
+
+      {/* FEATURED PRODUCTS */}
+      {/* <section className="px-5 pb-20 max-w-7xl mx-auto">
+        <div className="flex items-end justify-between mb-8">
+          <div>
+            <p className="text-xs tracking-[0.45em] uppercase text-[#9A7B4F]">
+              New Arrivals
+            </p>
+            <h2 className="font-serif text-5xl mt-2">Freshly Draped</h2>
+          </div>
+
+          <button
+            onClick={openAddModal}
+            className="hidden md:block bg-black text-white px-6 py-3 rounded-full"
+          >
+            + Add Product
+          </button>
+        </div>
+
+        <button
+          onClick={openAddModal}
+          className="md:hidden w-full mb-5 bg-black text-white px-6 py-3 rounded-full"
+        >
+          + Add Product
+        </button>
+
+        <ProductModal
+          isOpen={modalOpen}
+          mode={modalMode}
+          product={selectedProduct}
+          onClose={() => setModalOpen(false)}
+          onSubmit={handleProductSubmit}
+        />
+
+        {loading ? (
+          <div className="py-20 text-center text-[#6B5F54]">
+            Loading collection...
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+            {featuredProducts.map((product) => (
+              <ProductCard
+                key={product._id || product.sku}
+                product={product}
+                isAdmin={true}
+                onEdit={openEditModal}
+                onDelete={deleteProduct}
+              />
+            ))}
+          </div>
+        )}
+      </section> */}
+
+    </main>
   );
 }

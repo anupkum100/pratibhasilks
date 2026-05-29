@@ -1,6 +1,6 @@
 export const products = [
   {
-    id: "SLK_1",
+    sku: "SLK_1",
     name: "Madhubani Heritage Silk",
     price: 9999,
     offerPrice: 7499,
@@ -22,7 +22,7 @@ export const products = [
     occasion: "Festive",
   },
   {
-    id: "SLK_2",
+    sku: "SLK_2",
     name: "Royal Blue Linen Silk",
     price: 6499,
     offerPrice: 4899,
@@ -47,7 +47,7 @@ export const products = [
   },
 
   {
-    id: "SLK_3",
+    sku: "SLK_3",
     name: "Copper Tissue Silk",
     price: 8999,
     offerPrice: 6999,
@@ -71,7 +71,7 @@ export const products = [
     occasion: "Wedding",
   },
   {
-    id: "SLK_4",
+    sku: "SLK_4",
     name: "Madhubani Heritage Silk",
     price: 9999,
     offerPrice: 7499,
@@ -94,7 +94,7 @@ export const products = [
     occasion: "Festive",
   },
   {
-    id: "SLK_5",
+    sku: "SLK_5",
     name: "Banana Silk",
     price: 2999,
     offerPrice: 2599,
@@ -115,7 +115,7 @@ export const products = [
     occasion: "Festive",
   },
   {
-    id: "SLK_6",
+    sku: "SLK_6",
     name: "Tussar Silk",
     price: 7999,
     offerPrice: 5999,

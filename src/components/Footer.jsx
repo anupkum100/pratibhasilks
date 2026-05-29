@@ -1,62 +1,184 @@
+import {
+  Instagram,
+  MessageCircleCode,
+  ArrowUpRight
+} from "lucide-react";
 
-import { Instagram, MessageCircleCode } from "lucide-react"
-import { PS_EMAIL, PS_PHONE, PS_PHONE_WHATSAPP } from "../data/constants"
+import {
+  PS_EMAIL,
+  PS_PHONE,
+  PS_PHONE_WHATSAPP,
+} from "../data/constants";
 
 export default function Footer() {
   return (
-    <footer className="text-white mt-20 p-6" style={{ backgroundColor: 'var(--color-primary)' }}>
-      <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-10">
+    <footer className="bg-[#111111] text-white mt-24 overflow-hidden">
+
+      {/* Luxury CTA Section */}
+      <div className="max-w-7xl mx-auto px-6 md:px-10 py-20 border-b border-white/10">
+
+        <p className="text-xs tracking-[0.45em] uppercase text-[#C9A86A] mb-4">
+          Pratibha Silks
+        </p>
+
+        <h2 className="font-serif text-4xl md:text-7xl leading-none max-w-4xl">
+          Sarees chosen with emotion,
+          <br />
+          not algorithms.
+        </h2>
+
+        <p className="text-white/60 mt-8 max-w-xl text-lg">
+          Handpicked drapes crafted to make every occasion
+          feel unforgettable.
+        </p>
+
+      </div>
+
+      {/* Main Footer */}
+      <div className="max-w-7xl mx-auto px-6 md:px-10 py-16 grid md:grid-cols-4 gap-12">
+
+        {/* Brand */}
         <div>
-          <h2 className="text-2xl mb-3 text-white">Pratibha Silks</h2>
-          <p>Timeless heritage, handcrafted for you.</p>
-        </div>
-        {/* Social Icons */}
-        <div className="flex gap-4">
-          <a
-            href="https://www.instagram.com/pratibhasilkssarees"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ height: 40, width: 40 }}
-            className="flex justify-center align-center bg-white/10 p-2 rounded-full hover:bg-[#F58529] hover:text-black transition duration-300"
-          >
-            <Instagram size={22} color="orange" />
-          </a>
 
-          {/* <a
-            href="https://www.instagram.com/pratibhasilkssarees"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ height: 40, width: 40 }}
-            className="flex justify-center align-center bg-white/10 p-2 rounded-full hover:bg-[#F58529] hover:text-black transition duration-300"
-          >
-            <Facebook size={22} />
-          </a> */}
+          <h3 className="font-serif text-3xl">
+            Pratibha Silks
+          </h3>
 
-          <a
-            href={`https://api.whatsapp.com/send?phone=${PS_PHONE_WHATSAPP}&text=Hello!`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ height: 40, width: 40 }}
-            className="flex justify-center align-center bg-white/10 p-2 rounded-full hover:bg-[#F58529] hover:text-black transition duration-300"
-          >
-            <MessageCircleCode size={22} color="green" />
-          </a>
+          <p className="mt-5 text-white/60 leading-7">
+            Celebrating India's weaving heritage through
+            thoughtfully curated sarees for every occasion.
+          </p>
 
         </div>
 
+        {/* Collections */}
         <div>
-          <h3 className="text-xl mb-2" style={{ color: 'var(--color-accent)' }}>Contact Us</h3>
-          <ul className="space-y-2">
-            <li>📍 Pune</li>
-            <li>📞  <a href={`tel:+${PS_PHONE}`}>{PS_PHONE}</a></li>
-            <li>✉️ <a href={`mailto:${PS_EMAIL}`}>{PS_EMAIL}</a></li>
-            <li>🕐 Mon-Sat: 10AM - 8PM</li>
+
+          <h4 className="uppercase tracking-[0.25em] text-xs text-[#C9A86A] mb-5">
+            Collections
+          </h4>
+
+          <ul className="space-y-3 text-white/70">
+            <li>Wedding Sarees</li>
+            <li>Festive Collection</li>
+            <li>Office Wear</li>
+            <li>Silk Sarees</li>
+            <li>New Arrivals</li>
           </ul>
+
         </div>
+
+        {/* Customer Care */}
+        <div>
+
+          <h4 className="uppercase tracking-[0.25em] text-xs text-[#C9A86A] mb-5">
+            Customer Care
+          </h4>
+
+          <ul className="space-y-3 text-white/70">
+            <li>Shipping Policy</li>
+            <li>Returns & Exchanges</li>
+            <li>Track Order</li>
+            <li>Invoice Verification</li>
+            <li>FAQ</li>
+          </ul>
+
+        </div>
+
+        {/* Contact */}
+        <div>
+
+          <h4 className="uppercase tracking-[0.25em] text-xs text-[#C9A86A] mb-5">
+            Connect
+          </h4>
+
+          <div className="space-y-4 text-white/70">
+
+            <p>Pune, Maharashtra</p>
+
+            <a
+              href={`tel:+${PS_PHONE}`}
+              className="block hover:text-white"
+            >
+              {PS_PHONE}
+            </a>
+
+            <a
+              href={`mailto:${PS_EMAIL}`}
+              className="block hover:text-white"
+            >
+              {PS_EMAIL}
+            </a>
+
+            <p>Mon – Sat · 10 AM – 8 PM</p>
+
+          </div>
+
+          {/* Social */}
+          <div className="flex gap-4 mt-8">
+
+            <a
+              href="https://www.instagram.com/pratibhasilkssarees"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="
+                h-12 w-12
+                rounded-full
+                border border-white/10
+                flex items-center justify-center
+                hover:bg-white
+                hover:text-black
+                transition-all
+              "
+            >
+              <Instagram size={20} />
+            </a>
+
+            <a
+              href={`https://api.whatsapp.com/send?phone=${PS_PHONE_WHATSAPP}&text=Hello!`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="
+                h-12 w-12
+                rounded-full
+                border border-white/10
+                flex items-center justify-center
+                hover:bg-white
+                hover:text-black
+                transition-all
+              "
+            >
+              <MessageCircleCode size={20} />
+            </a>
+
+          </div>
+
+        </div>
+
       </div>
-      <div className="max-w-7xl mx-auto mt-8 pt-6 border-t border-white/20 text-center">
-        <p className="text-sm">© 2026 Pratibha Silks. Crafted with ❤️ in India</p>
+
+      {/* Bottom Bar */}
+      <div className="border-t border-white/10">
+
+        <div className="max-w-7xl mx-auto px-6 md:px-10 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+
+          <p className="text-white/40 text-sm">
+            © 2026 Pratibha Silks. All Rights Reserved.
+          </p>
+
+          <div className="flex gap-6 text-sm text-white/40">
+            <span>Privacy Policy</span>
+            <span>Terms of Service</span>
+            <span className="flex items-center gap-1">
+              Made in India
+              <ArrowUpRight size={14} />
+            </span>
+          </div>
+
+        </div>
+
       </div>
+
     </footer>
-  )
+  );
 }

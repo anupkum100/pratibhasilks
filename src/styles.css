@@ -6,72 +6,14 @@
    ======================================== */
 :root {
   /* Primary Colors */
-  --color-primary: #093C5D;
+  --color--primary: #1B2430;
   /* Deep Navy - navbar, footer, main buttons */
-  --color-secondary: #3B7597;
+  --color--secondary: #81694D;
   /* Ocean Blue - prices, CTA buttons, accents */
-  --color-accent: #5DF8D8;
+  --color--accent: #C5A572;
   /* Bright Cyan - hover states, highlights */
-  --color-background: #6FD1D7;
-  /* Turquoise - page background */
-
-  /* Text Colors */
-  --color-text-dark: #333333;
-  --color-text-light: #ffffff;
-  --color-text-muted: #6b7280;
-
-  /* UI Colors */
-  --color-card-bg: #ffffff;
-  --color-border: #e5e7eb;
-
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
-
-  /* Border Radius */
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.5rem;
-  --radius-full: 9999px;
-
-  /* Transitions */
-  --transition-fast: 150ms ease;
-  --transition-normal: 300ms ease;
+  --color--background: #FAF7F2;
 }
-
-/* ========================================
-   ALTERNATIVE THEMES (uncomment to use)
-   ======================================== */
-
-/* Theme: Royal Purple
-:root {
-  --color-primary: #6B46C1;
-  --color-secondary: #ED64A6;
-  --color-accent: #F6E05E;
-  --color-background: #FAF5FF;
-}
-*/
-
-/* Theme: Ocean Blue
-:root {
-  --color-primary: #2B6CB0;
-  --color-secondary: #E53E3E;
-  --color-accent: #ECC94B;
-  --color-background: #EBF8FF;
-}
-*/
-
-/* Theme: Earthy Brown
-:root {
-  --color-primary: #8B5A2B;
-  --color-secondary: #C53030;
-  --color-accent: #D69E2E;
-  --color-background: #FFFAF0;
-}
-*/
 
 /* ========================================
    BASE STYLES
@@ -88,7 +30,7 @@ h4 {
   font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
   font-family: "Proza Libre", sans-serif;
   font-weight: 100;
-  color: var(--color-text-dark);
+  /* color: #333; */
 }
 
 /* ========================================
@@ -293,4 +235,24 @@ h4 {
     box-shadow: none;
     border-radius: 0;
   }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.font-serif {
+  font-family: "Cormorant Garamond", Georgia, serif;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
