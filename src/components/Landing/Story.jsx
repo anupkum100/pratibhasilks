@@ -2,13 +2,13 @@ export default function Story() {
     return <section className="grid md:grid-cols-2 bg-[#181818] text-white">
         <div className="min-h-[560px] relative">
             <img
-                src={"https://png.pngtree.com/png-vector/20250408/ourmid/pngtree-stack-of-colorful-satin-fabrics-in-vibrant-hues-png-image_15939425.png"}
+                src={"https://png.pngtree.com/png-vector/20251028/ourmid/pngtree-elegant-black-saree-with-golden-embroidered-border-png-image_17846842.webp"}
                 alt="Saree story"
                 className="absolute inset-0 w-full h-full object-contain"
             />
         </div>
 
-        <div className="px-6 md:px-16 py-20 flex flex-col justify-center">
+        <div className="px-6 md:px-16 py-10 flex flex-col justify-center">
             <p className="text-xs tracking-[0.45em] uppercase text-[#D8B46A]">
                 Why It Feels Premium
             </p>
