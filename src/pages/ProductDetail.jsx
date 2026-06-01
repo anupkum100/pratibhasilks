@@ -246,7 +246,7 @@ Please share more details.`;
                 )}
               </div>
 
-              <div className="mt-6">
+              <div className="hidden mt-6">
                 {productDetails.offerPrice ? (
                   <div className="flex items-end gap-3 flex-wrap">
                     <p className="text-3xl md:text-4xl font-semibold">
