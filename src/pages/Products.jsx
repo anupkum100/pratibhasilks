@@ -239,7 +239,7 @@ export default function Products() {
 
             {/* Products */}
             {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-7">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 md:gap-7">
                 {filteredProducts.map((product) => (
                   <ProductCard
                     key={product._id || product.sku || product.id}
@@ -437,8 +437,8 @@ function PremiumCheckbox({ label, checked, onChange }) {
     <label className="flex items-center justify-between gap-3 cursor-pointer group">
       <span
         className={`text-sm transition ${checked
-            ? "text-[#181818] font-medium"
-            : "text-[#6B5F54] group-hover:text-[#181818]"
+          ? "text-[#181818] font-medium"
+          : "text-[#6B5F54] group-hover:text-[#181818]"
           }`}
       >
         {label}

@@ -2,34 +2,34 @@ import { getImageFromId } from "../../data/util";
 
 const occasions = [
     {
-        title: "For the First Look",
-        text: "Soft silks, graceful borders and quiet elegance.",
+        title: "For Weddings & Celebrations",
+        text: "Rich silks, statement borders and timeless drapes crafted for unforgettable moments.",
         src: "moods1_mf9jjx.png",
     },
     {
-        title: "For the Celebration",
-        text: "Festive drapes made for lights, laughter and portraits.",
+        title: "For Festivals & Traditions",
+        text: "Celebrate every ritual with vibrant colours, heritage weaves and festive elegance.",
         src: "moods2_ta60ok.png",
     },
     {
-        title: "For Everyday Royalty",
-        text: "Comfortable weaves with a premium handpicked feel.",
-        src: "moods3_n2dbym.png"
+        title: "For Office & Gatherings",
+        text: "Sophisticated textures and lightweight comfort designed for modern everyday grace.",
+        src: "moods3_n2dbym.png",
     },
     {
-        title: "For the First Look",
-        text: "Soft silks, graceful borders and quiet elegance.",
+        title: "For Housewarming & Family Events",
+        text: "Effortlessly elegant sarees that blend tradition, comfort and personal style.",
         src: "moods1_mf9jjx.png",
     },
     {
-        title: "For the Celebration",
-        text: "Festive drapes made for lights, laughter and portraits.",
+        title: "For Gifting Someone Special",
+        text: "Thoughtfully chosen drapes that carry stories, heritage and lasting memories.",
         src: "moods2_ta60ok.png",
     },
     {
-        title: "For Everyday Royalty",
-        text: "Comfortable weaves with a premium handpicked feel.",
-        src: "moods3_n2dbym.png"
+        title: "For Your Signature Collection",
+        text: "Exclusive pieces curated for women who appreciate artistry beyond fashion.",
+        src: "moods3_n2dbym.png",
     },
 ];
 

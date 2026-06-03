@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { getImageFromId } from "../../data/util";
 
 export default function Hero() {
@@ -36,9 +37,11 @@ export default function Hero() {
                 and made for moments that deserve attention.
             </p>
 
-            <button className="mt-8 bg-white text-black px-7 py-4 rounded-full inline-flex items-center gap-3 font-medium">
-                Enter the Collection <ArrowRight size={18} />
-            </button>
+            <Link to="/products">
+                <button className="mt-8 bg-white text-black px-7 py-4 rounded-full inline-flex items-center gap-3 font-medium">
+                    Enter the Collection <ArrowRight size={18} />
+                </button>
+            </Link>
         </div>
     </section>
 }

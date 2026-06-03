@@ -1,42 +1,15 @@
-import { useEffect, useState } from "react";
 import {
-  ArrowRight,
-  ShieldCheck,
-  Truck,
-  Sparkles,
-  Heart,
-  Search,
-  Instagram,
+  Instagram, Search
 } from "lucide-react";
-
-import ProductModal from "../components/Modal/ProductModal";
-import ProductCard from "../components/ProductCard";
-import { apiCall } from "../serice/api";
-import { getImageFromId } from "../data/util";
+import { useEffect, useState } from "react";
 import Hero from "../components/Landing/Hero";
-import Trust from "../components/Landing/Trust";
 import Intro from "../components/Landing/Intro";
+import OtherInfo from "../components/Landing/OtherInfo";
+import SareeTypesPreview from "../components/Landing/SareePreview";
 import ShopByOccasion from "../components/Landing/ShopByOccasion";
 import Story from "../components/Landing/Story";
-import OtherInfo from "../components/Landing/OtherInfo";
-
-const moods = [
-  {
-    title: "For the First Look",
-    text: "Soft silks, graceful borders and quiet elegance.",
-    src: "moods1_mf9jjx.png",
-  },
-  {
-    title: "For the Celebration",
-    text: "Festive drapes made for lights, laughter and portraits.",
-    src: "moods2_ta60ok.png",
-  },
-  {
-    title: "For Everyday Royalty",
-    text: "Comfortable weaves with a premium handpicked feel.",
-    src: "moods3_n2dbym.png"
-  },
-];
+import Trust from "../components/Landing/Trust";
+import { apiCall } from "../serice/api";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -131,6 +104,8 @@ export default function Home() {
       <ShopByOccasion />
 
       <Story />
+
+      <SareeTypesPreview />
 
       <OtherInfo />
 

@@ -6,8 +6,7 @@ const aboutImage =
 export default function About() {
   return (
     <main className="bg-[#F8F3EC] text-[#181818]">
-      {/* Story */}
-      <section className="px-5 pt-12 pb-8 md:pt-20 md:pb-14">
+      <section className="max-w-7xl mx-auto px-5 pt-10 md:pt-20 pb-10 md:pb-14">
         <div>
           <p className="text-xs tracking-[0.4em] uppercase text-[#9A7B4F]">
             The Story

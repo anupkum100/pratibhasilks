@@ -1,8 +1,10 @@
+import { getImageFromId } from "../../data/util";
+
 export default function Story() {
     return <section className="grid md:grid-cols-2 bg-[#181818] text-white">
         <div className="min-h-[560px] relative">
             <img
-                src={"https://png.pngtree.com/png-vector/20251028/ourmid/pngtree-elegant-black-saree-with-golden-embroidered-border-png-image_17846842.webp"}
+                src={getImageFromId("skeleton_a24yxr.png")}
                 alt="Saree story"
                 className="absolute inset-0 w-full h-full object-contain"
             />

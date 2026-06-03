@@ -12,7 +12,7 @@ import {
 
 export default function Footer() {
   return (
-    <footer className="bg-[#111111] text-white mt-24 overflow-hidden">
+    <footer className="bg-[#111111] text-white overflow-hidden">
 
       {/* Luxury CTA Section */}
       <div className="max-w-7xl mx-auto px-6 md:px-10 py-20 border-b border-white/10">

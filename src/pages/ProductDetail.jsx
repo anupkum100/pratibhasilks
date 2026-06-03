@@ -63,7 +63,7 @@ export default function ProductDetail() {
     {
       label: "Blouse",
       value: productDetails.blouseIncluded
-        ? "Included"
+        ? `Included/${productDetails.blouseColor}`
         : "Not Included",
       icon: "👗",
     },
@@ -246,7 +246,7 @@ Please share more details.`;
                 )}
               </div>
 
-              <div className="hidden mt-6">
+              <div className="mt-6">
                 {productDetails.offerPrice ? (
                   <div className="flex items-end gap-3 flex-wrap">
                     <p className="text-3xl md:text-4xl font-semibold">
@@ -284,7 +284,7 @@ Please share more details.`;
                   }`}
               >
                 <MessageCircle size={18} />
-                Enquire on WhatsApp
+                Order on WhatsApp
               </a>
 
               <div className="grid grid-cols-3 gap-3 mt-6">
