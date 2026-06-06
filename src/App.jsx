@@ -11,6 +11,12 @@ import Contact from "./pages/Contact";
 import PageNotFound from "./pages/PageNotFound";
 import InvoicePage from "./pages/InvoicePage";
 import SareeTypes from "./pages/SareeTypes";
+import ShippingPolicy from "./pages/CustomerCare/ShippingPolicy";
+import ReturnsExchanges from "./pages/CustomerCare/ReturnsExchanges";
+import TrackOrder from "./pages/CustomerCare/TrackOrder";
+import InvoiceVerification from "./pages/CustomerCare/InvoiceVerification";
+import FAQ from "./pages/CustomerCare/FAQ";
+
 
 export default function App() {
   return (
@@ -26,6 +32,13 @@ export default function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/saree-types" element={<SareeTypes />} />
           <Route path="/invoice/:invoiceId" element={<InvoicePage />} />
+
+          <Route path="/shipping-policy" element={<ShippingPolicy />} />
+          <Route path="/returns-exchanges" element={<ReturnsExchanges />} />
+          <Route path="/track-order" element={<TrackOrder />} />
+          <Route path="/invoice-verification" element={<InvoiceVerification />} />
+          <Route path="/faq" element={<FAQ />} />
+
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </div>

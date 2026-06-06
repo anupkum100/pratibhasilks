@@ -94,12 +94,12 @@ export default function ProductCard({
           </p>
 
           <div className="mt-4 flex flex-col gap-1">
-            <div className="hidden flex items-center gap-2 flex-wrap">
-              {product.offerPrice && (
+            <div className="flex items-center gap-2 flex-wrap">
+              {product.offerPrice ? (
                 <span className="text-xs md:text-sm text-[#9CA3AF] line-through">
                   ₹{product.price}
                 </span>
-              )}
+              ) : <></>}
 
               <span className="font-semibold text-sm md:text-base text-[#181818]">
                 ₹{sellingPrice}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Filter,
   X,
@@ -10,13 +10,36 @@ import {
 import ProductCard from "../components/ProductCard";
 import { products } from "../data/products";
 import { filterOptions } from "../data/util";
+import { useSearchParams } from "react-router-dom";
 
 export default function Products() {
+  const [searchParams] = useSearchParams();
+
+  const occasion = searchParams.get("occasion");
+  const fabric = searchParams.get("fabric");
+  const category = searchParams.get("category");
+
   const [filters, setFilters] = useState({
+    occasions: occasion ? [occasion] : [],
+    fabrics: fabric ? [fabric] : [],
+    categories: category ? [category] : [],
     colors: [],
-    fabrics: [],
-    occasions: [],
   });
+
+  useEffect(() => {
+    setFilters({
+      occasions: occasion ? [occasion] : [],
+      fabrics: fabric ? [fabric] : [],
+      categories: category ? [category] : [],
+      colors: [],
+    });
+  }, [searchParams])
+
+  // const [filters, setFilters] = useState({
+  //   colors: [],
+  //   fabrics: [],
+  //   occasions: [],
+  // });
 
   const [showFilters, setShowFilters] = useState(false);
 

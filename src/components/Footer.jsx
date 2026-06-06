@@ -3,6 +3,7 @@ import {
   MessageCircleCode,
   ArrowUpRight
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import {
   PS_EMAIL,
@@ -59,11 +60,21 @@ export default function Footer() {
           </h4>
 
           <ul className="space-y-3 text-white/70">
-            <li>Wedding Sarees</li>
-            <li>Festive Collection</li>
-            <li>Office Wear</li>
-            <li>Silk Sarees</li>
-            <li>New Arrivals</li>
+            <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/products?fabric=Pure Silk"><span>Pure Silk</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+              →
+            </span></Link></li>
+            <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/products?fabric=Mul Cotton"><span>Cotton</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+              →
+            </span></Link></li>
+            <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/products?occasion=Work"><span>Office Wear</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+              →
+            </span></Link></li>
+            <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/products?occasion=Festive"><span>Festive</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+              →
+            </span></Link></li>
+            <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/products?arrival=New"><span>New Arrivals</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+              →
+            </span></Link></li>
           </ul>
 
         </div>
@@ -76,11 +87,21 @@ export default function Footer() {
           </h4>
 
           <ul className="space-y-3 text-white/70">
-            <li>Shipping Policy</li>
-            <li>Returns & Exchanges</li>
-            <li>Track Order</li>
-            <li>Invoice Verification</li>
-            <li>FAQ</li>
+            <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/shipping-policy"><span>Shipping Policy</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+              →
+            </span></Link></li>
+            <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/returns-exchanges"><span>Returns & Exchanges</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+              →
+            </span></Link></li>
+            <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/track-order"><span>Track Order</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+              →
+            </span></Link></li>
+            <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/invoice-verification"><span>Invoice Verification</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+              →
+            </span></Link></li>
+            <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/faq"><span>FAQ</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+              →
+            </span></Link></li>
           </ul>
 
         </div>
