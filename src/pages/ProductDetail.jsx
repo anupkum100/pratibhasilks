@@ -22,6 +22,14 @@ import { products } from "../data/products";
 import { getImageFromId } from "../data/util";
 import { apiCall } from "../serice/api";
 
+const spriteViews = [
+  { label: "Full View", index: -1 },
+  { label: "View 1", index: 0 },
+  { label: "View 2", index: 1 },
+  { label: "View 3", index: 2 },
+  { label: "View 4", index: 3 },
+];
+
 export default function ProductDetail() {
   const { id } = useParams();
 
@@ -32,47 +40,39 @@ export default function ProductDetail() {
   const details = [
     {
       label: "Fabric",
-      value: productDetails.fabric,
-      icon: "🧵",
+      key: "fabric",
     },
     {
       label: "Weave",
-      value: productDetails.weave,
-      icon: "✨",
+      key: "weave",
     },
     {
       label: "Border",
-      value: productDetails.borderType,
-      icon: "🎨",
+      key: "borderType",
     },
     {
       label: "Length",
-      value: productDetails.length,
-      icon: "📏",
+      key: "length",
     },
     {
       label: "Occasion",
-      value: productDetails.occasion,
-      icon: "🎉",
+      key: "occasion",
     },
     {
       label: "Colour",
-      value: productDetails.color,
-      icon: "🎨",
+      key: "color",
     },
-    {
-      label: "Blouse",
-      value: productDetails.blouseIncluded
-        ? `Included/${productDetails.blouseColor}`
-        : "Not Included",
-      icon: "👗",
-    },
-    {
-      label: "Collection",
-      value: productDetails.categories?.[0],
-      icon: "⭐",
-    },
-  ].filter((item) => item.value);
+    // {
+    //   label: "Blouse",
+    //   value: productDetails.blouseIncluded
+    //     ? `Included/${productDetails.blouseColor}`
+    //     : "Not Included",
+    // },
+    // {
+    //   label: "Collection",
+    //   value: productDetails.categories?.[0],
+    // },
+  ].filter((item) => item.key);
 
   const fetchProductDetails = () => {
     setLoading(true);
@@ -175,7 +175,7 @@ Please share more details.`;
             <div className="relative rounded-[2rem] overflow-hidden bg-white shadow-[0_24px_70px_rgba(0,0,0,0.12)]">
 
               <AnimatePresence mode="wait">
-                <motion.img
+                {/* <motion.img
                   key={selectedImage}
                   src={getImageFromId(allImageIds[selectedImage])}
                   alt={`${productDetails.name} - View ${selectedImage + 1
@@ -185,11 +185,35 @@ Please share more details.`;
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.35 }}
+                /> */}
+                <SpriteImage
+                  src={getImageFromId(productDetails.mainImageId)}
+                  index={spriteViews[selectedImage].index}
+                  alt={`${productDetails.name} ${spriteViews[selectedImage].label}`}
+                  className="w-full aspect-[3/4]"
                 />
               </AnimatePresence>
             </div>
 
-            {allImageIds.length > 1 && (
+            {spriteViews.map((view, index) => (
+              <button
+                key={view.label}
+                onClick={() => setSelectedImage(index)}
+                className={`flex-shrink-0 w-20 h-24 me-2 rounded-2xl overflow-hidden ${selectedImage === index
+                  ? "ring-2 ring-[#181818] ring-offset-4 ring-offset-[#F8F3EC]"
+                  : "opacity-60 hover:opacity-100"
+                  }`}
+              >
+                <SpriteImage
+                  src={getImageFromId(productDetails.mainImageId)}
+                  index={view.index}
+                  alt={`${productDetails.name} ${view.label}`}
+                  className="w-full h-full"
+                />
+              </button>
+            ))}
+
+            {/* {allImageIds.length > 1 && (
               <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
                 {allImageIds.map((imgId, index) => (
                   <button
@@ -210,7 +234,7 @@ Please share more details.`;
                   </button>
                 ))}
               </div>
-            )}
+            )} */}
           </div>
 
           {/* Info */}
@@ -229,18 +253,16 @@ Please share more details.`;
                   SKU: {productDetails.sku}
                 </span>
 
-                {productDetails.limitedStock && (
-                  <span className="bg-[#FFF4E5] text-[#A15C00] px-4 py-2 rounded-full">
-                    Limited Stock
-                  </span>
-                )}
-
                 {productDetails.sold ? (
                   <span className="bg-red-50 text-red-700 px-4 py-2 rounded-full">
                     Out of Stock
                   </span>
                 ) : (
-                  <span className="bg-green-50 text-green-700 px-4 py-2 rounded-full">
+                  productDetails.limitedStock ? (
+                    <span className="bg-[#FFF4E5] text-[#A15C00] px-4 py-2 rounded-full">
+                      Limited Stock
+                    </span>
+                  ) : <span className="bg-green-50 text-green-700 px-4 py-2 rounded-full">
                     In Stock
                   </span>
                 )}
@@ -360,7 +382,7 @@ Please share more details.`;
                   </div>
 
                   <span className="font-semibold text-[#181818] text-sm md:text-base text-right">
-                    {item.value}
+                    {productDetails[item.key]}
                   </span>
 
                 </div>
@@ -428,5 +450,36 @@ function MiniTrust({ icon, title }) {
 
       <p className="text-xs">{title}</p>
     </div>
+  );
+}
+
+const getSpritePosition = (index) => {
+  const positions = [
+    "0% 0%",
+    "100% 0%",
+    "0% 100%",
+    "100% 100%",
+  ];
+
+  return positions[index] || "0% 0%";
+};
+
+function SpriteImage({ src, index, alt, className = "" }) {
+  const isOriginal = index === -1;
+
+  return (
+    <div
+      role="img"
+      aria-label={alt}
+      className={className}
+      style={{
+        backgroundImage: `url(${src})`,
+        backgroundSize: isOriginal ? "cover" : "200% 200%",
+        backgroundPosition: isOriginal
+          ? "center"
+          : getSpritePosition(index),
+        backgroundRepeat: "no-repeat",
+      }}
+    />
   );
 }

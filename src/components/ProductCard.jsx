@@ -48,7 +48,7 @@ export default function ProductCard({
             </div>
           )}
 
-          <div className="aspect-[3/4] overflow-hidden">
+          <div className="aspect-[4/7] overflow-hidden">
             <img
               loading="lazy"
               src={getImageFromId(product.mainImageId)}

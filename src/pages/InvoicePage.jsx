@@ -69,7 +69,7 @@ export default function InvoicePage() {
 
     const invoiceProducts = invoice.product.map((item) => {
         const productData = products.find(
-            (prod) => prod.id === item.id
+            (prod) => prod.sku === item.sku
         );
 
         return {
@@ -77,7 +77,7 @@ export default function InvoicePage() {
             quantity: item.quantity,
             specialRequest: item.specialRequest,
             total:
-                (productData.offerPrice || productData.price) *
+                (productData?.offerPrice || productData?.price) *
                 item.quantity,
         };
     });
@@ -90,133 +90,138 @@ export default function InvoicePage() {
     return (
         <div className="invoice-page">
 
-            <div ref={invoiceRef} className="invoice-container">
+            <div className="invoice-container">
 
-                {/* Header */}
-                <InvoiceHeader invoice={invoice} />
+                {/* Downloadable section  */}
+                <section ref={invoiceRef}>
 
-                {/* Billing + Shipping */}
-                <InvoiceBillingDetails invoice={invoice} />
+                    {/* Header */}
+                    <InvoiceHeader invoice={invoice} />
 
-                {/* Product Section */}
-                <div className="p-4">
+                    {/* Billing + Shipping */}
+                    <InvoiceBillingDetails invoice={invoice} />
 
-                    <h3 className="text-xl font-bold text-[var(--color-primary)] mb-2">
-                        Product Details
-                    </h3>
+                    {/* Product Section */}
+                    <div className="p-4">
 
-                    <div className="invoice-table-wrapper rounded-xl">
+                        <h3 className="text-xl font-bold text-[var(--color-primary)] mb-2">
+                            Product Details
+                        </h3>
 
-                        <table
-                            className="invoice-table"
-                            style={{
-                                tableLayout: "fixed",
-                            }}
-                        >
-                            <thead>
-                                <tr>
-                                    <th style={{ width: "40%" }}>
-                                        Product
-                                    </th>
-                                    <th style={{ width: "20%" }}>
-                                        Qty
-                                    </th>
-                                    <th style={{ width: "20%" }}>
-                                        Price
-                                    </th>
-                                    <th style={{ width: "20%", textAlign: "end" }}>
-                                        Total
-                                    </th>
-                                </tr>
-                            </thead>
+                        <div className="invoice-table-wrapper rounded-xl">
 
-                            <tbody>
+                            <table
+                                className="invoice-table"
+                                style={{
+                                    tableLayout: "fixed",
+                                }}
+                            >
+                                <thead>
+                                    <tr>
+                                        <th style={{ width: "40%" }}>
+                                            Product
+                                        </th>
+                                        <th style={{ width: "20%" }}>
+                                            Qty
+                                        </th>
+                                        <th style={{ width: "20%" }}>
+                                            Price
+                                        </th>
+                                        <th style={{ width: "20%", textAlign: "end" }}>
+                                            Total
+                                        </th>
+                                    </tr>
+                                </thead>
 
-                                {invoiceProducts.map((product) => (
+                                <tbody>
 
-                                    <tr key={product.id}>
+                                    {invoiceProducts.map((product) => (
 
-                                        {/* Product */}
-                                        <td>
+                                        <tr key={product.sku}>
 
-                                            <div className="flex gap-4 items-center">
+                                            {/* Product */}
+                                            <td>
 
-                                                <img
-                                                    src={getImageFromId(product.mainImageId)}
-                                                    alt={product.name}
-                                                    className="invoice-product-image"
-                                                />
+                                                <div className="flex gap-4 items-center">
 
-                                                <div>
-                                                    <h4 className="font-semibold text-[var(--color-primary)]">
-                                                        {product.name}
-                                                    </h4>
-                                                    {product.specialRequest &&
-                                                        product.specialRequest !== "NA" && (
-                                                            <small className="block mt-2">
-                                                                {product.specialRequest}
-                                                            </small>
-                                                        )}
+                                                    <img
+                                                        src={getImageFromId(product.mainImageId)}
+                                                        alt={product.name}
+                                                        className="invoice-product-image"
+                                                    />
+
+                                                    <div>
+                                                        <h4 className="font-semibold text-[var(--color-primary)]">
+                                                            {product.name}
+                                                        </h4>
+                                                        {product.specialRequest &&
+                                                            product.specialRequest !== "NA" && (
+                                                                <small className="block mt-2">
+                                                                    {product.specialRequest}
+                                                                </small>
+                                                            )}
+
+                                                    </div>
 
                                                 </div>
 
-                                            </div>
-
-                                        </td>
+                                            </td>
 
 
-                                        {/* Qty */}
-                                        <td className="text-[var(--color-primary)]">
-                                            {product.quantity}
-                                        </td>
+                                            {/* Qty */}
+                                            <td className="text-[var(--color-primary)]">
+                                                {product.quantity}
+                                            </td>
 
-                                        {/* Original Price */}
-                                        <td className="text-[var(--color-primary)]">
-                                            ₹{product.offerPrice}
-                                        </td>
+                                            {/* Original Price */}
+                                            <td className="text-[var(--color-primary)]">
+                                                ₹{product.offerPrice}
+                                            </td>
 
-                                        {/* Total */}
-                                        <td className="text-right font-bold text-[var(--color-primary)]">
-                                            ₹{product.total}
-                                        </td>
+                                            {/* Total */}
+                                            <td className="text-right font-bold text-[var(--color-primary)]">
+                                                ₹{product.total}
+                                            </td>
 
-                                    </tr>
+                                        </tr>
 
-                                ))}
+                                    ))}
 
-                            </tbody>
+                                </tbody>
 
-                        </table>
+                            </table>
 
-                    </div>
+                        </div>
 
-                    {/* Total Section */}
-                    <div className="flex justify-end mt-5">
+                        {/* Total Section */}
+                        <div className="flex justify-end mt-5">
 
-                        <div className="w-full md:w-96 bg-[var(--color-background)]/20 rounded-xl p-4 border border-[var(--color-border)]">
+                            <div className="w-full md:w-96 bg-[var(--color-background)]/20 rounded-xl p-4 border border-[var(--color-border)]">
 
-                            <div className="space-y-4">
+                                <div className="space-y-4">
 
-                                <div className="flex justify-between">
-                                    <span>Subtotal</span>
-                                    <b>₹{subtotal}</b>
-                                </div>
+                                    <div className="flex justify-between">
+                                        <span>Subtotal</span>
+                                        <b>₹{subtotal}</b>
+                                    </div>
 
-                                <div className="flex justify-between">
-                                    <span>Shipping</span>
+                                    <div className="flex justify-between">
+                                        <span>Shipping</span>
 
-                                    <span className="text-green-600">
-                                        FREE
-                                    </span>
-                                </div>
+                                        <span className="text-green-600">
+                                            FREE
+                                        </span>
+                                    </div>
 
-                                <div className="border-t pt-4 flex justify-between text-2xl font-bold text-[var(--color-primary)]">
+                                    <div className="border-t pt-4 flex justify-between text-2xl font-bold text-[var(--color-primary)]">
 
-                                    <span>Total</span>
+                                        <span>Total</span>
 
-                                    <span>
-                                        ₹{subtotal}
-                                    </span>
+                                        <span>
+                                            ₹{subtotal}
+                                        </span>
+
+                                    </div>
 
                                 </div>
 
@@ -225,9 +230,7 @@ export default function InvoicePage() {
                         </div>
 
                     </div>
-
-                </div>
-
+                </section>
                 {/* Footer */}
                 <InvoiceFooter downloadInvoice={downloadInvoice} />
             </div>

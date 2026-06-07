@@ -7,7 +7,7 @@ export default function InvoiceHeader({ invoice }) {
         <div className="flex justify-between gap-6">
 
             <div>
-                <h3 className="text-2xl tracking-wide">
+                <h3 className="text-2xl tracking-wide text-gray-200">
                     Pratibha Silks
                 </h3>
 
@@ -22,12 +22,12 @@ export default function InvoiceHeader({ invoice }) {
                 </div>
             </div>
 
-            <div className="bg-white/10 rounded-xl p-2 backdrop-blur-md">
+            <div className="bg-white/10 rounded-xl p-2 backdrop-blur-md text-gray-200">
                 <h3 className="text-2xl">
                     INVOICE
                 </h3>
 
-                <div className="space-y-1 text-sm">
+                <div className="space-y-1 text-sm ">
                     <p>
                         <span className="text-[var(--color-accent)]">
                             Invoice ID:

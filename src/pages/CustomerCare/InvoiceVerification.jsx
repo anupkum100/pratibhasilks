@@ -1,4 +1,16 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 export default function InvoiceVerification() {
+    const [invoiceId, setInvoiceId] = useState("");
+    const navigate = useNavigate();
+
+    const handleVerify = () => {
+        if (!invoiceId.trim()) return;
+
+        navigate(`/invoice/${invoiceId.trim()}`);
+    };
+
     return (
         <div className="max-w-4xl mx-auto px-5 py-16 md:py-24 text-center">
             <p className="text-xs tracking-[0.4em] uppercase text-[#9A7B4F]">
@@ -17,12 +29,32 @@ export default function InvoiceVerification() {
 
                 <div className="mt-8">
                     <input
-                        placeholder="Enter Invoice Number"
-                        className="w-full border rounded-xl p-4"
+                        value={invoiceId}
+                        onChange={(e) => setInvoiceId(e.target.value.toUpperCase())}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                handleVerify();
+                            }
+                        }}
+                        placeholder="Enter Invoice Number (e.g. PS1001)"
+                        className="w-full border rounded-xl p-4 text-center uppercase"
                     />
                 </div>
 
-                <button className="mt-5 bg-[#181818] text-white px-8 py-4 rounded-full">
+                <button
+                    onClick={handleVerify}
+                    disabled={!invoiceId.trim()}
+                    className="
+            mt-5
+            bg-[#181818]
+            text-white
+            px-8
+            py-4
+            rounded-full
+            disabled:opacity-50
+            disabled:cursor-not-allowed
+          "
+                >
                     Verify Invoice
                 </button>
 

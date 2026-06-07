@@ -9,7 +9,7 @@ export default function InvoiceFooter({ downloadInvoice }) {
             For support or order queries, contact us on WhatsApp.
         </p>
 
-        <div className="mt-2 flex justify-center gap-2 flex-wrap">
+        <div className="mt-5 flex justify-center gap-2 flex-wrap no-print">
             <button
                 onClick={downloadInvoice}
                 className="bg-[var(--color-primary)] hover:bg-[var(--color-secondary)] transition-all text-white px-3 py-1 rounded-full shadow-lg">
