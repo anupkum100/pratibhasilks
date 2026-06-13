@@ -6,7 +6,7 @@ export const invoices = [
             sku: "KO_CT_RRLP_0026",
             quantity: 1,
         }],
-        orderDate: "24 May 2026",
+        orderDate: "13 May 2026",
     }, {
         invoiceId: "PS_13_06_02",
         customer: "Priyanka",
@@ -17,5 +17,5 @@ export const invoices = [
             sku: "KO_CT_RRLP_0027",
             quantity: 1,
         }],
-        orderDate: "24 May 2026",
+        orderDate: "13 May 2026",
     }]
