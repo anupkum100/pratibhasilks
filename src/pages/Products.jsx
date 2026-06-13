@@ -1,16 +1,13 @@
-import { useState, useEffect } from "react";
 import {
-  Filter,
-  X,
   ChevronDown,
-  ChevronUp,
-  SlidersHorizontal,
+  ChevronUp, Filter, SlidersHorizontal, X
 } from "lucide-react";
-
-import ProductCard from "../components/ProductCard";
-import { products } from "../data/products";
-import { filterOptions } from "../data/util";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import ProductCard from "../components/ProductCard";
+import { productsWithImage } from "../data/products";
+import { filterOptions } from "../data/util";
+
 
 export default function Products() {
   const [searchParams] = useSearchParams();
@@ -73,7 +70,7 @@ export default function Products() {
     }));
   };
 
-  const filteredProducts = products.filter((product) => {
+  const filteredProducts = productsWithImage.filter((product) => {
     const colorMatch =
       filters.colors.length === 0 ||
       filters.colors.includes(product.color);
@@ -217,7 +214,7 @@ export default function Products() {
                   <span className="text-[#181818] font-semibold">
                     {filteredProducts.length}
                   </span>{" "}
-                  of {products.length} sarees
+                  of {productsWithImage.length} sarees
                 </p>
               </div>
 

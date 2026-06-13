@@ -1,26 +1,20 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import {
-  Mail,
-  Phone,
-  Truck,
-  ShieldBan,
-  MessageCircle,
-  ShieldCheck,
-  Sparkles,
-  Ruler,
+  Mail, MessageCircle, Phone, ShieldBan, ShieldCheck,
+  Sparkles, Truck
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-
 import {
   PS_EMAIL,
   PS_PHONE,
-  PS_PHONE_WHATSAPP,
+  PS_PHONE_WHATSAPP
 } from "../data/constants";
-import { products } from "../data/products";
-
+import { productsWithImage } from "../data/products";
 import { getImageFromId } from "../data/util";
 import { apiCall } from "../serice/api";
+
+
 
 const spriteViews = [
   { label: "Full View", index: -1 },
@@ -79,7 +73,7 @@ export default function ProductDetail() {
 
     apiCall(`/api/products/${id}`).then((res) => {
       setLoading(false);
-      !res.error ? setProductDetails(res.data) : setProductDetails(products.find((el => el.sku === id)));
+      !res.error ? setProductDetails(res.data) : setProductDetails(productsWithImage.find((el => el.sku === id)));
     });
   };
 
@@ -187,7 +181,7 @@ Please share more details.`;
                   transition={{ duration: 0.35 }}
                 /> */}
                 <SpriteImage
-                  src={getImageFromId(productDetails.mainImageId)}
+                  src={getImageFromId(productDetails.mainImageId ? productDetails.mainImageId : "pngtree-no-image-vector-illustration-isolated-png-image_1694547_scevu8.png")}
                   index={spriteViews[selectedImage].index}
                   alt={`${productDetails.name} ${spriteViews[selectedImage].label}`}
                   className="w-full aspect-[3/4]"
@@ -195,7 +189,7 @@ Please share more details.`;
               </AnimatePresence>
             </div>
 
-            {spriteViews.map((view, index) => (
+            {productDetails.mainImageId && spriteViews.map((view, index) => (
               <button
                 key={view.label}
                 onClick={() => setSelectedImage(index)}
@@ -205,7 +199,7 @@ Please share more details.`;
                   }`}
               >
                 <SpriteImage
-                  src={getImageFromId(productDetails.mainImageId)}
+                  src={getImageFromId(productDetails.mainImageId ? productDetails.mainImageId : "pngtree-no-image-vector-illustration-isolated-png-image_1694547_scevu8.png")}
                   index={view.index}
                   alt={`${productDetails.name} ${view.label}`}
                   className="w-full h-full"

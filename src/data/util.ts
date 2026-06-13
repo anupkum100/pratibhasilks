@@ -1,4 +1,4 @@
-import { products } from "./products"
+import { productsWithImage } from "./products"
 
 const cloudinaryDB = "dkiauapz4"
 const imgResolution = "f_auto,q_auto"
@@ -8,13 +8,13 @@ export function getImageFromId(imageId) {
 }
 
 const uniqueValues = (key) => {
-    return [...new Set(products.flatMap((p) => p[key]))];
+    return [...new Set(productsWithImage.flatMap((p) => p[key]))];
 };
 
 const uniqueColors = () => {
     const colorMap = new Map();
 
-    products.forEach((product) => {
+    productsWithImage.forEach((product) => {
         colorMap.set(product.color, {
             name: product.color,
             hex: product.colorHex,

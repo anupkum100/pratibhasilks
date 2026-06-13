@@ -1,15 +1,21 @@
 export const invoices = [
     {
-        invoiceId: "PS1001",
-        customer: "Priya Sharma",
+        invoiceId: "PS_13_06_01",
+        customer: "Swapnali",
+        product: [{
+            sku: "KO_CT_RRLP_0026",
+            quantity: 1,
+        }],
+        orderDate: "24 May 2026",
+    }, {
+        invoiceId: "PS_13_06_02",
+        customer: "Priyanka",
         product: [{
             sku: "JP_MC_RRIP_0001",
-            quantity: 2,
-            // specialRequest: "NA"
+            quantity: 1,
         }, {
-            sku: "JP_MC_RRIP_0002",
-            quantity: 5,
-            specialRequest: "Please gift wrap this."
+            sku: "KO_CT_RRLP_0027",
+            quantity: 1,
         }],
         orderDate: "24 May 2026",
     }]

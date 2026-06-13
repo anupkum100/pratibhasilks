@@ -51,14 +51,15 @@ export default function ProductCard({
           <div className="aspect-[4/7] overflow-hidden">
             <img
               loading="lazy"
-              src={getImageFromId(product.mainImageId)}
+              src={getImageFromId(product.mainImageId ? product.mainImageId : "pngtree-no-image-vector-illustration-isolated-png-image_1694547_scevu8.png")}
               alt={product.name}
               className={`
-                h-full w-full object-cover
+                h-full w-full
                 transition-transform duration-700 ease-out
                 group-hover:scale-105
                 ${product.sold ? "grayscale" : ""}
-              `}
+                ${!product.mainImageId ? "object-contain" : "object-cover"}
+                  `}
             />
           </div>
 
