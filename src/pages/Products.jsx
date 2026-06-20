@@ -1,57 +1,171 @@
 import {
-  ChevronDown,
-  ChevronUp, Filter, SlidersHorizontal, X
+  useInfiniteQuery,
+  useQuery,
+  useQueryClient
+} from "@tanstack/react-query";
+import {
+  ChevronDown, SlidersHorizontal,
+  X
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import PermissionRenderer from "../components/Admin/PermissionRenderer";
+import ProductModal from "../components/Modal/ProductModal";
+import PremiumLoader from "../components/PremiumLoader";
 import ProductCard from "../components/ProductCard";
-import { productsWithImage } from "../data/products";
-import { filterOptions } from "../data/util";
+import { PremiumFilterPanel } from "../components/ProductFilter/PremiumFilterPanel";
+import { useDelayedLoader } from "../data/util";
+import { apiCall } from "../serice/api";
 
+const PRODUCT_LIMIT = 64;
+
+const SORT_OPTIONS = [
+  {
+    label: "Newest Arrivals",
+    value: "latest",
+  },
+  {
+    label: "Price: Low to High",
+    value: "price_low_high",
+  },
+  {
+    label: "Price: High to Low",
+    value: "price_high_low",
+  },
+];
 
 export default function Products() {
   const [searchParams] = useSearchParams();
+  const queryClient = useQueryClient();
 
-  const occasion = searchParams.get("occasion");
-  const fabric = searchParams.get("fabric");
-  const category = searchParams.get("category");
+  const occasionFromUrl = searchParams.get("occasions");
+  const fabricFromUrl = searchParams.get("fabric");
+  const categoryFromUrl = searchParams.get("category");
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState("add");
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [sort, setSort] = useState("latest");
 
   const [filters, setFilters] = useState({
-    occasions: occasion ? [occasion] : [],
-    fabrics: fabric ? [fabric] : [],
-    categories: category ? [category] : [],
+    occasions: occasionFromUrl ? [occasionFromUrl] : [],
+    fabrics: fabricFromUrl ? [fabricFromUrl] : [],
+    categories: categoryFromUrl ? [categoryFromUrl] : [],
     colors: [],
   });
-
-  useEffect(() => {
-    setFilters({
-      occasions: occasion ? [occasion] : [],
-      fabrics: fabric ? [fabric] : [],
-      categories: category ? [category] : [],
-      colors: [],
-    });
-  }, [searchParams])
-
-  // const [filters, setFilters] = useState({
-  //   colors: [],
-  //   fabrics: [],
-  //   occasions: [],
-  // });
-
-  const [showFilters, setShowFilters] = useState(false);
 
   const [expandedSections, setExpandedSections] = useState({
     colors: true,
     fabrics: true,
     occasions: true,
+    categories: true,
   });
 
-  const toggleFilter = (category, value) => {
+  useEffect(() => {
+    setFilters({
+      occasions: occasionFromUrl ? [occasionFromUrl] : [],
+      fabrics: fabricFromUrl ? [fabricFromUrl] : [],
+      categories: categoryFromUrl ? [categoryFromUrl] : [],
+      colors: [],
+    });
+  }, [occasionFromUrl, fabricFromUrl, categoryFromUrl]);
+
+  const queryString = useMemo(() => {
+    const params = new URLSearchParams();
+
+    params.set("limit", PRODUCT_LIMIT);
+
+    if (filters.colors.length) {
+      params.set("colors", filters.colors.join(","));
+    }
+
+    if (filters.fabrics.length) {
+      params.set("fabrics", filters.fabrics.join(","));
+    }
+
+    if (filters.occasions.length) {
+      params.set("occasions", filters.occasions.join(","));
+    }
+
+    if (filters.categories.length) {
+      params.set("categories", filters.categories.join(","));
+    }
+
+    if (sort) {
+      params.set("sort", sort);
+    }
+
+    return params.toString();
+  }, [filters, sort]);
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isRefetching,
+  } = useInfiniteQuery({
+    queryKey: ["products", filters, sort],
+    queryFn: ({ pageParam = 1 }) =>
+      apiCall(`/api/products?page=${pageParam}&${queryString}`),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage?.pagination?.hasMore) {
+        return lastPage.pagination.page + 1;
+      }
+
+      return undefined;
+    },
+  });
+
+  const { data: filterResponse } = useQuery({
+    queryKey: ["product-filters"],
+    queryFn: () => apiCall("/api/products/filters"),
+  });
+
+  const products = useMemo(() => {
+    return data?.pages?.flatMap((page) => page?.data || []) || [];
+  }, [data]);
+
+  const totalProducts = data?.pages?.[0]?.pagination?.totalProducts || 0;
+
+  const filterOptions = filterResponse?.data || {
+    colors: [],
+    fabrics: [],
+    occasions: [],
+    categories: [],
+  };
+
+  const activeFilterCount =
+    filters.colors.length +
+    filters.fabrics.length +
+    filters.occasions.length +
+    filters.categories.length;
+
+  const loading = isLoading || submitting;
+  const { showLoader, isExiting } = useDelayedLoader(loading, 500);
+
+  const openAddModal = () => {
+    setModalMode("add");
+    setSelectedProduct(null);
+    setModalOpen(true);
+  };
+
+  const openEditModal = (product) => {
+    setModalMode("edit");
+    setSelectedProduct(product);
+    setModalOpen(true);
+  };
+
+  const toggleFilter = (filterKey, value) => {
     setFilters((prev) => ({
       ...prev,
-      [category]: prev[category].includes(value)
-        ? prev[category].filter((v) => v !== value)
-        : [...prev[category], value],
+      [filterKey]: prev[filterKey].includes(value)
+        ? prev[filterKey].filter((item) => item !== value)
+        : [...prev[filterKey], value],
     }));
   };
 
@@ -60,6 +174,7 @@ export default function Products() {
       colors: [],
       fabrics: [],
       occasions: [],
+      categories: [],
     });
   };
 
@@ -70,30 +185,59 @@ export default function Products() {
     }));
   };
 
-  const filteredProducts = productsWithImage.filter((product) => {
-    const colorMatch =
-      filters.colors.length === 0 ||
-      filters.colors.includes(product.color);
+  const handleProductSubmit = async (payload) => {
+    setSubmitting(true);
 
-    const fabricMatch =
-      filters.fabrics.length === 0 ||
-      filters.fabrics.includes(product.fabric);
+    const isEdit = modalMode === "edit";
 
-    const occasionMatch =
-      filters.occasions.length === 0 ||
-      filters.occasions.includes(product.occasion);
+    const url = isEdit
+      ? `/api/products/${selectedProduct._id}`
+      : "/api/products";
 
-    return colorMatch && fabricMatch && occasionMatch;
-  });
+    const res = await apiCall(url, isEdit ? "PUT" : "POST", payload);
 
-  const activeFilterCount =
-    filters.colors.length +
-    filters.fabrics.length +
-    filters.occasions.length;
+    setSubmitting(false);
+
+    if (res?.error) {
+      alert(res?.error?.message || "Something went wrong");
+      return;
+    }
+
+    setModalOpen(false);
+
+    queryClient.invalidateQueries({ queryKey: ["products"] });
+    queryClient.invalidateQueries({ queryKey: ["product-filters"] });
+  };
+
+  const deleteProduct = async (product) => {
+    const confirmDelete = window.confirm(`Delete ${product.name}?`);
+    if (!confirmDelete) return;
+
+    setSubmitting(true);
+
+    const res = await apiCall(`/api/products/${product._id}`, "DELETE");
+
+    setSubmitting(false);
+
+    if (res?.error) {
+      alert(res.message || "Failed to delete product");
+      return;
+    }
+
+    queryClient.invalidateQueries({ queryKey: ["products"] });
+    queryClient.invalidateQueries({ queryKey: ["product-filters"] });
+  };
+
+  const loadMoreProducts = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
     <main className="min-h-screen bg-[#F8F3EC] text-[#181818]">
-      {/* Top Editorial Header */}
+      {showLoader && <PremiumLoader isExiting={isExiting} />}
+
       <section className="px-5 pt-12 pb-8 md:pt-20 md:pb-14">
         <div className="max-w-7xl mx-auto">
           <p className="text-xs tracking-[0.45em] uppercase text-[#9A7B4F]">
@@ -114,21 +258,11 @@ export default function Products() {
 
             <button
               onClick={() => setShowFilters(true)}
-              className="
-                md:hidden
-                w-full
-                flex items-center justify-center gap-2
-                bg-[#181818]
-                text-white
-                px-5 py-4
-                rounded-full
-                text-sm
-                font-medium
-                shadow-xl
-              "
+              className="md:hidden w-full flex items-center justify-center gap-2 bg-[#181818] text-white px-5 py-4 rounded-full text-sm font-medium shadow-xl"
             >
               <SlidersHorizontal size={18} />
               Refine Collection
+
               {activeFilterCount > 0 && (
                 <span className="bg-[#C9A86A] text-black h-6 min-w-6 px-2 rounded-full flex items-center justify-center text-xs">
                   {activeFilterCount}
@@ -139,7 +273,6 @@ export default function Products() {
         </div>
       </section>
 
-      {/* Mobile Filter Overlay */}
       {showFilters && (
         <div className="fixed inset-0 z-[999] md:hidden">
           <div
@@ -179,19 +312,28 @@ export default function Products() {
                 onClick={() => setShowFilters(false)}
                 className="w-full mt-6 bg-[#181818] text-white py-4 rounded-full font-medium"
               >
-                Show {filteredProducts.length} Sarees
+                Show {totalProducts} Sarees
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Main Content */}
       <section className="max-w-7xl mx-auto px-5 pb-20">
+        <PermissionRenderer permission={false}>
+          <div className="text-end">
+            <button
+              onClick={openAddModal}
+              className="mb-2 bg-black text-white px-6 py-3 rounded-full"
+            >
+              + Add Product
+            </button>
+          </div>
+        </PermissionRenderer>
+
         <div className="grid md:grid-cols-[280px_1fr] gap-10">
-          {/* Desktop Filter */}
           <aside className="hidden md:block">
-            <div className="sticky top-28">
+            <div className="sticky top-20">
               <PremiumFilterPanel
                 filters={filters}
                 filterOptions={filterOptions}
@@ -204,31 +346,41 @@ export default function Products() {
             </div>
           </aside>
 
-          {/* Product Area */}
           <div>
-            {/* Toolbar */}
-            <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               <div>
                 <p className="text-sm text-[#6B5F54]">
                   Showing{" "}
                   <span className="text-[#181818] font-semibold">
-                    {filteredProducts.length}
+                    {products.length}
                   </span>{" "}
-                  of {productsWithImage.length} sarees
+                  of{" "}
+                  <span className="text-[#181818] font-semibold">
+                    {totalProducts}
+                  </span>{" "}
+                  sarees
                 </p>
+
+                {isRefetching && !isFetchingNextPage && (
+                  <p className="text-xs text-[#9A7B4F] mt-1">
+                    Refreshing collection...
+                  </p>
+                )}
               </div>
 
-              {activeFilterCount > 0 && (
-                <button
-                  onClick={clearFilters}
-                  className="text-sm text-[#9A7B4F] underline underline-offset-4 w-fit"
-                >
-                  Clear all filters
-                </button>
-              )}
+              <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                {activeFilterCount > 0 && (
+                  <button
+                    onClick={clearFilters}
+                    className="text-sm text-[#9A7B4F] underline underline-offset-4 w-fit"
+                  >
+                    Clear all filters
+                  </button>
+                )}
+                <SortDropdown value={sort} onChange={setSort} />
+              </div>
             </div>
 
-            {/* Active Filter Pills */}
             {activeFilterCount > 0 && (
               <div className="flex flex-wrap gap-2 mb-8">
                 {filters.colors.map((color) => (
@@ -254,19 +406,48 @@ export default function Products() {
                     onRemove={() => toggleFilter("occasions", occasion)}
                   />
                 ))}
-              </div>
-            )}
 
-            {/* Products */}
-            {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 md:gap-7">
-                {filteredProducts.map((product) => (
-                  <ProductCard
-                    key={product._id || product.sku || product.id}
-                    product={product}
+                {filters.categories.map((category) => (
+                  <ActivePill
+                    key={category}
+                    label={category}
+                    onRemove={() => toggleFilter("categories", category)}
                   />
                 ))}
               </div>
+            )}
+
+            {products.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-7">
+                  {products.map((product) => (
+                    <ProductCard
+                      key={product._id || product.sku || product.id}
+                      product={product}
+                      onEdit={openEditModal}
+                      onDelete={deleteProduct}
+                    />
+                  ))}
+                </div>
+
+                <InfiniteScrollTrigger
+                  hasMore={hasNextPage}
+                  loading={isFetchingNextPage}
+                  onLoadMore={loadMoreProducts}
+                />
+
+                {isFetchingNextPage && (
+                  <div className="py-8 text-center text-sm text-[#6B5F54]">
+                    Loading more sarees...
+                  </div>
+                )}
+
+                {!hasNextPage && products.length > 0 && (
+                  <div className="py-10 text-center text-sm text-[#6B5F54]">
+                    You have reached the end of the collection.
+                  </div>
+                )}
+              </>
             ) : (
               <div className="bg-white rounded-[2rem] p-10 md:p-16 text-center shadow-xl">
                 <p className="text-xs tracking-[0.35em] uppercase text-[#9A7B4F]">
@@ -292,200 +473,70 @@ export default function Products() {
           </div>
         </div>
       </section>
+
+      <ProductModal
+        isOpen={modalOpen}
+        mode={modalMode}
+        product={selectedProduct}
+        onClose={() => setModalOpen(false)}
+        onSubmit={handleProductSubmit}
+        loading={loading}
+        filters={filterOptions}
+      />
     </main>
   );
 }
 
-function PremiumFilterPanel({
-  filters,
-  filterOptions,
-  expandedSections,
-  activeFilterCount,
-  toggleFilter,
-  toggleSection,
-  clearFilters,
-}) {
+function SortDropdown({ value, onChange }) {
   return (
-    <div className="bg-white rounded-[2rem] shadow-xl border border-black/5 overflow-hidden">
-      <div className="p-6 border-b border-black/5">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs tracking-[0.35em] uppercase text-[#9A7B4F]">
-              Refine
-            </p>
+    <label className="relative block min-w-[220px]">
+      <span className="sr-only">Sort Products</span>
 
-            <h2 className="font-serif text-3xl mt-1">
-              Filters
-            </h2>
-          </div>
-
-          <div className="h-11 w-11 rounded-full bg-[#F8F3EC] flex items-center justify-center">
-            <Filter size={18} />
-          </div>
-        </div>
-
-        {activeFilterCount > 0 && (
-          <button
-            onClick={clearFilters}
-            className="mt-5 text-sm text-[#9A7B4F] underline underline-offset-4"
-          >
-            Clear all selections
-          </button>
-        )}
-      </div>
-
-      <div className="p-6 space-y-7">
-        <FilterSection
-          title="Fabric"
-          sectionKey="fabrics"
-          expanded={expandedSections.fabrics}
-          onToggle={toggleSection}
-        >
-          <div className="space-y-3">
-            {filterOptions.fabrics.map((fabric) => (
-              <PremiumCheckbox
-                key={fabric}
-                label={fabric}
-                checked={filters.fabrics.includes(fabric)}
-                onChange={() => toggleFilter("fabrics", fabric)}
-              />
-            ))}
-          </div>
-        </FilterSection>
-
-        <FilterSection
-          title="Occasion"
-          sectionKey="occasions"
-          expanded={expandedSections.occasions}
-          onToggle={toggleSection}
-        >
-          <div className="flex flex-wrap gap-2">
-            {filterOptions.occasions.map((occasion) => {
-              const active = filters.occasions.includes(occasion);
-
-              return (
-                <button
-                  key={occasion}
-                  onClick={() => toggleFilter("occasions", occasion)}
-                  className={`
-                    px-4 py-2 rounded-full text-sm transition-all border
-                    ${active
-                      ? "bg-[#181818] text-white border-[#181818]"
-                      : "bg-[#F8F3EC] text-[#6B5F54] border-transparent hover:border-[#C9A86A]"
-                    }
-                  `}
-                >
-                  {occasion}
-                </button>
-              );
-            })}
-          </div>
-        </FilterSection>
-
-        <FilterSection
-          title="Colour"
-          sectionKey="colors"
-          expanded={expandedSections.colors}
-          onToggle={toggleSection}
-        >
-          <div className="flex flex-wrap gap-4">
-            {filterOptions.colors.map((color) => {
-              const active = filters.colors.includes(color.name);
-
-              return (
-                <button
-                  key={color.name}
-                  title={color.name}
-                  onClick={() => toggleFilter("colors", color.name)}
-                  className={`
-                    relative h-10 w-10 rounded-full transition-all
-                    ${active
-                      ? "ring-2 ring-[#181818] ring-offset-4 ring-offset-white scale-105"
-                      : "ring-1 ring-black/10 hover:ring-[#C9A86A]"
-                    }
-                  `}
-                  style={{
-                    backgroundColor: color.hex,
-                  }}
-                >
-                  {active && (
-                    <span className="absolute inset-0 rounded-full border-2 border-white" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </FilterSection>
-      </div>
-    </div>
-  );
-}
-
-function FilterSection({
-  title,
-  sectionKey,
-  expanded,
-  onToggle,
-  children,
-}) {
-  return (
-    <div className="border-b border-black/5 last:border-b-0 pb-6 last:pb-0">
-      <button
-        onClick={() => onToggle(sectionKey)}
-        className="w-full flex items-center justify-between"
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="w-full appearance-none rounded-full bg-white border border-black/10 px-5 py-3 pr-11 text-sm text-[#181818] shadow-sm outline-none focus:border-[#9A7B4F]"
       >
-        <span className="font-serif text-2xl">
-          {title}
-        </span>
+        {SORT_OPTIONS.map((option) => (
+          <option key={option.value} value={option.value}>
+            Sort: {option.label}
+          </option>
+        ))}
+      </select>
 
-        <span className="h-8 w-8 rounded-full bg-[#F8F3EC] flex items-center justify-center">
-          {expanded ? (
-            <ChevronUp size={16} />
-          ) : (
-            <ChevronDown size={16} />
-          )}
-        </span>
-      </button>
-
-      {expanded && <div className="mt-5">{children}</div>}
-    </div>
-  );
-}
-
-function PremiumCheckbox({ label, checked, onChange }) {
-  return (
-    <label className="flex items-center justify-between gap-3 cursor-pointer group">
-      <span
-        className={`text-sm transition ${checked
-          ? "text-[#181818] font-medium"
-          : "text-[#6B5F54] group-hover:text-[#181818]"
-          }`}
-      >
-        {label}
-      </span>
-
-      <span
-        className={`
-          h-5 w-5 rounded-full border flex items-center justify-center transition
-          ${checked
-            ? "bg-[#181818] border-[#181818]"
-            : "border-black/20 group-hover:border-[#C9A86A]"
-          }
-        `}
-      >
-        {checked && (
-          <span className="h-2 w-2 rounded-full bg-[#C9A86A]" />
-        )}
-      </span>
-
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={onChange}
-        className="hidden"
+      <ChevronDown
+        size={16}
+        className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9A7B4F] pointer-events-none"
       />
     </label>
   );
+}
+
+function InfiniteScrollTrigger({ onLoadMore, hasMore, loading }) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!hasMore || loading) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          onLoadMore();
+        }
+      },
+      {
+        rootMargin: "500px",
+      }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasMore, loading, onLoadMore]);
+
+  return <div ref={ref} className="h-12 w-full" />;
 }
 
 function ActivePill({ label, onRemove }) {

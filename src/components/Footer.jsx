@@ -66,10 +66,10 @@ export default function Footer() {
             <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/products?fabric=Mul Cotton"><span>Cotton</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
               →
             </span></Link></li>
-            <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/products?occasion=Work"><span>Office Wear</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+            <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/products?occasions=Work"><span>Office Wear</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
               →
             </span></Link></li>
-            <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/products?occasion=Festive"><span>Festive</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+            <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/products?occasions=Festive"><span>Festive</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
               →
             </span></Link></li>
             <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/products?arrival=New"><span>New Arrivals</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">

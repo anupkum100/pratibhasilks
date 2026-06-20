@@ -1,15 +1,15 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Edit, Trash2 } from "lucide-react";
-import { getImageFromId } from "../data/util";
+import { getImageFromId, normalised } from "../data/util";
+import PermissionRenderer from "./Admin/PermissionRenderer";
 
 export default function ProductCard({
   product,
-  isAdmin = false,
+  isAdmin = true,
   onEdit,
   onDelete,
 }) {
-  const sellingPrice = product.offerPrice || product.price;
   const discount =
     product.offerPrice && product.price
       ? Math.round(((product.price - product.offerPrice) / product.price) * 100)
@@ -26,7 +26,7 @@ export default function ProductCard({
 
   return (
     <motion.article
-      whileHover={{ y: product.sold ? 0 : -6 }}
+      whileHover={{ y: !product.stock ? 0 : -6 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
       className={`
         group relative overflow-hidden rounded-[1.5rem]
@@ -34,13 +34,13 @@ export default function ProductCard({
         border border-black/5
         transition-all duration-500
         hover:shadow-[0_26px_70px_rgba(0,0,0,0.14)]
-        ${product.sold ? "opacity-75" : ""}
+        ${!product.stock ? "opacity-75" : ""}
       `}
     >
       <Link to={`/product/${product.sku}`} className="block">
         <div className="relative overflow-hidden bg-[#F8F3EC]">
 
-          {product.sold && (
+          {product.stock === 0 && (
             <div className="absolute inset-0 bg-black/35 z-20 flex items-center justify-center">
               <span className="text-white text-xl md:text-2xl font-serif rotate-[-12deg] bg-black/55 px-6 py-2 rounded-full">
                 Sold
@@ -48,17 +48,18 @@ export default function ProductCard({
             </div>
           )}
 
-          <div className="aspect-[4/7] overflow-hidden">
+          <div className={`${!product.mainImageId ? "aspect-1" : "aspect-[4/7]"} overflow-hidden`}>
             <img
               loading="lazy"
-              src={getImageFromId(product.mainImageId ? product.mainImageId : "pngtree-no-image-vector-illustration-isolated-png-image_1694547_scevu8.png")}
-              alt={product.name}
+              src={getImageFromId(product.mainImageId ? product.mainImageId : "no_image.png")}
+              alt={normalised(product.name)}
               className={`
                 h-full w-full
                 transition-transform duration-700 ease-out
                 group-hover:scale-105
-                ${product.sold ? "grayscale" : ""}
+                ${product.stock === 0 ? "grayscale" : ""}
                 ${!product.mainImageId ? "object-contain" : "object-cover"}
+                ${!product.mainImageId ? "p-10" : ""}
                   `}
             />
           </div>
@@ -87,7 +88,7 @@ export default function ProductCard({
 
 
           <h3 className="mt-2 font-serif text-xl md:text-2xl leading-tight text-[#181818] line-clamp-2">
-            {product.name}
+            {normalised(product.name)}
           </h3>
 
           <p className="mt-2 text-xs md:text-sm text-[#6B5F54] line-clamp-2 hidden sm:block">
@@ -103,20 +104,21 @@ export default function ProductCard({
               ) : <></>}
 
               <span className="font-semibold text-sm md:text-base text-[#181818]">
-                ₹{sellingPrice}
+                ₹{product.offerPrice || product.price}
               </span>
             </div>
 
-            {product.occasion && (
+            {product.occasions?.length ? (
               <span className="text-[11px] md:text-xs text-[#6B5F54]">
-                Perfect for {product.occasion}
+                Perfect for {product.occasions.join(", ")}
               </span>
-            )}
+            ) : null}
           </div>
         </div>
       </Link>
 
-      {isAdmin && (
+
+      <PermissionRenderer permission={false}>
         <div className="px-3 md:px-4 pb-4 flex gap-2">
           <button
             type="button"
@@ -157,7 +159,7 @@ export default function ProductCard({
             Delete
           </button>
         </div>
-      )}
+      </PermissionRenderer>
     </motion.article>
   );
 }

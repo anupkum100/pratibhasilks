@@ -1,22 +1,23 @@
-const URL = "http://localhost:4000"
-// const URL = "https://acbqgm94kf.execute-api.us-east-2.amazonaws.com"
+// const URL = "http://localhost:4000"
+const URL = "https://721gb6ymy1.execute-api.us-east-2.amazonaws.com"
 
-export async function apiCall(url, method = "GET", data = null) {
+
+
+export async function apiCall(url, method = "GET", payload = null) {
+    const isFormData = payload instanceof FormData;
+
     try {
         const token = localStorage.getItem('token'); // or sessionStorage if preferred
         const config = {
-            method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            method
         };
 
         if (token) {
             config.headers['Authorization'] = `Bearer ${token}`;
         }
 
-        if (data && method !== "GET") {
-            config.body = JSON.stringify(data);
+        if (payload && method !== "GET") {
+            config.body = isFormData ? payload : JSON.stringify(payload);
         }
 
         const response = await fetch(URL + url, config);
@@ -31,7 +32,7 @@ export async function apiCall(url, method = "GET", data = null) {
             return {
                 error: {
                     status: response.status,
-                    message: errText.error
+                    message: errText.message
                 }
             }
             // new Error(`Error ${ response.status }: ${ errText } `);
@@ -40,9 +41,7 @@ export async function apiCall(url, method = "GET", data = null) {
         return await response.json();
     } catch (error) {
         return {
-            error: {
-                message: "Something went wrong"
-            }
+            error: "Something went wrong..."
         };
     }
 }
