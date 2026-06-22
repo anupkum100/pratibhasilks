@@ -1,5 +1,9 @@
-export default function PermissionRenderer({ permission, children }) {
-    if (!permission) return null;
+import { useAuth } from "../../contexts/AuthContexts";
+
+export default function PermissionRenderer({ children }) {
+    const { isAdmin } = useAuth();
+
+    if (!isAdmin) return null;
 
     return <>{children}</>;
 }

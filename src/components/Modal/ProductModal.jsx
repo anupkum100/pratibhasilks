@@ -188,7 +188,7 @@ export default function ProductModal({
 
         productFormData.append("sku", form.sku);
         productFormData.append("name", form.name);
-        productFormData.append("description", form.description || "-");
+        productFormData.append("description", form.description);
         productFormData.append("price", form.price);
         productFormData.append("offerPrice", form.offerPrice ? form.offerPrice : 0);
         productFormData.append("stock", form.stock || 1);
@@ -196,7 +196,7 @@ export default function ProductModal({
         productFormData.append("blouseIncluded", form.blouseIncluded);
         productFormData.append("color", form.color || "");
         productFormData.append("colorHex", form.colorHex || "");
-        productFormData.append("additionalInformation", form.additionalInformation || "");
+        productFormData.append("additionalInformation", form.additionalInformation);
 
         productFormData.append("mainImageId", form.mainImageId || "");
         productFormData.append(
@@ -338,7 +338,7 @@ function FieldRenderer({
         label: field.label + (field.required ? "*" : ""),
         value: form[field.name] ?? "",
         onChange,
-        disabled: field.disabled || (mode === "edit" && field.name === "sku"),
+        // disabled: field.disabled || (mode === "edit" && field.name === "sku"),
         required: field.required,
         type: field.type,
         textarea: field.textarea,

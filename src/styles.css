@@ -49,6 +49,11 @@ select {
   font-family: inherit;
 }
 
+button:disabled {
+  opacity: .4 !important;
+  pointer-events: none !important;
+}
+
 a {
   color: inherit;
   text-decoration: none;

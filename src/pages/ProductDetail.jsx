@@ -7,9 +7,9 @@ import CareInstructionsCard from "../components/ProductDetail/CareInstructionCar
 import { NeedHelpOnProduct } from "../components/ProductDetail/NeedHelpOnProduct";
 import ProductGallery from "../components/ProductDetail/ProductGallery";
 import { ProductInfo } from "../components/ProductDetail/ProductInfo";
-import { productsWithImage } from "../data/products";
 import { useDelayedLoader } from "../data/util";
 import { apiCall } from "../serice/api";
+import { Helmet } from "react-helmet-async";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -27,13 +27,9 @@ export default function ProductDetail() {
 
       if (!res.error && res.data) {
         setProductDetails(res.data);
-      } else {
-        const fallbackProduct = productsWithImage.find((el) => el.sku === id);
-        setProductDetails(fallbackProduct || null);
       }
     } catch (error) {
-      const fallbackProduct = productsWithImage.find((el) => el.sku === id);
-      setProductDetails(fallbackProduct || null);
+      console.log("Error fetching Product details..")
     } finally {
       setLoading(false);
     }
@@ -42,7 +38,6 @@ export default function ProductDetail() {
   useEffect(() => {
     fetchProductDetails();
   }, [id]);
-
 
   if (!loading && !productDetails?.sku) {
     return (
@@ -72,35 +67,56 @@ export default function ProductDetail() {
 
   return (
     <main className="relative min-h-screen bg-[#F8F3EC] text-[#181818] overflow-hidden">
-      {showLoader && <PremiumLoader isExiting={isExiting} />}
+      <Helmet>
+        <title>
+          {productDetails?.name
+            ? `${productDetails.name} | Pratibha Silks`
+            : "Premium Sarees | Pratibha Silks"}
+        </title>
 
-      <section
-        className={`max-w-7xl mx-auto px-5 pt-8 md:pt-16 pb-16 transition-all duration-700 ease-out ${showLoader ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"
-          }`}
-      >
-        <div className="mb-8 text-sm text-[#6B5F54]">
-          <Link to="/" className="hover:text-[#181818]">
-            Home
-          </Link>{" "}
-          /{" "}
-          <Link to="/products" className="hover:text-[#181818]">
-            Collections
-          </Link>{" "}
-          / <span className="text-[#181818]">{productDetails?.name}</span>
-        </div>
+        <meta
+          name="description"
+          content={
+            productDetails?.description ||
+            `Shop ${productDetails?.name || "premium handcrafted sarees"} from Pratibha Silks.`
+          }
+        />
 
-        <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-8 lg:gap-14 items-start">
-          <ProductGallery productDetails={productDetails} />
-          <ProductInfo productDetails={productDetails} />
-        </div>
+        <link
+          rel="canonical"
+          href={`https://www.pratibhasilks.com/products/${productDetails?.sku?.toLowerCase()}`}
+        />
+      </Helmet>
 
-        <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-8 lg:gap-14 items-start mt-5">
-          <CareInstructionsCard careInstructions={productDetails?.careInstructions} />
-          <AdditionalInformation productDetails={productDetails} />
-        </div>
+      {showLoader ? <PremiumLoader isExiting={isExiting} /> :
 
-        <NeedHelpOnProduct />
-      </section>
+        <section
+          className={`max-w-7xl mx-auto px-5 pt-8 md:pt-16 pb-16 transition-all duration-700 ease-out ${showLoader ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"
+            }`}
+        >
+          <div className="mb-8 text-sm text-[#6B5F54]">
+            <Link to="/" className="hover:text-[#181818]">
+              Home
+            </Link>{" "}
+            /{" "}
+            <Link to="/products" className="hover:text-[#181818]">
+              Collections
+            </Link>{" "}
+            / <span className="text-[#181818]">{productDetails?.name}</span>
+          </div>
+
+          <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-8 lg:gap-14 items-start">
+            <ProductGallery productDetails={productDetails} />
+            <ProductInfo productDetails={productDetails} />
+          </div>
+
+          <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-8 lg:gap-14 items-start mt-5">
+            <CareInstructionsCard careInstructions={productDetails?.careInstructions} />
+            <AdditionalInformation productDetails={productDetails} />
+          </div>
+
+          <NeedHelpOnProduct />
+        </section>}
     </main>
   );
 }

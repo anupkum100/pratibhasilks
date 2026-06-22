@@ -8,8 +8,9 @@ import InvoiceFooter from "../components/InvoiceFooter";
 import InvoiceHeader from "../components/InvoiceHeader";
 
 import { invoices } from "../data/invoices";
-import { products } from "../data/products";
+// import { products } from "../data/products";
 import { getImageFromId } from "../data/util";
+const products = []
 
 export default function InvoicePage() {
     const { invoiceId } = useParams();
