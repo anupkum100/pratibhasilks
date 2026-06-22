@@ -19,7 +19,7 @@ import { PremiumFilterPanel } from "../components/ProductFilter/PremiumFilterPan
 import { useDelayedLoader } from "../data/util";
 import { apiCall } from "../serice/api";
 
-const PRODUCT_LIMIT = 100;
+const PRODUCT_LIMIT = 24;
 
 const SORT_OPTIONS = [
   {
@@ -66,7 +66,7 @@ export default function Products() {
     fabrics: fabricFromUrl ? [fabricFromUrl] : [],
     categories: categoryFromUrl ? [categoryFromUrl] : [],
     colors: [],
-    hideOutOfStock: true,
+    hideOutOfStock: false,
   });
 
   const [expandedSections, setExpandedSections] = useState({
@@ -83,7 +83,7 @@ export default function Products() {
       fabrics: fabricFromUrl ? [fabricFromUrl] : [],
       categories: categoryFromUrl ? [categoryFromUrl] : [],
       colors: [],
-      hideOutOfStock: prev.hideOutOfStock ?? true,
+      hideOutOfStock: prev.hideOutOfStock ?? false,
     }));
   }, [occasionFromUrl, fabricFromUrl, categoryFromUrl]);
 
@@ -115,7 +115,7 @@ export default function Products() {
       params.set("categories", filters.categories.join(","));
     }
 
-    params.set("hideOutOfStock", String(filters.hideOutOfStock ?? true));
+    params.set("hideOutOfStock", String(filters.hideOutOfStock ?? false));
 
     if (sort) {
       params.set("sort", sort);

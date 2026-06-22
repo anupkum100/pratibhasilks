@@ -50,7 +50,6 @@ export default function ProductCard({
           )}
 
           <div className={`${!product.mainImageId ? "aspect-1" : "aspect-[4/7]"} overflow-hidden`}>
-            <p className="p-5">{product.sku}</p>
             <img
               loading="lazy"
               src={getImageFromId(product.mainImageId ? product.mainImageId : "no_image.png")}
@@ -75,17 +74,23 @@ export default function ProductCard({
 
         <div className="p-3 md:p-4">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-[10px] md:text-xs uppercase tracking-[0.25em] text-[#9A7B4F] truncate">
+            <p className="text-[10px] md:text-xs uppercase tracking-[0.15em] text-[#9A7B4F] truncate">
               {product.fabric || "Saree"}
             </p>
 
-            {product.colorHex && (
-              <span
-                title={product.color}
-                className="h-4 w-4 rounded-full border border-black/10 flex-shrink-0"
-                style={{ backgroundColor: product.colorHex }}
-              />
-            )}
+            <div className="flex items-center">
+              <p className="text-[8px] truncate bg-[#F8F3EC] text-[#6B5F54] px-2 py-1 rounded-full me-2">
+                {product.sku}
+              </p>
+
+              {product.colorHex && (
+                <span
+                  title={product.color}
+                  className="h-4 w-4 rounded-full border border-black/10 flex-shrink-0"
+                  style={{ backgroundColor: product.colorHex }}
+                />
+              )}
+            </div>
           </div>
 
 
