@@ -10,14 +10,16 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import PermissionRenderer from "../components/Admin/PermissionRenderer";
+import { useCart } from "../components/Cart/cartContext";
 import ProductModal from "../components/Modal/ProductModal";
+import { SoldModal } from "../components/Modal/SoldModal";
 import PremiumLoader from "../components/PremiumLoader";
 import ProductCard from "../components/ProductCard";
 import { PremiumFilterPanel } from "../components/ProductFilter/PremiumFilterPanel";
 import { useDelayedLoader } from "../data/util";
 import { apiCall } from "../serice/api";
 
-const PRODUCT_LIMIT = 64;
+const PRODUCT_LIMIT = 100;
 
 const SORT_OPTIONS = [
   {
@@ -37,6 +39,8 @@ const SORT_OPTIONS = [
 export default function Products() {
   const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
+  const { createOrder } = useCart();
+
 
   const occasionFromUrl = searchParams.get("occasions");
   const fabricFromUrl = searchParams.get("fabric");
@@ -49,11 +53,20 @@ export default function Products() {
   const [submitting, setSubmitting] = useState(false);
   const [sort, setSort] = useState("latest");
 
+  const [showSoldModal, setShowSoldModal] = useState(false);
+
+  const handleOpenSoldModal = (product) => {
+    setSelectedProduct(product);
+    setShowSoldModal(true);
+  };
+
+
   const [filters, setFilters] = useState({
     occasions: occasionFromUrl ? [occasionFromUrl] : [],
     fabrics: fabricFromUrl ? [fabricFromUrl] : [],
     categories: categoryFromUrl ? [categoryFromUrl] : [],
     colors: [],
+    hideOutOfStock: true,
   });
 
   const [expandedSections, setExpandedSections] = useState({
@@ -64,13 +77,22 @@ export default function Products() {
   });
 
   useEffect(() => {
-    setFilters({
+    setFilters((prev) => ({
+      ...prev,
       occasions: occasionFromUrl ? [occasionFromUrl] : [],
       fabrics: fabricFromUrl ? [fabricFromUrl] : [],
       categories: categoryFromUrl ? [categoryFromUrl] : [],
       colors: [],
-    });
+      hideOutOfStock: prev.hideOutOfStock ?? true,
+    }));
   }, [occasionFromUrl, fabricFromUrl, categoryFromUrl]);
+
+  const toggleOutOfStock = () => {
+    setFilters((prev) => ({
+      ...prev,
+      hideOutOfStock: !prev.hideOutOfStock,
+    }));
+  };
 
   const queryString = useMemo(() => {
     const params = new URLSearchParams();
@@ -93,6 +115,8 @@ export default function Products() {
       params.set("categories", filters.categories.join(","));
     }
 
+    params.set("hideOutOfStock", String(filters.hideOutOfStock ?? true));
+
     if (sort) {
       params.set("sort", sort);
     }
@@ -108,7 +132,7 @@ export default function Products() {
     isLoading,
     isRefetching,
   } = useInfiniteQuery({
-    queryKey: ["products", filters, sort],
+    queryKey: ["products", queryString],
     queryFn: ({ pageParam = 1 }) =>
       apiCall(`/api/products?page=${pageParam}&${queryString}`),
     initialPageParam: 1,
@@ -170,12 +194,14 @@ export default function Products() {
   };
 
   const clearFilters = () => {
-    setFilters({
+    setFilters((prev) => ({
+      ...prev,
       colors: [],
       fabrics: [],
       occasions: [],
       categories: [],
-    });
+      hideOutOfStock: prev.hideOutOfStock ?? true,
+    }));
   };
 
   const toggleSection = (section) => {
@@ -306,6 +332,7 @@ export default function Products() {
                 toggleFilter={toggleFilter}
                 toggleSection={toggleSection}
                 clearFilters={clearFilters}
+                toggleOutOfStock={toggleOutOfStock}
               />
 
               <button
@@ -320,7 +347,7 @@ export default function Products() {
       )}
 
       <section className="max-w-7xl mx-auto px-5 pb-20">
-        <PermissionRenderer permission={false}>
+        <PermissionRenderer>
           <div className="text-end">
             <button
               onClick={openAddModal}
@@ -342,6 +369,7 @@ export default function Products() {
                 toggleFilter={toggleFilter}
                 toggleSection={toggleSection}
                 clearFilters={clearFilters}
+                toggleOutOfStock={toggleOutOfStock}
               />
             </div>
           </aside>
@@ -426,6 +454,7 @@ export default function Products() {
                       product={product}
                       onEdit={openEditModal}
                       onDelete={deleteProduct}
+                      onMarkSold={handleOpenSoldModal}
                     />
                   ))}
                 </div>
@@ -474,6 +503,7 @@ export default function Products() {
         </div>
       </section>
 
+      {/* TODO : Add permission FieldRenderer */}
       <ProductModal
         isOpen={modalOpen}
         mode={modalMode}
@@ -482,6 +512,13 @@ export default function Products() {
         onSubmit={handleProductSubmit}
         loading={loading}
         filters={filterOptions}
+        onMarkSold={handleOpenSoldModal}
+      />
+      <SoldModal
+        open={showSoldModal}
+        product={selectedProduct}
+        onClose={() => setShowSoldModal(false)}
+        onSubmit={createOrder}
       />
     </main>
   );

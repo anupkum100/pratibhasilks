@@ -10,6 +10,7 @@ export function PremiumFilterPanel({
     toggleFilter,
     toggleSection,
     clearFilters,
+    toggleOutOfStock,
 }) {
     return (
         <div className="bg-white rounded-[2rem] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.08)] border border-black/5">
@@ -18,7 +19,10 @@ export function PremiumFilterPanel({
                     <p className="text-xs tracking-[0.35em] uppercase text-[#9A7B4F]">
                         Filters
                     </p>
-                    <h3 className="font-serif text-3xl mt-1">Refine</h3>
+
+                    <h3 className="font-serif text-3xl mt-1">
+                        Refine
+                    </h3>
                 </div>
 
                 {activeFilterCount > 0 && (
@@ -43,6 +47,7 @@ export function PremiumFilterPanel({
 
                         return (
                             <button
+                                type="button"
                                 key={color.name}
                                 onClick={() => toggleFilter("colors", color.name)}
                                 className={`flex items-center gap-2 rounded-full border px-3 py-2 text-xs transition ${selected
@@ -52,7 +57,9 @@ export function PremiumFilterPanel({
                             >
                                 <span
                                     className="h-4 w-4 rounded-full border border-black/10"
-                                    style={{ backgroundColor: color.hex || "#cccccc" }}
+                                    style={{
+                                        backgroundColor: color.hex || "#cccccc",
+                                    }}
                                 />
 
                                 {color.name}
@@ -117,6 +124,34 @@ export function PremiumFilterPanel({
                     ))}
                 </PremiumOptionWrap>
             </FilterSection>
+
+            <div className="pt-5">
+                <button
+                    type="button"
+                    onClick={() => toggleOutOfStock()}
+                    className="w-full flex items-center justify-between gap-4 rounded-[1.25rem] bg-[#FFFCF8] border border-[#E8DCCB] px-4 py-4 hover:bg-[#F8F3EC] transition"
+                >
+                    <div className="text-left">
+                        <p className="text-[11px] uppercase tracking-[0.28em] text-[#9A7B4F]">
+                            Availability
+                        </p>
+
+                        <p className="text-sm mt-1 text-[#2B241D]">
+                            Hide out of stock sarees
+                        </p>
+                    </div>
+
+                    <span
+                        className={`h-6 w-11 rounded-full p-1 transition ${filters.hideOutOfStock ? "bg-[#181818]" : "bg-[#D8CBB8]"
+                            }`}
+                    >
+                        <span
+                            className={`block h-4 w-4 rounded-full bg-white transition ${filters.hideOutOfStock ? "translate-x-5" : "translate-x-0"
+                                }`}
+                        />
+                    </span>
+                </button>
+            </div>
         </div>
     );
 }

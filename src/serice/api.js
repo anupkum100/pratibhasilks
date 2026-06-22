@@ -1,47 +1,70 @@
-// const URL = "http://localhost:4000"
-const URL = "https://721gb6ymy1.execute-api.us-east-2.amazonaws.com"
+const URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+// const URL = "https://721gb6ymy1.execute-api.us-east-2.amazonaws.com";
 
-
-
-export async function apiCall(url, method = "GET", payload = null) {
-    const isFormData = payload instanceof FormData;
-
+export async function apiCall(
+    url,
+    method = "GET",
+    payload = null,
+    customHeaders = {}
+) {
     try {
-        const token = localStorage.getItem('token'); // or sessionStorage if preferred
-        const config = {
-            method
+        const token = localStorage.getItem("ps_token");
+        const isFormData = payload instanceof FormData;
+
+        const headers = {
+            ...(!isFormData && { "Content-Type": "application/json" }),
+            ...customHeaders,
+            ...(token && { Authorization: `Bearer ${token}` }),
         };
 
-        if (token) {
-            config.headers['Authorization'] = `Bearer ${token}`;
-        }
+        const config = {
+            method,
+            headers,
+        };
 
         if (payload && method !== "GET") {
             config.body = isFormData ? payload : JSON.stringify(payload);
         }
 
-        const response = await fetch(URL + url, config);
+        const response = await fetch(`${URL}${url}`, config);
 
-        if (response.status === 401 && localStorage.getItem("token")) {
-            localStorage.removeItem("token")
-            window.location.reload()
+        let data = null;
+
+        try {
+            data = await response.json();
+        } catch {
+            data = null;
+        }
+
+        if (response.status === 401 && token) {
+            // localStorage.removeItem("ps_token");
+            window.dispatchEvent(new Event("ps-auth-logout"));
+
+            return {
+                error: {
+                    status: 401,
+                    message: data?.message || "Session expired. Please login again.",
+                },
+            };
         }
 
         if (!response.ok) {
-            const errText = await response.json();
             return {
                 error: {
                     status: response.status,
-                    message: errText.message
-                }
-            }
-            // new Error(`Error ${ response.status }: ${ errText } `);
+                    message: data?.message || data?.error || "Something went wrong",
+                },
+            };
         }
 
-        return await response.json();
+        return data;
     } catch (error) {
+        console.error(error);
+
         return {
-            error: "Something went wrong..."
+            error: {
+                message: error.message || "Network error",
+            },
         };
     }
 }

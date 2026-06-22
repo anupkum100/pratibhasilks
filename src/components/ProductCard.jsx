@@ -1,19 +1,20 @@
-import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Edit, Trash2 } from "lucide-react";
+import { BadgeIndianRupee, Edit, Trash2, ShoppingCart, Check } from "lucide-react";
+import { Link } from "react-router-dom";
 import { getImageFromId, normalised } from "../data/util";
 import PermissionRenderer from "./Admin/PermissionRenderer";
+import { useCart } from "./Cart/cartContext";
 
 export default function ProductCard({
   product,
   isAdmin = true,
   onEdit,
   onDelete,
+  onMarkSold
 }) {
-  const discount =
-    product.offerPrice && product.price
-      ? Math.round(((product.price - product.offerPrice) / product.price) * 100)
-      : 0;
+  const { addToCart, removeFromCart, isInCart } = useCart();
+
+  const added = isInCart(product._id);
 
   const stopCardNavigation = (event, callback) => {
     event.preventDefault();
@@ -49,6 +50,7 @@ export default function ProductCard({
           )}
 
           <div className={`${!product.mainImageId ? "aspect-1" : "aspect-[4/7]"} overflow-hidden`}>
+            <p className="p-5">{product.sku}</p>
             <img
               loading="lazy"
               src={getImageFromId(product.mainImageId ? product.mainImageId : "no_image.png")}
@@ -118,12 +120,13 @@ export default function ProductCard({
       </Link>
 
 
-      <PermissionRenderer permission={false}>
-        <div className="px-3 md:px-4 pb-4 flex gap-2">
-          <button
-            type="button"
-            onClick={(event) => stopCardNavigation(event, onEdit)}
-            className="
+      <PermissionRenderer>
+        {product.stock > 0 && <>
+          <div className="px-3 md:px-4 pb-4 flex gap-2">
+            <button
+              type="button"
+              onClick={(event) => stopCardNavigation(event, onEdit)}
+              className="
               flex-1
               rounded-full
               border border-black/10
@@ -134,15 +137,15 @@ export default function ProductCard({
               hover:text-white
               transition
             "
-          >
-            <Edit size={14} />
-            Edit
-          </button>
+            >
+              <Edit size={14} />
+              Edit
+            </button>
 
-          <button
-            type="button"
-            onClick={(event) => stopCardNavigation(event, onDelete)}
-            className="
+            <button
+              type="button"
+              onClick={(event) => stopCardNavigation(event, onDelete)}
+              className="
               flex-1
               rounded-full
               border border-red-200
@@ -154,12 +157,72 @@ export default function ProductCard({
               hover:text-white
               transition
             "
-          >
-            <Trash2 size={14} />
-            Delete
-          </button>
-        </div>
+            >
+              <Trash2 size={14} />
+              Delete
+            </button>
+          </div>
+
+          <div className="px-3 md:px-4 pb-4 flex gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                if (added) {
+                  removeFromCart(product._id);
+                } else {
+                  addToCart(product);
+                }
+              }}
+              className=" flex-1
+              rounded-full
+              border border-black/10
+              py-2
+              flex items-center justify-center gap-2
+              text-xs font-medium
+              hover:bg-[#181818]
+              hover:text-white
+              transition"
+            >
+              {added ? (
+                <>
+                  <Check size={16} />
+                  Added To Cart
+                </>
+              ) : (
+                <>
+                  <ShoppingCart size={16} />
+                  Add To Cart
+                </>
+              )}
+            </button>
+
+
+            <button
+              disabled={isInCart(product._id)}
+              type="button"
+              onClick={(event) =>
+                stopCardNavigation(event, () => onMarkSold(product))
+              }
+              className="
+          flex-1
+          rounded-full
+          border border-green-200
+          text-green-700
+          py-2
+          flex items-center justify-center gap-2
+          text-xs font-medium
+          hover:bg-green-600
+          hover:text-white
+          transition
+          "
+            >
+              <BadgeIndianRupee size={14} />
+              Sell now
+            </button>
+          </div>
+        </>}
       </PermissionRenderer>
-    </motion.article>
+
+    </motion.article >
   );
 }

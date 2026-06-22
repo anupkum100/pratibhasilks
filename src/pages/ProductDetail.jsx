@@ -10,6 +10,7 @@ import { ProductInfo } from "../components/ProductDetail/ProductInfo";
 import { productsWithImage } from "../data/products";
 import { useDelayedLoader } from "../data/util";
 import { apiCall } from "../serice/api";
+import { Helmet } from "react-helmet-async";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -72,6 +73,26 @@ export default function ProductDetail() {
 
   return (
     <main className="relative min-h-screen bg-[#F8F3EC] text-[#181818] overflow-hidden">
+      <Helmet>
+        <title>
+          {productDetails?.name
+            ? `${productDetails.name} | Pratibha Silks`
+            : "Premium Sarees | Pratibha Silks"}
+        </title>
+
+        <meta
+          name="description"
+          content={
+            productDetails?.description ||
+            `Shop ${productDetails?.name || "premium handcrafted sarees"} from Pratibha Silks.`
+          }
+        />
+
+        <link
+          rel="canonical"
+          href={`https://www.pratibhasilks.com/products/${productDetails?.sku?.toLowerCase()}`}
+        />
+      </Helmet>
       {showLoader && <PremiumLoader isExiting={isExiting} />}
 
       <section

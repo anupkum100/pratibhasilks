@@ -16,6 +16,8 @@ import ReturnsExchanges from "./pages/CustomerCare/ReturnsExchanges";
 import TrackOrder from "./pages/CustomerCare/TrackOrder";
 import InvoiceVerification from "./pages/CustomerCare/InvoiceVerification";
 import FAQ from "./pages/CustomerCare/FAQ";
+import Orders from "./pages/Orders";
+import ProtectedAdminRoute from "./pages/ProtectesAdminRoute";
 
 
 export default function App() {
@@ -38,6 +40,10 @@ export default function App() {
           <Route path="/track-order" element={<TrackOrder />} />
           <Route path="/invoice-verification" element={<InvoiceVerification />} />
           <Route path="/faq" element={<FAQ />} />
+
+          <Route element={<ProtectedAdminRoute />}>
+            <Route path="/admin/orders" element={<Orders />} />
+          </Route>
 
           <Route path="*" element={<PageNotFound />} />
         </Routes>
