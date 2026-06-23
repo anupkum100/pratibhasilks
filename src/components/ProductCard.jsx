@@ -58,7 +58,6 @@ export default function ProductCard({
                 h-full w-full
                 transition-transform duration-700 ease-out
                 group-hover:scale-105
-                ${product.stock === 0 ? "grayscale" : ""}
                 ${!product.mainImageId ? "object-contain" : "object-cover"}
                 ${!product.mainImageId ? "p-10" : ""}
                   `}
