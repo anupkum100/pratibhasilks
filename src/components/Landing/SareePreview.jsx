@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { getImageFromId } from "../../data/util";
 import { sareeTypes } from "../../data/sareeTypes"
 
-const previewTypes = [...sareeTypes].splice(1, 3)
+const previewTypes = [...sareeTypes].splice(0, 3)
 
 export default function SareeTypesPreview() {
     return (

@@ -1,9 +1,24 @@
 export const sareeTypes = [
     {
+        name: "Madhubani Print",
+        region: "Mithila, Bihar",
+        mood: "Folk Art Draped",
+        image: "ChatGPT_Image_Jun_24_2026_02_55_33_PM_po5dfk",
+        intro:
+            "A centuries-old folk art known for bold outlines, natural colours and mythological storytelling.",
+        details: [
+            "Originates from the Mithila region of Bihar.",
+            "Uses geometric forms, nature motifs and village-life themes.",
+            "Often features deities, animals, flowers and symbolic patterns.",
+        ],
+        technique:
+            "Detailed linework and strong visual rhythm give Madhubani prints their expressive identity.",
+    },
+    {
         name: "Chanderi",
         region: "Madhya Pradesh",
         mood: "Lightweight Royalty",
-        image: "samples/paper.png",
+        image: "ChatGPT_Image_Jun_24_2026_02_29_28_PM_fpkvva",
         intro:
             "Known as ‘bunni hui hawa’ — a woven breeze — Chanderi is delicate, semi-sheer and graceful.",
         details: [
@@ -18,7 +33,7 @@ export const sareeTypes = [
         name: "Ikat",
         region: "Gujarat, Odisha, Andhra Pradesh",
         mood: "Mathematical Art",
-        image: "samples/paper.png",
+        image: "ChatGPT_Image_Jun_24_2026_02_38_52_PM_ezdpgf",
         intro:
             "Ikat patterns are created before weaving, giving the textile its signature blurred beauty.",
         details: [
@@ -29,21 +44,6 @@ export const sareeTypes = [
         technique:
             "Warp or weft yarns are tied, dyed and aligned on the loom to reveal the final pattern.",
     },
-    // {
-    //     name: "Bandhej / Laheriya",
-    //     region: "Rajasthan & Gujarat",
-    //     mood: "Festive Movement",
-    //     image: "Jaipur_myxoxv.png",
-    //     intro:
-    //         "A traditional tie-dye craft where tied parts resist dye, creating dots, waves and vibrant patterns.",
-    //     details: [
-    //         "Bandhej uses marked dots to guide the tying process.",
-    //         "Laheriya creates wave-like diagonal patterns.",
-    //         "Multiple dyeing cycles create rich layered colour effects.",
-    //     ],
-    //     technique:
-    //         "Fabric is tied, dyed, opened and sometimes repeated with multiple colours.",
-    // },
     {
         name: "Bagru Handblock",
         region: "Jaipur, Rajasthan",
@@ -78,7 +78,7 @@ export const sareeTypes = [
         name: "Batik",
         region: "West Bengal",
         mood: "Cracked Dye Poetry",
-        image: "samples/paper.png",
+        image: "ChatGPT_Image_Jun_24_2026_02_53_28_PM_afjkpk",
         intro:
             "A wax-resist textile art where molten wax protects parts of the fabric during dyeing.",
         details: [
@@ -89,22 +89,6 @@ export const sareeTypes = [
         technique:
             "Waxing, dyeing and dewaxing may be repeated to create layered colours.",
     },
-    {
-        name: "Madhubani Print",
-        region: "Mithila, Bihar",
-        mood: "Folk Art Draped",
-        image: "samples/paper.png",
-        intro:
-            "A centuries-old folk art known for bold outlines, natural colours and mythological storytelling.",
-        details: [
-            "Originates from the Mithila region of Bihar.",
-            "Uses geometric forms, nature motifs and village-life themes.",
-            "Often features deities, animals, flowers and symbolic patterns.",
-        ],
-        technique:
-            "Detailed linework and strong visual rhythm give Madhubani prints their expressive identity.",
-    },
-
     {
         name: "Multani Handblock",
         region: "Rajasthan",
