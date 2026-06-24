@@ -1,17 +1,16 @@
-import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
     ChevronDown,
+    ChevronLeft,
+    ChevronRight,
     Eye,
-    PackageCheck,
-    Phone,
-    ReceiptText,
-    Search,
-    ShoppingBag,
-    User,
-    X,
+    PackageCheck, ReceiptText,
+    Search, User,
+    X
 } from "lucide-react";
+import { useMemo, useState } from "react";
 import PremiumLoader from "../components/PremiumLoader";
+import { formatDate, formatMoney } from "../data/util";
 import { apiCall } from "../serice/api";
 
 const STATUS_OPTIONS = [
@@ -21,17 +20,18 @@ const STATUS_OPTIONS = [
     { label: "Returned", value: "RETURNED" },
 ];
 
+const PAGE_SIZE = 8;
+
 export default function Orders() {
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState("all");
     const [selectedOrder, setSelectedOrder] = useState(null);
+    const [page, setPage] = useState(1);
 
     const queryString = useMemo(() => {
         const params = new URLSearchParams();
-
         if (search.trim()) params.set("search", search.trim());
         if (status !== "all") params.set("status", status);
-
         return params.toString();
     }, [search, status]);
 
@@ -42,61 +42,81 @@ export default function Orders() {
 
     const orders = data?.data || [];
 
-    const totalRevenue = useMemo(() => {
-        return orders.reduce((sum, order) => sum + Number(order.totalSoldPrice || order.totalAmount || 0), 0);
-    }, [orders]);
+    const totalRevenue = useMemo(
+        () =>
+            orders.reduce(
+                (sum, order) =>
+                    sum + Number(order.totalSoldPrice || order.totalAmount || 0),
+                0
+            ),
+        [orders]
+    );
 
-    const totalItems = useMemo(() => {
-        return orders.reduce((sum, order) => sum + (order.items?.length || 0), 0);
-    }, [orders]);
+    const totalItems = useMemo(
+        () => orders.reduce((sum, order) => sum + (order.items?.length || 0), 0),
+        [orders]
+    );
+
+    const paginatedOrders = orders.slice(
+        (page - 1) * PAGE_SIZE,
+        page * PAGE_SIZE
+    );
+
+    const totalPages = Math.ceil(orders.length / PAGE_SIZE);
 
     return (
-        <main className="min-h-screen bg-[#F8F3EC] text-[#181818] px-5 pt-12 pb-20">
+        <main className="min-h-screen bg-[#F8F3EC] text-[#181818] px-5 py-10 md:py-16">
             {isLoading && <PremiumLoader />}
 
             <section className="max-w-7xl mx-auto">
-                <div className="rounded-[2.5rem] bg-gradient-to-br from-[#17130F] via-[#241B13] to-[#0F0D0B] text-white px-6 md:px-10 py-8 md:py-10 shadow-[0_30px_90px_rgba(0,0,0,0.22)]">
-                    <p className="text-[11px] uppercase tracking-[0.4em] text-[#D7B77A]">
-                        Pratibha Silks
-                    </p>
+                <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+                    <div>
+                        <p className="text-xs tracking-[0.45em] uppercase text-[#9A7B4F]">
+                            Sales Ledger
+                        </p>
 
-                    <div className="mt-3 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-                        <div>
-                            <h1 className="font-serif text-5xl md:text-7xl leading-none">
-                                Orders
-                            </h1>
+                        <h1 className="font-serif text-5xl md:text-7xl mt-4 leading-none">
+                            Orders
+                        </h1>
 
-                            <p className="mt-4 max-w-2xl text-white/65 leading-7">
-                                Manage completed saree sales, buyer details, order values and product history in one elegant place.
-                            </p>
-                        </div>
-
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                            <StatCard label="Orders" value={orders.length} />
-                            <StatCard label="Sarees Sold" value={totalItems} />
-                            <StatCard label="Revenue" value={`₹${totalRevenue}`} />
-                        </div>
+                        <p className="text-[#6B5F54] mt-5 max-w-2xl leading-7">
+                            Manage saree sales, buyer information, order value and product
+                            history in one refined business view.
+                        </p>
                     </div>
                 </div>
 
-                <div className="mt-8 rounded-[2rem] bg-white border border-[#E8DCCB] p-4 md:p-5 shadow-[0_20px_60px_rgba(0,0,0,0.07)]">
-                    <div className="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
-                        <div className="relative flex-1">
-                            <Search size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9A7B4F]" />
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
+                    <SummaryCard title="Orders" value={orders.length} />
+                    <SummaryCard title="Sarees Sold" value={totalItems} />
+                    <SummaryCard title="Revenue" value={formatMoney(totalRevenue)} />
+                    <SummaryCard title="Status" value={status === "all" ? "All" : status} />
+                </div>
+
+                <div className="mt-8 bg-white rounded-[2rem] p-4 md:p-5 shadow-[0_18px_55px_rgba(0,0,0,0.08)] border border-black/5">
+                    <div className="grid md:grid-cols-[1fr_220px] gap-3">
+                        <div className="flex items-center gap-3 bg-[#F8F3EC] rounded-full px-4 py-3">
+                            <Search size={18} className="text-[#9A7B4F]" />
 
                             <input
                                 value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                placeholder="Search by order no, buyer name, phone or SKU..."
-                                className="w-full rounded-full border border-[#E2D5C3] bg-[#FFFCF8] pl-11 pr-4 py-3.5 text-sm outline-none focus:border-[#B88A44] focus:ring-4 focus:ring-[#B88A44]/10"
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                    setPage(1);
+                                }}
+                                placeholder="Search order, buyer, phone or SKU..."
+                                className="bg-transparent outline-none w-full text-sm"
                             />
                         </div>
 
-                        <label className="relative min-w-[220px]">
+                        <label className="relative">
                             <select
                                 value={status}
-                                onChange={(e) => setStatus(e.target.value)}
-                                className="w-full appearance-none rounded-full border border-[#E2D5C3] bg-[#FFFCF8] px-5 py-3.5 pr-11 text-sm outline-none focus:border-[#B88A44]"
+                                onChange={(e) => {
+                                    setStatus(e.target.value);
+                                    setPage(1);
+                                }}
+                                className="w-full appearance-none bg-[#F8F3EC] rounded-full px-4 py-3 pr-11 text-sm outline-none"
                             >
                                 {STATUS_OPTIONS.map((item) => (
                                     <option key={item.value} value={item.value}>
@@ -105,32 +125,69 @@ export default function Orders() {
                                 ))}
                             </select>
 
-                            <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9A7B4F]" />
+                            <ChevronDown
+                                size={16}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9A7B4F]"
+                            />
                         </label>
                     </div>
                 </div>
 
                 {isRefetching && (
-                    <p className="mt-4 text-sm text-[#9A7B4F]">
-                        Refreshing orders...
-                    </p>
+                    <p className="mt-4 text-sm text-[#9A7B4F]">Refreshing orders...</p>
                 )}
 
-                <section className="mt-8">
-                    {orders.length > 0 ? (
-                        <div className="space-y-4">
-                            {orders.map((order) => (
-                                <OrderCard
+                {orders.length > 0 ? (
+                    <>
+                        <div className="hidden md:block mt-6 bg-white rounded-[2rem] overflow-hidden shadow-[0_18px_55px_rgba(0,0,0,0.08)] border border-black/5">
+                            <table className="w-full text-sm">
+                                <thead className="bg-[#181818] text-white">
+                                    <tr>
+                                        <TableHead label="Order" />
+                                        <TableHead label="Buyer" />
+                                        <TableHead label="Phone" />
+                                        <TableHead label="Items" />
+                                        <TableHead label="Amount" />
+                                        <TableHead label="Status" />
+                                        <TableHead label="Date" />
+                                        <TableHead label="Action" />
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {paginatedOrders.map((order) => (
+                                        <OrderRow
+                                            key={order._id}
+                                            order={order}
+                                            onView={() => setSelectedOrder(order)}
+                                        />
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div className="md:hidden mt-6 space-y-4">
+                            {paginatedOrders.map((order) => (
+                                <OrderMobileCard
                                     key={order._id}
                                     order={order}
                                     onView={() => setSelectedOrder(order)}
                                 />
                             ))}
                         </div>
-                    ) : (
+
+                        <Pagination
+                            page={page}
+                            totalPages={totalPages}
+                            onPrev={() => setPage((prev) => Math.max(prev - 1, 1))}
+                            onNext={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                        />
+                    </>
+                ) : (
+                    <div className="mt-8">
                         <EmptyOrders />
-                    )}
-                </section>
+                    </div>
+                )}
             </section>
 
             <OrderDetailsModal
@@ -141,82 +198,96 @@ export default function Orders() {
     );
 }
 
-function OrderCard({ order, onView }) {
+function OrderRow({ order, onView }) {
     const amount = order.totalSoldPrice || order.totalAmount || 0;
     const buyerName = order.buyer?.name || "—";
     const buyerPhone = order.buyer?.phone || "—";
 
     return (
-        <div className="rounded-[2rem] bg-white border border-[#E8DCCB] p-5 md:p-6 shadow-[0_18px_55px_rgba(0,0,0,0.06)] hover:shadow-[0_24px_70px_rgba(0,0,0,0.10)] transition">
-            <div className="flex flex-col xl:flex-row xl:items-center gap-5">
-                <div className="flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                        <span className="rounded-full bg-[#17130F] text-white px-3 py-1 text-xs">
-                            {order.orderNo || order.orderSku || order._id}
-                        </span>
+        <tr className="border-b border-black/5 hover:bg-[#F8F3EC]/70 transition">
+            <td className="p-5 font-medium">
+                <span className="rounded-full bg-[#181818] text-white px-3 py-1 text-xs">
+                    {order.orderNo || order.orderSku || order._id}
+                </span>
+            </td>
 
-                        <StatusBadge status={order.status} />
+            <td className="p-5 font-serif text-xl">{buyerName}</td>
 
-                        <span className="text-xs text-[#8A7A68]">
-                            {formatDate(order.soldAt || order.createdAt)}
-                        </span>
-                    </div>
+            <td className="p-5 text-[#6B5F54]">{buyerPhone}</td>
 
-                    <h3 className="font-serif text-2xl mt-3 text-[#1F1A14]">
+            <td className="p-5">{order.items?.length || 0}</td>
+
+            <td className="p-5 font-semibold">{formatMoney(amount)}</td>
+
+            <td className="p-5">
+                <StatusBadge status={order.status} />
+            </td>
+
+            <td className="p-5 text-[#6B5F54]">
+                {formatDate(order.soldAt || order.createdAt)}
+            </td>
+
+            <td className="p-5">
+                <button
+                    type="button"
+                    onClick={onView}
+                    className="inline-flex items-center gap-2 rounded-full bg-[#181818] text-white px-4 py-2 text-xs"
+                >
+                    <Eye size={14} />
+                    View
+                </button>
+            </td>
+        </tr>
+    );
+}
+
+function OrderMobileCard({ order, onView }) {
+    const amount = order.totalSoldPrice || order.totalAmount || 0;
+    const buyerName = order.buyer?.name || "—";
+    const buyerPhone = order.buyer?.phone || "—";
+
+    return (
+        <div className="bg-white rounded-[1.75rem] p-5 shadow-[0_18px_55px_rgba(0,0,0,0.08)] border border-black/5">
+            <div className="flex justify-between gap-4">
+                <div>
+                    <StatusBadge status={order.status} />
+
+                    <h3 className="font-serif text-3xl mt-3 leading-none">
                         {buyerName}
                     </h3>
 
-                    <div className="mt-2 flex flex-wrap gap-4 text-sm text-[#6B5F54]">
-                        <span className="flex items-center gap-1.5">
-                            <Phone size={14} />
-                            {buyerPhone}
-                        </span>
-
-                        <span className="flex items-center gap-1.5">
-                            <ShoppingBag size={14} />
-                            {order.items?.length || 0} item(s)
-                        </span>
-                    </div>
-
-                    <div className="mt-4 flex flex-wrap gap-2">
-                        {(order.items || []).slice(0, 3).map((item) => (
-                            <span
-                                key={item.productId || item.sku}
-                                className="rounded-full bg-[#F8F3EC] border border-[#E8DCCB] px-3 py-1 text-xs text-[#6B5F54]"
-                            >
-                                {item.sku}
-                            </span>
-                        ))}
-
-                        {(order.items || []).length > 3 && (
-                            <span className="rounded-full bg-[#F8F3EC] border border-[#E8DCCB] px-3 py-1 text-xs text-[#6B5F54]">
-                                +{order.items.length - 3} more
-                            </span>
-                        )}
-                    </div>
+                    <p className="text-xs text-[#6B5F54] mt-2">
+                        {order.orderNo || order.orderSku || order._id}
+                    </p>
                 </div>
 
-                <div className="flex xl:flex-col items-center xl:items-end justify-between gap-4">
-                    <div className="text-right">
-                        <p className="text-[10px] uppercase tracking-[0.28em] text-[#9A7B4F]">
-                            Order Value
-                        </p>
-
-                        <p className="text-3xl font-semibold text-[#181818]">
-                            ₹{amount}
-                        </p>
-                    </div>
-
-                    <button
-                        type="button"
-                        onClick={onView}
-                        className="inline-flex items-center justify-center gap-2 rounded-full bg-[#17130F] px-5 py-3 text-sm text-white hover:bg-black transition"
-                    >
-                        <Eye size={16} />
-                        View Details
-                    </button>
-                </div>
+                <p className="font-serif text-3xl">{formatMoney(amount)}</p>
             </div>
+
+            <div className="grid grid-cols-2 gap-3 mt-5 text-sm">
+                <MobileMeta label="Phone" value={buyerPhone} />
+                <MobileMeta label="Items" value={`${order.items?.length || 0} saree(s)`} />
+                <MobileMeta
+                    label="Date"
+                    value={formatDate(order.soldAt || order.createdAt)}
+                />
+                <MobileMeta
+                    label="SKUs"
+                    value={(order.items || [])
+                        .slice(0, 2)
+                        .map((item) => item.sku)
+                        .join(", ") || "—"}
+                />
+            </div>
+
+            <button
+                type="button"
+                onClick={onView}
+                className="mt-5 w-full bg-[#181818] text-white rounded-full py-3 text-sm flex items-center justify-center gap-2"
+            >
+                <Eye size={16} />
+                View Details
+            </button>
         </div>
     );
 }
@@ -230,7 +301,7 @@ function OrderDetailsModal({ order, onClose }) {
         <div className="fixed inset-0 z-[999] bg-black/55 backdrop-blur-sm overflow-y-auto">
             <div className="min-h-dvh flex items-start justify-center px-3 py-6 sm:px-5 sm:py-8">
                 <div className="w-full max-w-[860px] rounded-[2rem] bg-[#FFFCF8] border border-[#E8DCCB] shadow-[0_30px_90px_rgba(0,0,0,0.28)] overflow-hidden">
-                    <div className="relative bg-gradient-to-br from-[#17130F] via-[#241B13] to-[#0F0D0B] text-white px-5 sm:px-8 py-6">
+                    <div className="relative bg-[#181818] text-white px-5 sm:px-8 py-6">
                         <button
                             onClick={onClose}
                             className="absolute right-4 top-4 h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition"
@@ -242,7 +313,7 @@ function OrderDetailsModal({ order, onClose }) {
                             Order Details
                         </p>
 
-                        <h2 className="font-serif text-3xl sm:text-4xl mt-2">
+                        <h2 className="font-serif text-3xl sm:text-4xl mt-2 pr-10">
                             {order.orderNo || order.orderSku || order._id}
                         </h2>
 
@@ -252,7 +323,7 @@ function OrderDetailsModal({ order, onClose }) {
                                 {formatDate(order.soldAt || order.createdAt)}
                             </span>
                             <span className="rounded-full bg-[#D7B77A] text-[#1A120B] px-3 py-1 font-semibold">
-                                ₹{amount}
+                                {formatMoney(amount)}
                             </span>
                         </div>
                     </div>
@@ -270,7 +341,7 @@ function OrderDetailsModal({ order, onClose }) {
                                 icon={<ReceiptText size={17} />}
                                 label="Order Summary"
                                 value={`${order.items?.length || 0} Saree(s)`}
-                                subValue={`Total ₹${amount}`}
+                                subValue={`Total ${formatMoney(amount)}`}
                             />
                         </div>
 
@@ -299,7 +370,10 @@ function OrderDetailsModal({ order, onClose }) {
                                             </div>
 
                                             <div className="grid grid-cols-2 gap-3 sm:min-w-[220px]">
-                                                <PriceBox label="Listed" value={item.listedPrice || item.price} />
+                                                <PriceBox
+                                                    label="Listed"
+                                                    value={item.listedPrice || item.price}
+                                                />
                                                 <PriceBox label="Sold" value={item.soldPrice} dark />
                                             </div>
                                         </div>
@@ -324,7 +398,7 @@ function OrderDetailsModal({ order, onClose }) {
                     <div className="px-5 sm:px-8 pb-5 sm:pb-8">
                         <button
                             onClick={onClose}
-                            className="w-full rounded-full bg-[#17130F] text-white py-3.5 text-sm hover:bg-black transition"
+                            className="w-full rounded-full bg-[#181818] text-white py-3.5 text-sm hover:bg-black transition"
                         >
                             Close
                         </button>
@@ -335,18 +409,20 @@ function OrderDetailsModal({ order, onClose }) {
     );
 }
 
-function StatCard({ label, value }) {
+function SummaryCard({ title, value }) {
     return (
-        <div className="rounded-2xl bg-white/8 border border-white/10 px-4 py-3 min-w-[120px]">
-            <p className="text-[10px] uppercase tracking-[0.25em] text-[#D7B77A]">
-                {label}
+        <div className="bg-white rounded-[1.5rem] p-5 md:p-6 shadow-[0_18px_55px_rgba(0,0,0,0.06)] border border-black/5">
+            <p className="text-[10px] md:text-xs tracking-[0.3em] uppercase text-[#9A7B4F]">
+                {title}
             </p>
 
-            <p className="mt-1 text-2xl font-semibold">
-                {value}
-            </p>
+            <p className="font-serif text-3xl md:text-4xl mt-3">{value}</p>
         </div>
     );
+}
+
+function TableHead({ label }) {
+    return <th className="p-5 text-left font-medium">{label}</th>;
 }
 
 function StatusBadge({ status = "COMPLETED", dark = false }) {
@@ -363,8 +439,11 @@ function StatusBadge({ status = "COMPLETED", dark = false }) {
     };
 
     return (
-        <span className={`rounded-full border px-3 py-1 text-xs ${styles[status] || styles.COMPLETED}`}>
-            {status}
+        <span
+            className={`rounded-full border px-3 py-1 text-xs ${styles[status] || styles.COMPLETED
+                }`}
+        >
+            {status || "COMPLETED"}
         </span>
     );
 }
@@ -374,32 +453,71 @@ function InfoCard({ icon, label, value, subValue }) {
         <div className="rounded-[1.5rem] bg-white border border-[#E8DCCB] p-5">
             <div className="flex items-center gap-2 text-[#9A7B4F]">
                 {icon}
-                <p className="text-[10px] uppercase tracking-[0.28em]">
-                    {label}
-                </p>
+                <p className="text-[10px] uppercase tracking-[0.28em]">{label}</p>
             </div>
 
-            <p className="mt-3 font-serif text-2xl text-[#1F1A14]">
-                {value}
-            </p>
+            <p className="mt-3 font-serif text-2xl text-[#1F1A14]">{value}</p>
 
-            <p className="mt-1 text-sm text-[#6B5F54]">
-                {subValue}
-            </p>
+            <p className="mt-1 text-sm text-[#6B5F54]">{subValue}</p>
         </div>
     );
 }
 
 function PriceBox({ label, value, dark = false }) {
     return (
-        <div className={`rounded-2xl px-4 py-3 ${dark ? "bg-[#17130F] text-white" : "bg-[#F8F3EC] text-[#181818]"}`}>
-            <p className={`text-[9px] uppercase tracking-[0.22em] ${dark ? "text-[#D7B77A]" : "text-[#9A7B4F]"}`}>
+        <div
+            className={`rounded-2xl px-4 py-3 ${dark ? "bg-[#181818] text-white" : "bg-[#F8F3EC] text-[#181818]"
+                }`}
+        >
+            <p
+                className={`text-[9px] uppercase tracking-[0.22em] ${dark ? "text-[#D7B77A]" : "text-[#9A7B4F]"
+                    }`}
+            >
                 {label}
             </p>
 
-            <p className="mt-1 font-semibold">
-                ₹{value || 0}
+            <p className="mt-1 font-semibold">{formatMoney(value || 0)}</p>
+        </div>
+    );
+}
+
+function MobileMeta({ label, value }) {
+    return (
+        <div className="bg-[#F8F3EC] rounded-2xl p-3">
+            <p className="text-[10px] tracking-[0.2em] uppercase text-[#9A7B4F]">
+                {label}
             </p>
+
+            <p className="mt-1 text-[#181818] font-medium break-words">{value}</p>
+        </div>
+    );
+}
+
+function Pagination({ page, totalPages, onPrev, onNext }) {
+    if (totalPages <= 1) return null;
+
+    return (
+        <div className="flex items-center justify-between mt-8">
+            <button
+                onClick={onPrev}
+                disabled={page === 1}
+                className="h-11 w-11 rounded-full bg-white disabled:opacity-40 flex items-center justify-center shadow-md"
+            >
+                <ChevronLeft size={18} />
+            </button>
+
+            <p className="text-sm text-[#6B5F54]">
+                Page <span className="text-[#181818] font-medium">{page}</span> of{" "}
+                {totalPages}
+            </p>
+
+            <button
+                onClick={onNext}
+                disabled={page === totalPages}
+                className="h-11 w-11 rounded-full bg-white disabled:opacity-40 flex items-center justify-center shadow-md"
+            >
+                <ChevronRight size={18} />
+            </button>
         </div>
     );
 }
@@ -413,23 +531,11 @@ function EmptyOrders() {
                 No Orders
             </p>
 
-            <h3 className="font-serif text-4xl mt-3">
-                No sales recorded yet
-            </h3>
+            <h3 className="font-serif text-4xl mt-3">No sales recorded yet</h3>
 
             <p className="text-[#6B5F54] mt-4">
                 Once sarees are marked as sold, orders will appear here.
             </p>
         </div>
     );
-}
-
-function formatDate(date) {
-    if (!date) return "—";
-
-    return new Date(date).toLocaleDateString("en-IN", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-    });
 }

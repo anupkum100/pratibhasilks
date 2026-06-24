@@ -7,7 +7,6 @@ import { useCart } from "./Cart/cartContext";
 
 export default function ProductCard({
   product,
-  isAdmin = true,
   onEdit,
   onDelete,
   onMarkSold

@@ -18,6 +18,7 @@ import InvoiceVerification from "./pages/CustomerCare/InvoiceVerification";
 import FAQ from "./pages/CustomerCare/FAQ";
 import Orders from "./pages/Orders";
 import ProtectedAdminRoute from "./pages/ProtectesAdminRoute";
+import PaymentsPage from "./pages/Payments";
 
 
 export default function App() {
@@ -43,6 +44,7 @@ export default function App() {
 
           <Route element={<ProtectedAdminRoute />}>
             <Route path="/admin/orders" element={<Orders />} />
+            <Route path="/admin/payments" element={<PaymentsPage />} />
           </Route>
 
           <Route path="*" element={<PageNotFound />} />

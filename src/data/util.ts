@@ -51,3 +51,19 @@ export function normalised(str = "") {
         // 4. Capitalize the very first letter
         .replace(/^./, char => char.toUpperCase())
 }
+
+export function formatMoney(value) {
+    return `₹${Number(value || 0).toLocaleString("en-IN", {
+        maximumFractionDigits: 0,
+    })}`;
+}
+
+export function formatDate(date) {
+    if (!date) return "-";
+
+    return new Date(date).toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+    });
+}

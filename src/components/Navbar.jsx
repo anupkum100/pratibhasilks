@@ -1,12 +1,11 @@
 import {
   ChevronDown,
   Fingerprint,
+  IndianRupee,
   LogOut,
-  Menu,
-  Package,
-  ShoppingBag,
+  Menu, ShoppingBag,
   ShoppingCart,
-  X,
+  X
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -25,7 +24,7 @@ const navLinks = [
 
 const adminLinks = [
   { label: "Orders", to: "/admin/orders", icon: ShoppingBag },
-  { label: "Products", to: "/admin/products", icon: Package },
+  { label: "Payments", to: "/admin/payments", icon: IndianRupee },
 ];
 
 export default function Navbar() {
@@ -209,7 +208,7 @@ export default function Navbar() {
                   })}
                   <button
                     type="button"
-                    onClick={() => { }}
+                    onClick={handleLogout}
                     className="flex text-red-600 gap-3 px-4 py-3 items-center justify-center font-medium transition"
                   >
                     <LogOut size={17} />
