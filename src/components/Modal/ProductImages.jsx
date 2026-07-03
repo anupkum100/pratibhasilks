@@ -95,12 +95,22 @@ export function ImageUploader({ label, imageId, onUpload, useRef }) {
 
 export function GalleryUploader({
     label,
-    imageIds,
+    imageIds = [],
     onUpload,
     onDelete,
     useRef
 }) {
     const inputRef = useRef(null);
+
+    const handleUpload = (event) => {
+        const file = event.target.files?.[0];
+
+        if (file) {
+            onUpload(file);
+        }
+
+        event.target.value = "";
+    };
 
     return (
         <div className="flex flex-col gap-2 md:col-span-2">
@@ -108,35 +118,64 @@ export function GalleryUploader({
                 {label}
             </span>
 
-            <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                 {imageIds.map((imageId) => (
                     <div
                         key={imageId}
-                        className="relative aspect-square rounded-2xl overflow-hidden bg-white border border-black/10"
+                        className="relative aspect-square rounded-2xl overflow-hidden bg-[#F8F3EC] border border-black/10 group"
                     >
                         <img
                             src={getImageFromId(imageId)}
                             alt="Gallery"
-                            className="h-full w-full object-contain"
+                            className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.03]"
                         />
 
                         <button
                             type="button"
                             onClick={() => onDelete(imageId)}
-                            className="absolute top-2 right-2 bg-red-600 text-white rounded-full h-7 w-7 flex items-center justify-center"
+                            className="absolute top-2 right-2 bg-red-600 text-white rounded-full h-7 w-7 flex items-center justify-center shadow-md"
                         >
                             ×
                         </button>
                     </div>
                 ))}
+
+                <button
+                    type="button"
+                    onClick={() => inputRef.current?.click()}
+                    className="
+                        aspect-square
+                        rounded-2xl
+                        border border-dashed border-black/20
+                        bg-[#F8F3EC]
+                        hover:bg-[#F3E8D8]
+                        transition
+                        flex flex-col items-center justify-center
+                        text-center
+                        px-4
+                        group
+                    "
+                >
+                    <div className="h-12 w-12 rounded-full bg-white flex items-center justify-center shadow-sm group-hover:scale-105 transition">
+                        <ImagePlus className="text-[#9A7B4F]" size={26} />
+                    </div>
+
+                    <p className="mt-3 text-sm font-serif text-[#2F261D]">
+                        Add new image
+                    </p>
+
+                    <p className="mt-1 text-[11px] text-[#6B5F54]">
+                        Upload gallery photo
+                    </p>
+                </button>
             </div>
 
             <input
                 ref={inputRef}
                 type="file"
                 accept="image/*"
-
-                onChange={(event) => onUpload(event.target.files?.[0])}
+                hidden
+                onChange={handleUpload}
             />
         </div>
     );
