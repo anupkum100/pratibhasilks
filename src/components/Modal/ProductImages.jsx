@@ -135,7 +135,7 @@ export function GalleryUploader({
                 ref={inputRef}
                 type="file"
                 accept="image/*"
-                hidden
+
                 onChange={(event) => onUpload(event.target.files?.[0])}
             />
         </div>
