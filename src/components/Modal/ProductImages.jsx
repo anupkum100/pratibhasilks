@@ -1,9 +1,22 @@
 import {
-    ImagePlus,
-    Loader2,
-    Trash2
+    ImagePlus
 } from "lucide-react";
 import { getImageFromId } from "../../data/util";
+import imageCompression from "browser-image-compression";
+
+const compressImage = async (file) => {
+    if (!(file instanceof File || file instanceof Blob)) {
+        console.log("Invalid file passed:", file);
+        return null;
+    }
+
+    return await imageCompression(file, {
+        maxSizeMB: 2,
+        maxWidthOrHeight: 2500,
+        useWebWorker: true,
+        initialQuality: 0.85,
+    });
+};
 
 export function ImageUploader({ label, imageId, onUpload, useRef }) {
     const inputRef = useRef(null);
@@ -102,12 +115,20 @@ export function GalleryUploader({
 }) {
     const inputRef = useRef(null);
 
-    const handleUpload = (event) => {
+    const handleUpload = async (event) => {
         const file = event.target.files?.[0];
 
-        if (file) {
-            onUpload(file);
-        }
+        if (!file) return;
+
+        console.log("Original:", (file.size / 1024 / 1024).toFixed(2), "MB");
+
+        const compressedFile = await compressImage(file);
+
+        if (!compressedFile) return;
+
+        console.log("Compressed:", (compressedFile.size / 1024 / 1024).toFixed(2), "MB");
+
+        onUpload(compressedFile);
 
         event.target.value = "";
     };
