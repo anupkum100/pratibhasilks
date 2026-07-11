@@ -19,6 +19,8 @@ import FAQ from "./pages/CustomerCare/FAQ";
 import Orders from "./pages/Orders";
 import ProtectedAdminRoute from "./pages/ProtectesAdminRoute";
 import PaymentsPage from "./pages/Payments";
+import CheckoutPage from "./pages/CheckoutPage";
+import OrderSuccessPage from "./pages/OrderSuccessPage";
 
 
 export default function App() {
@@ -35,6 +37,9 @@ export default function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/saree-types" element={<SareeTypes />} />
           <Route path="/invoice/:invoiceId" element={<InvoicePage />} />
+
+          <Route path="/checkout/:sku" element={<CheckoutPage />} />
+          <Route path="/order-success/:orderNumber" element={<OrderSuccessPage />} />
 
           <Route path="/shipping-policy" element={<ShippingPolicy />} />
           <Route path="/returns-exchanges" element={<ReturnsExchanges />} />

@@ -14,8 +14,8 @@ import { initGA } from "./utils/analytics";
 initGA();
 const queryClient = new QueryClient();
 
-console.log("origin:", window.location.origin);
-console.log("google client:", import.meta.env.VITE_GOOGLE_CLIENT_ID);
+// console.log("origin:", window.location.origin);
+// console.log("google client:", import.meta.env.VITE_GOOGLE_CLIENT_ID);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>

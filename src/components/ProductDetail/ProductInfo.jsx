@@ -5,6 +5,7 @@ import {
 import { Link } from "react-router-dom";
 import { PS_PHONE_WHATSAPP } from "../../data/constants";
 import { normalised } from "../../data/util";
+import BuyNowButton from "../BuyNowButton";
 import MiniTrust from "./MiniTrust";
 
 export function ProductInfo({ productDetails }) {
@@ -95,6 +96,9 @@ export function ProductInfo({ productDetails }) {
         <p className="mt-6 text-[#6B5F54] leading-7 text-sm md:text-base">
             {productDetails.description}
         </p>
+
+        <BuyNowButton product={productDetails} className="w-full sm:w-auto" />
+
 
         <a
             target="_blank"
