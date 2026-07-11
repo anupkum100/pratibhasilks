@@ -66,7 +66,7 @@ export default function Products() {
     fabrics: fabricFromUrl ? [fabricFromUrl] : [],
     categories: categoryFromUrl ? [categoryFromUrl] : [],
     colors: [],
-    hideOutOfStock: false,
+    hideOutOfStock: true,
   });
 
   const [expandedSections, setExpandedSections] = useState({

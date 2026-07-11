@@ -4,16 +4,16 @@ import {
     Search, Trash2
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { CategoryBadge } from "../components/Payments/CategoryBadge";
-import { Pagination } from "../components/Payments/Pagination";
-import { PaymentMobileCard } from "../components/Payments/PaymentMobileCard";
-import { PaymentModal } from "../components/Payments/PaymentModal";
-import { PaymentTypeBadge } from "../components/Payments/PaymentTypeBadge";
-import { SummaryCard } from "../components/Payments/SummaryCard";
-import { TableHead } from "../components/Payments/TableHead";
-import PremiumLoader from "../components/PremiumLoader";
-import { formatDate, formatMoney } from "../data/util";
-import { apiCall } from "../serice/api";
+import { CategoryBadge } from "../../components/Payments/CategoryBadge";
+import { Pagination } from "../../components/Payments/Pagination";
+import { PaymentMobileCard } from "../../components/Payments/PaymentMobileCard";
+import { PaymentModal } from "../../components/Payments/PaymentModal";
+import { PaymentTypeBadge } from "../../components/Payments/PaymentTypeBadge";
+import { SummaryCard } from "../../components/Payments/SummaryCard";
+import { TableHead } from "../../components/Payments/TableHead";
+import PremiumLoader from "../../components/PremiumLoader";
+import { formatDate, formatMoney } from "../../data/util";
+import { apiCall } from "../../serice/api";
 
 const pageSize = 8;
 

@@ -1,4 +1,5 @@
 import {
+  CheckCheck,
   ChevronDown,
   Fingerprint,
   IndianRupee,
@@ -25,6 +26,7 @@ const navLinks = [
 const adminLinks = [
   { label: "Orders", to: "/admin/orders", icon: ShoppingBag },
   { label: "Payments", to: "/admin/payments", icon: IndianRupee },
+  { label: "Sold", to: "/admin/sold", icon: CheckCheck },
 ];
 
 export default function Navbar() {

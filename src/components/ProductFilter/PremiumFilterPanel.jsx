@@ -137,7 +137,7 @@ export function PremiumFilterPanel({
                         </p>
 
                         <p className="text-sm mt-1 text-[#2B241D]">
-                            Hide out of stock sarees
+                            Hide out of stock
                         </p>
                     </div>
 

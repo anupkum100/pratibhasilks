@@ -1,24 +1,25 @@
 
-import { Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar";
+import { Route, Routes } from "react-router-dom";
 import Footer from "./components/Footer";
-import Home from "./pages/Home";
-import Products from "./pages/Products";
-import ProductDetail from "./pages/ProductDetail";
-import Cart from "./pages/Cart";
+import Navbar from "./components/Navbar";
 import About from "./pages/About";
+import SoldProducts from "./pages/Admin/SoldProducts";
+import Cart from "./pages/Cart";
 import Contact from "./pages/Contact";
-import PageNotFound from "./pages/PageNotFound";
-import InvoicePage from "./pages/InvoicePage";
-import SareeTypes from "./pages/SareeTypes";
-import ShippingPolicy from "./pages/CustomerCare/ShippingPolicy";
-import ReturnsExchanges from "./pages/CustomerCare/ReturnsExchanges";
-import TrackOrder from "./pages/CustomerCare/TrackOrder";
-import InvoiceVerification from "./pages/CustomerCare/InvoiceVerification";
 import FAQ from "./pages/CustomerCare/FAQ";
-import Orders from "./pages/Orders";
+import InvoiceVerification from "./pages/CustomerCare/InvoiceVerification";
+import ReturnsExchanges from "./pages/CustomerCare/ReturnsExchanges";
+import ShippingPolicy from "./pages/CustomerCare/ShippingPolicy";
+import TrackOrder from "./pages/CustomerCare/TrackOrder";
+import Home from "./pages/Home";
+import InvoicePage from "./pages/InvoicePage";
+import Orders from "./pages/Admin/Orders";
+import PageNotFound from "./pages/PageNotFound";
+import PaymentsPage from "./pages/Admin/Payments";
+import ProductDetail from "./pages/ProductDetail";
+import Products from "./pages/Products";
 import ProtectedAdminRoute from "./pages/ProtectesAdminRoute";
-import PaymentsPage from "./pages/Payments";
+import SareeTypes from "./pages/SareeTypes";
 
 
 export default function App() {
@@ -45,6 +46,7 @@ export default function App() {
           <Route element={<ProtectedAdminRoute />}>
             <Route path="/admin/orders" element={<Orders />} />
             <Route path="/admin/payments" element={<PaymentsPage />} />
+            <Route path="/admin/sold" element={<SoldProducts />} />
           </Route>
 
           <Route path="*" element={<PageNotFound />} />
