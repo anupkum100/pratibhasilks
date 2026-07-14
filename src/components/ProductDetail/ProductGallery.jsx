@@ -1,3 +1,4 @@
+import { PackageCheck } from "lucide-react";
 import { useState } from "react";
 import { getImageFromId } from "../../data/util";
 
@@ -9,20 +10,33 @@ export default function ProductGallery({ productDetails }) {
         ...(productDetails?.otherImageIds || []),
     ].filter(Boolean);
     return <div className="space-y-4">
-        <div className="relative rounded-[2rem] overflow-hidden bg-white shadow-[0_24px_70px_rgba(0,0,0,0.12)]">
-            <img
-                key={selectedImage}
-                // src={getImageFromId(allImageIds[selectedImage])}
-                src={getImageFromId(productDetails.mainImageId ? allImageIds[selectedImage] : "no_image.png")}
+        <div className="relative rounded-[2rem] overflow-hidden bg-white shadow-[0_24px_70px_rgba(0,0,0,0.12)] aspect-[3/4]">
+            {productDetails?.mainImageId ? (
+                <img
+                    key={selectedImage}
+                    src={getImageFromId(allImageIds[selectedImage])}
 
-                alt={`${productDetails.name} - View ${selectedImage + 1
-                    }`}
-                className={`w-full aspect-[3/4] ${!productDetails.mainImageId ? "object-contain p-10" : "object-cover"}`}
-                initial={{ opacity: 0, scale: 1.02 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.35 }}
-            />
+                    alt={`${productDetails.name} - View ${selectedImage + 1
+                        }`}
+                    className="w-full object-cover"
+                    initial={{ opacity: 0, scale: 1.02 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.35 }}
+                />
+            ) : (
+                <div className="h-full w-full flex flex-col items-center justify-center text-[#9A7B4F]">
+                    <PackageCheck
+                        size={42}
+                        strokeWidth={1.3}
+                    />
+
+                    <p className="mt-3 text-xs uppercase tracking-[0.24em]">
+                        Image unavailable
+                    </p>
+                </div>
+            )}
+
         </div>
 
         {allImageIds.length > 1 && (

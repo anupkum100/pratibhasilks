@@ -1,9 +1,10 @@
 import {
+  CheckCheck,
   ChevronDown,
   Fingerprint,
   IndianRupee,
   LogOut,
-  Menu, ShoppingBag,
+  Menu, MonitorSmartphone, ShoppingBag,
   ShoppingCart,
   X
 } from "lucide-react";
@@ -24,7 +25,9 @@ const navLinks = [
 
 const adminLinks = [
   { label: "Orders", to: "/admin/orders", icon: ShoppingBag },
+  { label: "Online Orders", to: "/admin/online-orders", icon: MonitorSmartphone },
   { label: "Payments", to: "/admin/payments", icon: IndianRupee },
+  { label: "Sold", to: "/admin/sold", icon: CheckCheck },
 ];
 
 export default function Navbar() {

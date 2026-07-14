@@ -4,16 +4,16 @@ import {
     Search, Trash2
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { CategoryBadge } from "../components/Payments/CategoryBadge";
-import { Pagination } from "../components/Payments/Pagination";
-import { PaymentMobileCard } from "../components/Payments/PaymentMobileCard";
-import { PaymentModal } from "../components/Payments/PaymentModal";
-import { PaymentTypeBadge } from "../components/Payments/PaymentTypeBadge";
-import { SummaryCard } from "../components/Payments/SummaryCard";
-import { TableHead } from "../components/Payments/TableHead";
-import PremiumLoader from "../components/PremiumLoader";
-import { formatDate, formatMoney } from "../data/util";
-import { apiCall } from "../serice/api";
+import { CategoryBadge } from "../../components/Payments/CategoryBadge";
+import { Pagination } from "../../components/Payments/Pagination";
+import { PaymentMobileCard } from "../../components/Payments/PaymentMobileCard";
+import { PaymentModal } from "../../components/Payments/PaymentModal";
+import { PaymentTypeBadge } from "../../components/Payments/PaymentTypeBadge";
+import { SummaryCard } from "../../components/Payments/SummaryCard";
+import { TableHead } from "../../components/Payments/TableHead";
+import PremiumLoader from "../../components/PremiumLoader";
+import { formatDate, formatMoney } from "../../data/util";
+import { apiCall } from "../../serice/api";
 
 const pageSize = 8;
 
@@ -103,7 +103,7 @@ export default function PaymentsPage() {
     };
 
     const handleDeletePayment = (payment) => {
-        const confirmed = window.confirm(`Delete payment "${payment.type}"?`);
+        const confirmed = window.confirm(`Delete payment "${payment.paymentType}"?`);
 
         if (!confirmed) return;
 
@@ -204,7 +204,7 @@ export default function PaymentsPage() {
                             <option value="date-asc">Oldest First</option>
                             <option value="amount-desc">Amount High</option>
                             <option value="amount-asc">Amount Low</option>
-                            <option value="type-asc">Type A-Z</option>
+                            <option value="paymentType-asc">Type A-Z</option>
                         </select>
                     </div>
                 </div>
@@ -219,7 +219,7 @@ export default function PaymentsPage() {
                     <table className="w-full text-sm">
                         <thead className="bg-[#181818] text-white">
                             <tr>
-                                <TableHead label="Type" onClick={() => handleSort("type")} />
+                                <TableHead label="Type" onClick={() => handleSort("paymentType")} />
                                 <TableHead label="Category" />
                                 <TableHead label="Payment Type" />
                                 <TableHead label="Amount" onClick={() => handleSort("amount")} />
@@ -238,7 +238,7 @@ export default function PaymentsPage() {
                                     key={payment._id}
                                     className="border-b border-black/5 hover:bg-[#F8F3EC]/70 transition"
                                 >
-                                    <td className="p-5 font-medium">{payment.type}</td>
+                                    <td className="p-5 font-medium">{payment.paymentType}</td>
 
                                     <td className="p-5">
                                         <CategoryBadge category={payment.category} />

@@ -2,6 +2,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import { ShieldCheck, X } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContexts";
+const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 export default function LoginModal({ open, onClose }) {
     const { googleLogin } = useAuth();
@@ -68,14 +69,20 @@ export default function LoginModal({ open, onClose }) {
                         </div>
 
                         <div className="flex justify-center">
-                            <GoogleLogin
-                                onSuccess={handleGoogleSuccess}
-                                onError={() => setError("Google login failed. Please try again.")}
-                                theme="outline"
-                                size="large"
-                                shape="pill"
-                                text="signin_with"
-                            />
+                            {googleClientId ? (
+                                <GoogleLogin
+                                    onSuccess={handleGoogleSuccess}
+                                    onError={() => setError("Google login failed. Please try again.")}
+                                    theme="outline"
+                                    size="large"
+                                    shape="pill"
+                                    text="signin_with"
+                                />
+                            ) : (
+                                <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-center text-sm text-amber-800">
+                                    Google admin login is not configured.
+                                </div>
+                            )}
                         </div>
 
                         {error && (

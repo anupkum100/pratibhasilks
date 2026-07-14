@@ -15,6 +15,7 @@ import {
   UserRound
 } from "lucide-react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
+import { getImageFromId } from "../data/util";
 import { getPublicOrder } from "../serice/checkoutApi";
 
 const formatCurrency = (value) =>
@@ -193,7 +194,7 @@ export default function OrderSuccessPage() {
                       : "warning"
                   }
                 >
-                  Payment {formatText(order.paymentStatus || "Received")}
+                  {formatText(order.paymentStatus || "Received")}
                 </StatusBadge>
               </div>
             )}
@@ -313,7 +314,7 @@ export default function OrderSuccessPage() {
                               <div className="h-24 w-20 shrink-0 overflow-hidden rounded-2xl bg-[#F4EEE7]">
                                 {imageUrl ? (
                                   <img
-                                    src={imageUrl}
+                                    src={getImageFromId(imageUrl)}
                                     alt={item.name || "Saree"}
                                     className="h-full w-full object-cover"
                                   />

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { BadgeIndianRupee, Edit, Trash2, ShoppingCart, Check } from "lucide-react";
+import { BadgeIndianRupee, Edit, Trash2, ShoppingCart, Check, PackageCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getImageFromId, normalised } from "../data/util";
 import PermissionRenderer from "./Admin/PermissionRenderer";
@@ -48,19 +48,33 @@ export default function ProductCard({
             </div>
           )}
 
-          <div className={`${!product.mainImageId ? "aspect-1" : "aspect-[4/7]"} overflow-hidden`}>
-            <img
-              loading="lazy"
-              src={getImageFromId(product.mainImageId ? product.mainImageId : "no_image.png")}
-              alt={normalised(product.name)}
-              className={`
-                h-full w-full
-                transition-transform duration-700 ease-out
-                group-hover:scale-105
-                ${!product.mainImageId ? "object-contain" : "object-cover"}
-                ${!product.mainImageId ? "p-10" : ""}
-                  `}
-            />
+          <div className="aspect-[4/7] overflow-hidden">
+            {product?.mainImageId ? (
+              <img
+                loading="lazy"
+                src={getImageFromId(product.mainImageId ? product.mainImageId : "no_image.png")}
+                alt={normalised(product.name)}
+                className={`
+                      h-full w-full
+                      transition-transform duration-700 ease-out
+                      group-hover:scale-105
+                      ${!product.mainImageId ? "object-contain" : "object-cover"}
+                      ${!product.mainImageId ? "p-10" : ""}
+                        `}
+              />
+            ) : (
+              <div className="h-full w-full flex flex-col items-center justify-center text-[#9A7B4F]">
+                <PackageCheck
+                  size={42}
+                  strokeWidth={1.3}
+                />
+
+                <p className="mt-3 text-xs uppercase tracking-[0.24em]">
+                  Image unavailable
+                </p>
+              </div>
+            )}
+
           </div>
 
           <div className="absolute inset-x-3 bottom-3 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 hidden md:block">

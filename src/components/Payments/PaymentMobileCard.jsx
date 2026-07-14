@@ -11,7 +11,7 @@ export function PaymentMobileCard({ payment, onEdit, onDelete }) {
                     <CategoryBadge category={payment.category} />
 
                     <h3 className="font-serif text-3xl mt-3 leading-none">
-                        {payment.type}
+                        {payment.paymentType || "Miscellaneous"}
                     </h3>
                 </div>
 

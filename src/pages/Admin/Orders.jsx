@@ -9,9 +9,9 @@ import {
     X
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import PremiumLoader from "../components/PremiumLoader";
-import { formatDate, formatMoney } from "../data/util";
-import { apiCall } from "../serice/api";
+import PremiumLoader from "../../components/PremiumLoader";
+import { formatDate, formatMoney } from "../../data/util";
+import { apiCall } from "../../serice/api";
 
 const STATUS_OPTIONS = [
     { label: "All Orders", value: "all" },

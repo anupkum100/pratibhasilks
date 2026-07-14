@@ -100,18 +100,23 @@ export function ProductInfo({ productDetails }) {
         <BuyNowButton product={productDetails} className="w-full sm:w-auto" />
 
 
-        <a
-            target="_blank"
-            rel="noreferrer"
-            href={createWhatsappMessage()}
-            className={`mt-8 w-full rounded-full py-4 text-sm md:text-base font-medium flex items-center justify-center gap-3 transition ${!productDetails.stock
-                ? "bg-gray-300 text-gray-500 pointer-events-none"
-                : "bg-[#181818] text-white hover:opacity-90"
-                }`}
-        >
-            <MessageCircle size={18} />
-            Order on WhatsApp
-        </a>
+        {!!productDetails.stock &&
+            <a
+                target="_blank"
+                rel="noreferrer"
+                href={createWhatsappMessage()}
+                className={`group mt-4 flex w-full items-center justify-center gap-3 rounded-full border px-6 py-4 text-sm md:text-base font-semibold transition-all duration-300 ${!productDetails.stock
+                    ? "pointer-events-none border-gray-200 bg-gray-100 text-gray-400"
+                    : "border-[#25D366]/25 bg-white text-[#181818] hover:border-[#25D366] hover:bg-[#F5FFF8] hover:-translate-y-1 hover:shadow-lg"
+                    }`}
+            >
+                <MessageCircle
+                    size={19}
+                    className="text-[#25D366] transition-transform duration-300 group-hover:scale-110"
+                />
+
+                <span>Ask about this Saree</span>
+            </a>}
 
         <div className="grid grid-cols-3 gap-3 mt-6">
             <MiniTrust

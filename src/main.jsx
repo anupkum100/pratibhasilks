@@ -16,21 +16,30 @@ const queryClient = new QueryClient();
 
 // console.log("origin:", window.location.origin);
 // console.log("google client:", import.meta.env.VITE_GOOGLE_CLIENT_ID);
+const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+const app = (
+  <HelmetProvider>
+    <BrowserRouter>
+      <AnalyticsTracker />
+      <ScrollToTop />
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <CartProvider>
+            <App />
+          </CartProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </BrowserRouter>
+  </HelmetProvider>
+);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-    <HelmetProvider>
-      <BrowserRouter>
-        <AnalyticsTracker />
-        <ScrollToTop />
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <CartProvider>
-              <App />
-            </CartProvider>
-          </AuthProvider>
-        </QueryClientProvider>
-      </BrowserRouter>
-    </HelmetProvider>
-  </GoogleOAuthProvider>
+  googleClientId ? (
+    <GoogleOAuthProvider clientId={googleClientId}>
+      {app}
+    </GoogleOAuthProvider>
+  ) : (
+    app
+  )
 );

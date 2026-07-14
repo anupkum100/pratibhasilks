@@ -84,7 +84,7 @@ export default function ProductDetail() {
 
         <link
           rel="canonical"
-          href={`https://www.pratibhasilks.com/products/${productDetails?.sku?.toLowerCase()}`}
+          href={`https://www.pratibhasilks.com/product/${productDetails?.sku || ""}`}
         />
       </Helmet>
 

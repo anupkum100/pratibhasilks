@@ -1,4 +1,4 @@
-const URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+const URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL : "http://localhost:4000";
 // const URL = "https://721gb6ymy1.execute-api.us-east-2.amazonaws.com";
 
 export async function apiCall(
