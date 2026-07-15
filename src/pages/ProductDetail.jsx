@@ -16,20 +16,29 @@ export default function ProductDetail() {
 
   const [productDetails, setProductDetails] = useState({});
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const { showLoader, isExiting } = useDelayedLoader(loading, 500);
 
   const fetchProductDetails = async () => {
     setLoading(true);
+    setErrorMessage("");
 
     try {
       const res = await apiCall(`/api/products/${id}`);
 
-      if (!res.error && res.data) {
+      if (res?.error) {
+        setProductDetails({});
+        setErrorMessage(res.error.message || "Unable to load this product.");
+        return;
+      }
+
+      if (res.data) {
         setProductDetails(res.data);
       }
     } catch (error) {
-      console.log("Error fetching Product details..")
+      setProductDetails({});
+      setErrorMessage(error.message || "Unable to load this product.");
     } finally {
       setLoading(false);
     }
@@ -46,12 +55,12 @@ export default function ProductDetail() {
           <ShieldBan size={64} className="text-red-700 mb-5 mx-auto" />
 
           <h1 className="font-serif text-4xl mb-3">
-            Product not found
+            {errorMessage ? "Unable to load product" : "Product not found"}
           </h1>
 
           <p className="text-[#6B5F54] leading-7">
-            This product may be added in future. For now, explore our
-            listed saree collection.
+            {errorMessage ||
+              "This product may be added in future. For now, explore our listed saree collection."}
           </p>
 
           <Link
@@ -84,7 +93,7 @@ export default function ProductDetail() {
 
         <link
           rel="canonical"
-          href={`https://www.pratibhasilks.com/product/${productDetails?.sku || ""}`}
+          href={`https://www.pratibhasilks.com/product/${encodeURIComponent(productDetails?.sku || "")}`}
         />
       </Helmet>
 

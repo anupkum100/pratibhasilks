@@ -30,15 +30,21 @@ export default function PincodeLocationSelector({
   }
 
   if (pincodeLookupError || postOffices.length === 0) {
+    const canUseManualFallback =
+      pincodeLookupError?.code === "LOOKUP_UNAVAILABLE";
+
     return (
       <div className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-4">
         <p className="text-sm font-medium text-amber-900">
-          We could not fetch locations for this PIN code.
+          {pincodeLookupError?.message ||
+            "We could not fetch locations for this PIN code."}
         </p>
         <p className="mt-1 text-xs leading-5 text-amber-800">
-          You can still continue by entering your locality, city and state manually.
+          {canUseManualFallback
+            ? "You can still continue by entering your locality, city and state manually."
+            : "Please check the PIN code or use a serviceable delivery location."}
         </p>
-        {!manualAddressMode && (
+        {canUseManualFallback && !manualAddressMode && (
           <button
             type="button"
             onClick={onUseManualAddress}
@@ -147,7 +153,7 @@ export default function PincodeLocationSelector({
                     {location.Name}
                   </span>
                   <span className="mt-1 block text-xs leading-5 text-[#6B5F54]">
-                    {[location.Block, location.District, location.State]
+                    {[location.BranchType, location.Block, location.District, location.State]
                       .filter(Boolean)
                       .join(", ")}
                   </span>

@@ -17,6 +17,14 @@ import { apiCall } from "../../serice/api";
 
 const PRODUCT_LIMIT = 24;
 
+const unwrapApiResponse = (response, fallbackMessage) => {
+    if (response?.error) {
+        throw new Error(response.error.message || fallbackMessage);
+    }
+
+    return response;
+};
+
 const SORT_OPTIONS = [
     {
         label: "Recently Added",
@@ -55,8 +63,11 @@ export default function SoldProducts() {
         error,
     } = useInfiniteQuery({
         queryKey: ["sold-products", queryString],
-        queryFn: ({ pageParam = 1 }) =>
-            apiCall(`/api/products?page=${pageParam}&${queryString}`),
+        queryFn: async ({ pageParam = 1 }) =>
+            unwrapApiResponse(
+                await apiCall(`/api/products?page=${pageParam}&${queryString}`),
+                "Failed to fetch sold products"
+            ),
         initialPageParam: 1,
         getNextPageParam: (lastPage) => {
             if (lastPage?.pagination?.hasMore) {

@@ -1,9 +1,12 @@
 import { motion } from "framer-motion";
-import { BadgeIndianRupee, Edit, Trash2, ShoppingCart, Check, PackageCheck } from "lucide-react";
+import { BadgeIndianRupee, Edit, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { getImageFromId, normalised } from "../data/util";
 import PermissionRenderer from "./Admin/PermissionRenderer";
+import CartActionButton from "./Cart/CartActionButton";
 import { useCart } from "./Cart/cartContext";
+import UnavailableImage from "./UnavailableImage";
 
 export default function ProductCard({
   product,
@@ -12,8 +15,10 @@ export default function ProductCard({
   onMarkSold
 }) {
   const { addToCart, removeFromCart, isInCart } = useCart();
+  const [imageFailed, setImageFailed] = useState(false);
 
-  const added = isInCart(product._id);
+  const added = isInCart(product);
+  const imageSrc = getImageFromId(product?.mainImageId);
 
   const stopCardNavigation = (event, callback) => {
     event.preventDefault();
@@ -37,7 +42,7 @@ export default function ProductCard({
         ${!product.stock ? "opacity-75" : ""}
       `}
     >
-      <Link to={`/product/${product.sku}`} className="block">
+      <Link to={`/product/${encodeURIComponent(product.sku)}`} className="block">
         <div className="relative overflow-hidden bg-[#F8F3EC]">
 
           {product.stock === 0 && (
@@ -49,30 +54,21 @@ export default function ProductCard({
           )}
 
           <div className="aspect-[4/7] overflow-hidden">
-            {product?.mainImageId ? (
+            {imageSrc && !imageFailed ? (
               <img
                 loading="lazy"
-                src={getImageFromId(product.mainImageId ? product.mainImageId : "no_image.png")}
+                src={imageSrc}
                 alt={normalised(product.name)}
+                onError={() => setImageFailed(true)}
                 className={`
                       h-full w-full
                       transition-transform duration-700 ease-out
                       group-hover:scale-105
-                      ${!product.mainImageId ? "object-contain" : "object-cover"}
-                      ${!product.mainImageId ? "p-10" : ""}
+                      object-cover
                         `}
               />
             ) : (
-              <div className="h-full w-full flex flex-col items-center justify-center text-[#9A7B4F]">
-                <PackageCheck
-                  size={42}
-                  strokeWidth={1.3}
-                />
-
-                <p className="mt-3 text-xs uppercase tracking-[0.24em]">
-                  Image unavailable
-                </p>
-              </div>
+              <UnavailableImage />
             )}
 
           </div>
@@ -136,14 +132,34 @@ export default function ProductCard({
         </div>
       </Link>
 
+      {/* TODO: Remove this permission when changes for user is deployed */}
+      <PermissionRenderer>
+        {product.stock > 0 && (
+          <div className="px-3 md:px-4 pb-4">
+            <CartActionButton
+              added={added}
+              onClick={() => {
+                if (added) {
+                  removeFromCart(product);
+                  return;
+                }
+
+                addToCart(product);
+              }}
+              size="card"
+            />
+          </div>
+        )}
+      </PermissionRenderer>
 
       <PermissionRenderer>
-        {product.stock > 0 && <>
+        {product.stock > 0 && (onEdit || onDelete) && (
           <div className="px-3 md:px-4 pb-4 flex gap-2">
-            <button
-              type="button"
-              onClick={(event) => stopCardNavigation(event, onEdit)}
-              className="
+            {onEdit && (
+              <button
+                type="button"
+                onClick={(event) => stopCardNavigation(event, onEdit)}
+                className="
               flex-1
               rounded-full
               border border-black/10
@@ -154,15 +170,17 @@ export default function ProductCard({
               hover:text-white
               transition
             "
-            >
-              <Edit size={14} />
-              Edit
-            </button>
+              >
+                <Edit size={14} />
+                Edit
+              </button>
+            )}
 
-            <button
-              type="button"
-              onClick={(event) => stopCardNavigation(event, onDelete)}
-              className="
+            {onDelete && (
+              <button
+                type="button"
+                onClick={(event) => stopCardNavigation(event, onDelete)}
+                className="
               flex-1
               rounded-full
               border border-red-200
@@ -174,48 +192,18 @@ export default function ProductCard({
               hover:text-white
               transition
             "
-            >
-              <Trash2 size={14} />
-              Delete
-            </button>
+              >
+                <Trash2 size={14} />
+                Delete
+              </button>
+            )}
           </div>
+        )}
 
+        {product.stock > 0 && onMarkSold && (
           <div className="px-3 md:px-4 pb-4 flex gap-2">
             <button
-              type="button"
-              onClick={() => {
-                if (added) {
-                  removeFromCart(product._id);
-                } else {
-                  addToCart(product);
-                }
-              }}
-              className=" flex-1
-              rounded-full
-              border border-black/10
-              py-2
-              flex items-center justify-center gap-2
-              text-xs font-medium
-              hover:bg-[#181818]
-              hover:text-white
-              transition"
-            >
-              {added ? (
-                <>
-                  <Check size={16} />
-                  Added To Cart
-                </>
-              ) : (
-                <>
-                  <ShoppingCart size={16} />
-                  Add To Cart
-                </>
-              )}
-            </button>
-
-
-            <button
-              disabled={isInCart(product._id)}
+              disabled={isInCart(product)}
               type="button"
               onClick={(event) =>
                 stopCardNavigation(event, () => onMarkSold(product))
@@ -237,7 +225,7 @@ export default function ProductCard({
               Sell now
             </button>
           </div>
-        </>}
+        )}
       </PermissionRenderer>
 
     </motion.article >

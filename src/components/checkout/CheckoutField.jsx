@@ -3,16 +3,19 @@ import { forwardRef } from "react";
 const CheckoutField = forwardRef(
   (
     {
-      label,
-      error,
+	      label,
+	      as,
+	      error,
       className = "",
       containerClassName = "",
       required = false,
       ...inputProps
     },
     ref
-  ) => {
-    return (
+	  ) => {
+	    const Field = as === "textarea" ? "textarea" : "input";
+
+	    return (
       <div className={containerClassName}>
         {label && (
           <label className="mb-2 block text-sm font-medium text-[#181818]">
@@ -24,9 +27,9 @@ const CheckoutField = forwardRef(
           </label>
         )}
 
-        <input
-          ref={ref}
-          {...inputProps}
+	        <Field
+	          ref={ref}
+	          {...inputProps}
           className={`w-full rounded-2xl border bg-[#F8F3EC] px-4 py-3.5 text-sm text-[#181818] outline-none transition placeholder:text-[#6B5F54]/60 ${error
               ? "border-red-400 focus:border-red-500"
               : "border-black/10 focus:border-[#9A7B4F]"

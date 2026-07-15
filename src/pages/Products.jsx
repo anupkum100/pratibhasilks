@@ -5,6 +5,7 @@ import {
 } from "@tanstack/react-query";
 import {
   ChevronDown, SlidersHorizontal,
+  Search,
   X
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -21,6 +22,14 @@ import { apiCall } from "../serice/api";
 
 const PRODUCT_LIMIT = 24;
 
+const DEFAULT_FILTERS = {
+  occasions: [],
+  fabrics: [],
+  categories: [],
+  colors: [],
+  hideOutOfStock: true,
+};
+
 const SORT_OPTIONS = [
   {
     label: "Newest Arrivals",
@@ -36,22 +45,48 @@ const SORT_OPTIONS = [
   },
 ];
 
+function getCatalogueStateFromParams(searchParams) {
+  const arrival = searchParams.get("arrival");
+
+  return {
+    search: searchParams.get("search") || "",
+    sort: searchParams.get("sort") || (arrival === "New" ? "latest" : "latest"),
+    filters: {
+      ...DEFAULT_FILTERS,
+      colors: getParamList(searchParams, ["colors", "color"]),
+      fabrics: getParamList(searchParams, ["fabrics", "fabric"]),
+      occasions: getParamList(searchParams, ["occasions", "occasion"]),
+      categories: getParamList(searchParams, ["categories", "category"]),
+      hideOutOfStock: searchParams.get("hideOutOfStock") !== "false",
+    },
+  };
+}
+
+function getParamList(searchParams, keys) {
+  return keys
+    .flatMap((key) => (searchParams.get(key) || "").split(","))
+    .map((value) => value.trim())
+    .filter(Boolean);
+}
+
 export default function Products() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const { createOrder } = useCart();
 
-
-  const occasionFromUrl = searchParams.get("occasions");
-  const fabricFromUrl = searchParams.get("fabric");
-  const categoryFromUrl = searchParams.get("category");
+  const currentSearch = searchParams.toString();
+  const urlState = useMemo(
+    () => getCatalogueStateFromParams(new URLSearchParams(currentSearch)),
+    [currentSearch]
+  );
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("add");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [sort, setSort] = useState("latest");
+  const [sort, setSort] = useState(urlState.sort);
+  const [searchTerm, setSearchTerm] = useState(urlState.search);
 
   const [showSoldModal, setShowSoldModal] = useState(false);
 
@@ -61,13 +96,7 @@ export default function Products() {
   };
 
 
-  const [filters, setFilters] = useState({
-    occasions: occasionFromUrl ? [occasionFromUrl] : [],
-    fabrics: fabricFromUrl ? [fabricFromUrl] : [],
-    categories: categoryFromUrl ? [categoryFromUrl] : [],
-    colors: [],
-    hideOutOfStock: true,
-  });
+  const [filters, setFilters] = useState(urlState.filters);
 
   const [expandedSections, setExpandedSections] = useState({
     colors: true,
@@ -77,15 +106,47 @@ export default function Products() {
   });
 
   useEffect(() => {
-    setFilters((prev) => ({
-      ...prev,
-      occasions: occasionFromUrl ? [occasionFromUrl] : [],
-      fabrics: fabricFromUrl ? [fabricFromUrl] : [],
-      categories: categoryFromUrl ? [categoryFromUrl] : [],
-      colors: [],
-      hideOutOfStock: prev.hideOutOfStock ?? false,
-    }));
-  }, [occasionFromUrl, fabricFromUrl, categoryFromUrl]);
+    setFilters(urlState.filters);
+    setSort(urlState.sort);
+    setSearchTerm(urlState.search);
+  }, [urlState]);
+
+  useEffect(() => {
+    const nextParams = new URLSearchParams();
+    const trimmedSearch = searchTerm.trim();
+
+    if (trimmedSearch) {
+      nextParams.set("search", trimmedSearch);
+    }
+
+    if (filters.colors.length) {
+      nextParams.set("colors", filters.colors.join(","));
+    }
+
+    if (filters.fabrics.length) {
+      nextParams.set("fabrics", filters.fabrics.join(","));
+    }
+
+    if (filters.occasions.length) {
+      nextParams.set("occasions", filters.occasions.join(","));
+    }
+
+    if (filters.categories.length) {
+      nextParams.set("categories", filters.categories.join(","));
+    }
+
+    if (filters.hideOutOfStock === false) {
+      nextParams.set("hideOutOfStock", "false");
+    }
+
+    if (sort && sort !== "latest") {
+      nextParams.set("sort", sort);
+    }
+
+    if (nextParams.toString() !== currentSearch) {
+      setSearchParams(nextParams, { replace: true });
+    }
+  }, [currentSearch, filters, searchTerm, setSearchParams, sort]);
 
   const toggleOutOfStock = () => {
     setFilters((prev) => ({
@@ -115,6 +176,10 @@ export default function Products() {
       params.set("categories", filters.categories.join(","));
     }
 
+    if (searchTerm.trim()) {
+      params.set("search", searchTerm.trim());
+    }
+
     params.set("hideOutOfStock", String(filters.hideOutOfStock ?? false));
 
     if (sort) {
@@ -122,10 +187,11 @@ export default function Products() {
     }
 
     return params.toString();
-  }, [filters, sort]);
+  }, [filters, searchTerm, sort]);
 
   const {
     data,
+    error: productsError,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
@@ -133,8 +199,15 @@ export default function Products() {
     isRefetching,
   } = useInfiniteQuery({
     queryKey: ["products", queryString],
-    queryFn: ({ pageParam = 1 }) =>
-      apiCall(`/api/products?page=${pageParam}&${queryString}`),
+    queryFn: async ({ pageParam = 1 }) => {
+      const res = await apiCall(`/api/products?page=${pageParam}&${queryString}`);
+
+      if (res?.error) {
+        throw new Error(res.error.message || "Failed to fetch products");
+      }
+
+      return res;
+    },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       if (lastPage?.pagination?.hasMore) {
@@ -145,9 +218,17 @@ export default function Products() {
     },
   });
 
-  const { data: filterResponse } = useQuery({
+  const { data: filterResponse, error: filtersError } = useQuery({
     queryKey: ["product-filters"],
-    queryFn: () => apiCall("/api/products/filters"),
+    queryFn: async () => {
+      const res = await apiCall("/api/products/filters");
+
+      if (res?.error) {
+        throw new Error(res.error.message || "Failed to fetch product filters");
+      }
+
+      return res;
+    },
   });
 
   const products = useMemo(() => {
@@ -168,6 +249,8 @@ export default function Products() {
     filters.fabrics.length +
     filters.occasions.length +
     filters.categories.length;
+
+  const catalogueError = productsError;
 
   const loading = isLoading || submitting;
   const { showLoader, isExiting } = useDelayedLoader(loading, 500);
@@ -195,13 +278,13 @@ export default function Products() {
 
   const clearFilters = () => {
     setFilters((prev) => ({
-      ...prev,
-      colors: [],
-      fabrics: [],
-      occasions: [],
-      categories: [],
+      ...DEFAULT_FILTERS,
       hideOutOfStock: prev.hideOutOfStock ?? true,
     }));
+  };
+
+  const clearSearch = () => {
+    setSearchTerm("");
   };
 
   const toggleSection = (section) => {
@@ -246,7 +329,7 @@ export default function Products() {
     setSubmitting(false);
 
     if (res?.error) {
-      alert(res.message || "Failed to delete product");
+      alert(res.error.message || "Failed to delete product");
       return;
     }
 
@@ -327,6 +410,7 @@ export default function Products() {
               <PremiumFilterPanel
                 filters={filters}
                 filterOptions={filterOptions}
+                filterError={filtersError?.message}
                 expandedSections={expandedSections}
                 activeFilterCount={activeFilterCount}
                 toggleFilter={toggleFilter}
@@ -364,6 +448,7 @@ export default function Products() {
               <PremiumFilterPanel
                 filters={filters}
                 filterOptions={filterOptions}
+                filterError={filtersError?.message}
                 expandedSections={expandedSections}
                 activeFilterCount={activeFilterCount}
                 toggleFilter={toggleFilter}
@@ -376,7 +461,7 @@ export default function Products() {
 
           <div>
             <div className="mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-              <div>
+              <div className="space-y-3">
                 <p className="text-sm text-[#6B5F54]">
                   Showing{" "}
                   <span className="text-[#181818] font-semibold">
@@ -394,6 +479,31 @@ export default function Products() {
                     Refreshing collection...
                   </p>
                 )}
+
+                <label className="relative block w-full max-w-md">
+                  <span className="sr-only">Search sarees</span>
+                  <Search
+                    size={17}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9A7B4F]"
+                  />
+                  <input
+                    type="search"
+                    value={searchTerm}
+                    onChange={(event) => setSearchTerm(event.target.value)}
+                    placeholder="Search by name, SKU, fabric..."
+                    className="w-full rounded-full bg-white border border-black/10 py-3 pl-11 pr-11 text-sm text-[#181818] shadow-sm outline-none focus:border-[#9A7B4F]"
+                  />
+                  {searchTerm && (
+                    <button
+                      type="button"
+                      onClick={clearSearch}
+                      aria-label="Clear search"
+                      className="absolute right-3 top-1/2 h-7 w-7 -translate-y-1/2 rounded-full bg-[#F8F3EC] text-[#6B5F54] flex items-center justify-center"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </label>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
@@ -445,7 +555,21 @@ export default function Products() {
               </div>
             )}
 
-            {products.length > 0 ? (
+            {catalogueError ? (
+              <div className="bg-white rounded-[2rem] p-10 md:p-16 text-center shadow-xl">
+                <p className="text-xs tracking-[0.35em] uppercase text-red-700">
+                  Collection Unavailable
+                </p>
+
+                <h3 className="font-serif text-4xl mt-3">
+                  Unable to load sarees
+                </h3>
+
+                <p className="text-[#6B5F54] mt-4">
+                  {catalogueError.message || "Please try refreshing the collection."}
+                </p>
+              </div>
+            ) : products.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-7">
                   {products.map((product) => (
@@ -488,11 +612,16 @@ export default function Products() {
                 </h3>
 
                 <p className="text-[#6B5F54] mt-4">
-                  Try removing some filters to discover more pieces.
+                  {searchTerm.trim()
+                      ? "Try a different search or remove some filters."
+                      : "Try removing some filters to discover more pieces."}
                 </p>
 
                 <button
-                  onClick={clearFilters}
+                  onClick={() => {
+                    clearFilters();
+                    clearSearch();
+                  }}
                   className="mt-8 bg-[#181818] text-white px-8 py-4 rounded-full"
                 >
                   Clear Filters
@@ -503,7 +632,6 @@ export default function Products() {
         </div>
       </section>
 
-      {/* TODO : Add permission FieldRenderer */}
       <ProductModal
         isOpen={modalOpen}
         mode={modalMode}

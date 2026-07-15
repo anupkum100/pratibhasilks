@@ -9,7 +9,7 @@ import {
   X
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContexts";
 import LoginModal from "./Admin/Login";
 import { useCart } from "./Cart/cartContext";
@@ -31,7 +31,14 @@ const adminLinks = [
 ];
 
 export default function Navbar() {
-  const { cartItems, removeFromCart, createOrder } = useCart();
+  const navigate = useNavigate();
+  const {
+    adminCartItems,
+    adminCartCount,
+    publicCartCount,
+    removeFromAdminCart,
+    createOrder
+  } = useCart();
   const { isAdmin, logout } = useAuth();
 
   const [orderModalOpen, setOrderModalOpen] = useState(false);
@@ -42,6 +49,7 @@ export default function Navbar() {
   const [loginOpen, setLoginOpen] = useState(false);
 
   const isLightNav = scrolled || isOpen;
+  const navCartCount = isAdmin ? adminCartCount : publicCartCount;
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -88,6 +96,17 @@ export default function Navbar() {
   const handleLogout = () => {
     logout();
     closeMenu();
+    navigate("/");
+  };
+
+  const handleCartClick = () => {
+    if (isAdmin) {
+      setOrderModalOpen(true);
+      return;
+    }
+
+    closeMenu();
+    navigate("/checkout");
   };
 
   return (
@@ -132,25 +151,30 @@ export default function Navbar() {
               />
             )}
 
-            {isAdmin ? <CartButton
-              cartItems={cartItems}
-              onClick={() => setOrderModalOpen(true)}
+            <CartButton
+              cartCount={navCartCount}
+              onClick={handleCartClick}
+              title={isAdmin ? "Order Cart" : "Shopping Cart"}
             />
-              : (
-                <IconButton
-                  onClick={() => setLoginOpen(true)}
-                  title="Admin Login"
-                >
-                  <Fingerprint size={18} strokeWidth={1.8} />
-                </IconButton>
-              )}
+
+            {!isAdmin && (
+              <IconButton
+                onClick={() => setLoginOpen(true)}
+                title="Admin Login"
+              >
+                <Fingerprint size={18} strokeWidth={1.8} />
+              </IconButton>
+            )}
           </div>
 
           <div className="md:hidden flex items-center gap-2">
-            {isAdmin ? <CartButton
-              cartItems={cartItems}
-              onClick={() => setOrderModalOpen(true)}
-            /> : (
+            <CartButton
+              cartCount={navCartCount}
+              onClick={handleCartClick}
+              title={isAdmin ? "Order Cart" : "Shopping Cart"}
+            />
+
+            {!isAdmin && (
               <IconButton
                 onClick={() => setLoginOpen(true)}
                 title="Admin Login"
@@ -225,11 +249,11 @@ export default function Navbar() {
       </nav>
 
       <SoldModal
-        products={cartItems}
+        products={adminCartItems}
         open={orderModalOpen}
         onClose={() => setOrderModalOpen(false)}
         onSubmit={createOrder}
-        onRemoveProduct={removeFromCart}
+        onRemoveProduct={removeFromAdminCart}
       />
 
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
@@ -326,18 +350,18 @@ function IconButton({ children, onClick, title }) {
   );
 }
 
-function CartButton({ cartItems, onClick }) {
+function CartButton({ cartCount, onClick, title }) {
   return (
     <button
       onClick={onClick}
-      className="relative flex h-10 w-10 items-center justify-center rounded-full border border-[#d6b56d]/25 bg-black text-[#d6b56d] shadow-md transition-all duration-200 hover:scale-105 hover:border-[#d6b56d] hover:bg-[#111]"
-      title="Order Cart"
+      className="hidden relative flex h-10 w-10 items-center justify-center rounded-full border border-[#d6b56d]/25 bg-black text-[#d6b56d] shadow-md transition-all duration-200 hover:scale-105 hover:border-[#d6b56d] hover:bg-[#111]"
+      title={title}
     >
       <ShoppingCart size={18} />
 
-      {cartItems.length > 0 && (
+      {cartCount > 0 && (
         <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#181818] px-1 text-[10px] text-white ring-2 ring-[#fffaf0]">
-          {cartItems.length}
+          {cartCount}
         </span>
       )}
     </button>

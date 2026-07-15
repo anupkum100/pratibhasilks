@@ -6,9 +6,13 @@ import { Link } from "react-router-dom";
 import { PS_PHONE_WHATSAPP } from "../../data/constants";
 import { normalised } from "../../data/util";
 import BuyNowButton from "../BuyNowButton";
+import CartActionButton from "../Cart/CartActionButton";
+import { useCart } from "../Cart/cartContext";
 import MiniTrust from "./MiniTrust";
 
 export function ProductInfo({ productDetails }) {
+    const { addToCart, removeFromCart, isInCart } = useCart();
+    const added = isInCart(productDetails);
 
     const createWhatsappMessage = () => {
         const message = `Hello Pratibha Silks,
@@ -59,11 +63,7 @@ export function ProductInfo({ productDetails }) {
                     Out of Stock
                 </span>
             ) : (
-                productDetails.limitedStock ? (
-                    <span className="bg-[#FFF4E5] text-[#A15C00] px-4 py-2 rounded-full">
-                        Limited Stock
-                    </span>
-                ) : <span className="bg-green-50 text-green-700 px-4 py-2 rounded-full">
+                <span className="bg-green-50 text-green-700 px-4 py-2 rounded-full">
                     In Stock
                 </span>
             )}
@@ -97,7 +97,25 @@ export function ProductInfo({ productDetails }) {
             {productDetails.description}
         </p>
 
-        <BuyNowButton product={productDetails} className="w-full sm:w-auto" />
+        <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+            <BuyNowButton product={productDetails} className="w-full sm:w-auto hidden" />
+
+            {!!productDetails.stock && (
+                <CartActionButton
+                    added={added}
+                    onClick={() => {
+                        if (added) {
+                            removeFromCart(productDetails);
+                            return;
+                        }
+
+                        addToCart(productDetails);
+                    }}
+                    size="detail"
+                    className="sm:w-auto hidden"
+                />
+            )}
+        </div>
 
 
         {!!productDetails.stock &&
@@ -148,7 +166,7 @@ export function ProductInfo({ productDetails }) {
                         {productDetails.categories.map((category) => (
                             <Link
                                 key={category}
-                                to="/products"
+                                to={`/products?categories=${encodeURIComponent(category)}`}
                                 className="
                             px-5 py-2.5
                             rounded-full
@@ -180,7 +198,7 @@ export function ProductInfo({ productDetails }) {
                         {productDetails.occasions.map((occasion) => (
                             <Link
                                 key={occasion}
-                                to="/products"
+                                to={`/products?occasions=${encodeURIComponent(occasion)}`}
                                 className="
                             px-5 py-2.5
                             rounded-full

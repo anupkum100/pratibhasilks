@@ -17,6 +17,14 @@ import { apiCall } from "../../serice/api";
 
 const pageSize = 8;
 
+const unwrapApiResponse = (response, fallbackMessage) => {
+    if (response?.error) {
+        throw new Error(response.error.message || fallbackMessage);
+    }
+
+    return response;
+};
+
 export default function PaymentsPage() {
     const queryClient = useQueryClient();
 
@@ -42,9 +50,13 @@ export default function PaymentsPage() {
         return params.toString();
     }, [search, category, sortBy, sortOrder, page]);
 
-    const { data, isLoading, isRefetching } = useQuery({
+    const { data, isLoading, isRefetching, error } = useQuery({
         queryKey: ["payments", queryString],
-        queryFn: () => apiCall(`/api/payments?${queryString}`),
+        queryFn: async () =>
+            unwrapApiResponse(
+                await apiCall(`/api/payments?${queryString}`),
+                "Failed to fetch payments"
+            ),
     });
 
     const payments = data?.data || [];
@@ -52,24 +64,34 @@ export default function PaymentsPage() {
     const summary = data?.summary || {};
 
     const savePaymentMutation = useMutation({
-        mutationFn: (payload) => {
-            if (payload._id) {
-                return apiCall(`/api/payments/${payload._id}`, "PUT", payload);
-            }
+        mutationFn: async (payload) => {
+            const response = payload._id
+                ? await apiCall(`/api/payments/${payload._id}`, "PUT", payload)
+                : await apiCall("/api/payments", "POST", payload);
 
-            return apiCall("/api/payments", "POST", payload);
+            return unwrapApiResponse(response, "Failed to save payment");
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["payments"] });
             setOpenModal(false);
             setEditingPayment(null);
         },
+        onError: (error) => {
+            alert(error.message || "Failed to save payment");
+        },
     });
 
     const deletePaymentMutation = useMutation({
-        mutationFn: (id) => apiCall(`/api/payments/${id}`, "DELETE"),
+        mutationFn: async (id) =>
+            unwrapApiResponse(
+                await apiCall(`/api/payments/${id}`, "DELETE"),
+                "Failed to delete payment"
+            ),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["payments"] });
+        },
+        onError: (error) => {
+            alert(error.message || "Failed to delete payment");
         },
     });
 
@@ -97,6 +119,7 @@ export default function PaymentsPage() {
     const handleSavePayment = (payment) => {
         savePaymentMutation.mutate({
             ...payment,
+            type: payment.type || "",
             amount: Number(payment.amount || 0),
             quantity: Number(payment.quantity || 1),
         });
@@ -172,7 +195,7 @@ export default function PaymentsPage() {
                                     setSearch(event.target.value);
                                     setPage(1);
                                 }}
-                                placeholder="Search type, source, paid via..."
+                                placeholder="Search type, payment type, source, paid via..."
                                 className="bg-transparent outline-none w-full text-sm"
                             />
                         </div>
@@ -204,7 +227,8 @@ export default function PaymentsPage() {
                             <option value="date-asc">Oldest First</option>
                             <option value="amount-desc">Amount High</option>
                             <option value="amount-asc">Amount Low</option>
-                            <option value="paymentType-asc">Type A-Z</option>
+                            <option value="type-asc">Type A-Z</option>
+                            <option value="paymentType-asc">Payment Type A-Z</option>
                         </select>
                     </div>
                 </div>
@@ -215,11 +239,22 @@ export default function PaymentsPage() {
                     </p>
                 )}
 
+                {error ? (
+                    <div className="mt-8 rounded-[2rem] border border-red-200 bg-red-50 p-8 text-center">
+                        <h2 className="font-serif text-3xl text-red-800">
+                            Unable to load payments
+                        </h2>
+                        <p className="mt-2 text-sm text-red-700">
+                            {error.message || "Please try again."}
+                        </p>
+                    </div>
+                ) : (
+                    <>
                 <div className="hidden md:block mt-6 bg-white rounded-[2rem] overflow-hidden shadow-[0_18px_55px_rgba(0,0,0,0.08)] border border-black/5">
                     <table className="w-full text-sm">
                         <thead className="bg-[#181818] text-white">
                             <tr>
-                                <TableHead label="Type" onClick={() => handleSort("paymentType")} />
+                                <TableHead label="Type" onClick={() => handleSort("type")} />
                                 <TableHead label="Category" />
                                 <TableHead label="Payment Type" />
                                 <TableHead label="Amount" onClick={() => handleSort("amount")} />
@@ -238,7 +273,9 @@ export default function PaymentsPage() {
                                     key={payment._id}
                                     className="border-b border-black/5 hover:bg-[#F8F3EC]/70 transition"
                                 >
-                                    <td className="p-5 font-medium">{payment.paymentType}</td>
+                                    <td className="p-5 font-medium">
+                                        {payment.type || "-"}
+                                    </td>
 
                                     <td className="p-5">
                                         <CategoryBadge category={payment.category} />
@@ -324,6 +361,8 @@ export default function PaymentsPage() {
                         setPage((prev) => Math.min(prev + 1, pagination.totalPages || 1))
                     }
                 />
+                    </>
+                )}
             </section>
 
             <PaymentModal
@@ -338,4 +377,3 @@ export default function PaymentsPage() {
         </main>
     );
 }
-

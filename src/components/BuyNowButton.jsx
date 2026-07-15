@@ -14,7 +14,7 @@ export default function BuyNowButton({ product, className = "" }) {
       onClick={() =>
         navigate(`/checkout/${encodeURIComponent(product.sku)}`)
       }
-      className={`mt-3 group relative overflow-hidden rounded-full bg-[#181818] px-7 py-3.5 text-sm font-semibold tracking-wide text-white transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_15px_40px_rgba(0,0,0,0.25)] ${className}`}
+      className={`group relative overflow-hidden rounded-full bg-[#181818] px-7 py-3.5 text-sm font-semibold tracking-wide text-white transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_15px_40px_rgba(0,0,0,0.25)] ${className}`}
     >
       {/* Gold Shine */}
       <span className="absolute inset-0 overflow-hidden rounded-full">

@@ -33,6 +33,7 @@ export default function ProductModal({
     product,
     onClose,
     onSubmit,
+    loading = false,
     nextIndex = 1,
     filters
 }) {
@@ -183,6 +184,7 @@ export default function ProductModal({
 
     const handleSubmit = (event) => {
         event.preventDefault();
+        if (loading) return;
 
         const productFormData = new FormData();
 
@@ -310,9 +312,14 @@ export default function ProductModal({
 
                         <button
                             type="submit"
+                            disabled={loading}
                             className="flex-1 md:flex-none px-6 py-3 rounded-full bg-[#181818] text-white text-sm font-medium"
                         >
-                            {mode === "edit" ? "Update Product" : "Save Product"}
+                            {loading
+                                ? "Saving..."
+                                : mode === "edit"
+                                    ? "Update Product"
+                                    : "Save Product"}
                         </button>
                     </div>
                 </form>

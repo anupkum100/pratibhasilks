@@ -22,6 +22,14 @@ const STATUS_OPTIONS = [
 
 const PAGE_SIZE = 8;
 
+const unwrapApiResponse = (response, fallbackMessage) => {
+    if (response?.error) {
+        throw new Error(response.error.message || fallbackMessage);
+    }
+
+    return response;
+};
+
 export default function Orders() {
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState("all");
@@ -35,9 +43,13 @@ export default function Orders() {
         return params.toString();
     }, [search, status]);
 
-    const { data, isLoading, isRefetching } = useQuery({
+    const { data, isLoading, isRefetching, error } = useQuery({
         queryKey: ["orders", queryString],
-        queryFn: () => apiCall(`/api/orders?${queryString}`),
+        queryFn: async () =>
+            unwrapApiResponse(
+                await apiCall(`/api/orders?${queryString}`),
+                "Failed to fetch orders"
+            ),
     });
 
     const orders = data?.data || [];
@@ -137,7 +149,16 @@ export default function Orders() {
                     <p className="mt-4 text-sm text-[#9A7B4F]">Refreshing orders...</p>
                 )}
 
-                {orders.length > 0 ? (
+                {error ? (
+                    <div className="mt-8 rounded-[2rem] border border-red-200 bg-red-50 p-8 text-center">
+                        <h2 className="font-serif text-3xl text-red-800">
+                            Unable to load orders
+                        </h2>
+                        <p className="mt-2 text-sm text-red-700">
+                            {error.message || "Please try again."}
+                        </p>
+                    </div>
+                ) : orders.length > 0 ? (
                     <>
                         <div className="hidden md:block mt-6 bg-white rounded-[2rem] overflow-hidden shadow-[0_18px_55px_rgba(0,0,0,0.08)] border border-black/5">
                             <table className="w-full text-sm">

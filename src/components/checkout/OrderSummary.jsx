@@ -1,10 +1,14 @@
 import {
+  Trash2,
   MapPin,
   ShieldCheck,
   Truck,
 } from "lucide-react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { getImageFromId } from "../../data/util";
 import { FREE_SHIPPING_THRESHOLD, getSellingPrice } from "../../utils/shipping";
+import UnavailableImage from "../UnavailableImage";
 
 const money = (value) =>
   new Intl.NumberFormat("en-IN", {
@@ -15,6 +19,7 @@ const money = (value) =>
 
 export default function OrderSummary({
   product,
+  products,
   quantity = 1,
   pincode = "",
   shippingLocation = "",
@@ -23,15 +28,27 @@ export default function OrderSummary({
   isFreeShipping = false,
   isShippingLoading = false,
   canCalculateShipping = false,
+  onRemoveProduct,
 }) {
-  const safeQuantity = Math.max(1, Number(quantity) || 1);
-  const sellingPrice = getSellingPrice(product);
-  const subtotal = sellingPrice * safeQuantity;
-  const total = subtotal + Number(shippingCharge || 0);
-  const amountForFreeShipping = Math.max(
-    0,
-    FREE_SHIPPING_THRESHOLD + 1 - subtotal
+  const summaryProducts = Array.isArray(products)
+    ? products.filter(Boolean)
+    : product
+      ? [product]
+      : [];
+
+  const safeQuantity = Math.max(
+    1,
+    summaryProducts.length || Number(quantity) || 1
   );
+
+  const subtotal = summaryProducts.length
+    ? summaryProducts.reduce(
+      (total, item) => total + getSellingPrice(item),
+      0
+    )
+    : getSellingPrice(product) * safeQuantity;
+
+  const total = subtotal + Number(shippingCharge || 0);
 
   const shippingText = (() => {
     if (isFreeShipping) return "Free";
@@ -50,28 +67,38 @@ export default function OrderSummary({
       </div>
 
       <div className="p-6">
-        <div className="flex gap-4">
-          <div className="h-32 w-24 shrink-0 overflow-hidden rounded-2xl bg-[#F8F3EC]">
-            {product?.mainImageId ? (
-              <img
-                src={getImageFromId(product.mainImageId)}
-                alt={product?.name || "Selected saree"}
-                className="h-full w-full object-cover"
-              />
-            ) : null}
-          </div>
+        <div className="space-y-4">
+          {summaryProducts.map((item) => (
+            <div key={item.sku || item._id} className="flex gap-4">
+              <SummaryProductImage product={item} />
 
-          <div className="min-w-0 flex-1">
-            <h3 className="font-serif text-2xl leading-tight">
-              {product?.name}
-            </h3>
-            <p className="mt-2 text-xs uppercase tracking-[0.18em] text-[#9A7B4F]">
-              SKU {product?.sku}
-            </p>
-            <p className="mt-4 text-lg font-semibold">
-              {money(sellingPrice)}
-            </p>
-          </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="font-serif text-2xl leading-tight">
+                    {item?.name}
+                  </h3>
+
+                  {onRemoveProduct && (
+                    <button
+                      type="button"
+                      onClick={() => onRemoveProduct(item)}
+                      className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-red-100 bg-white text-red-600 transition hover:bg-red-50"
+                      title="Remove from cart"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+                </div>
+
+                <p className="mt-2 text-xs uppercase tracking-[0.18em] text-[#9A7B4F]">
+                  SKU {item?.sku}
+                </p>
+                <p className="mt-4 text-lg font-semibold">
+                  {money(getSellingPrice(item))}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
 
         {(pincode || shippingLocation) && (
@@ -102,6 +129,9 @@ export default function OrderSummary({
               {!isFreeShipping && canCalculateShipping && baseShippingCharge > 0 && (
                 <p className="mt-1 text-[11px] text-[#8A7B6E]">
                   Location base charge {money(baseShippingCharge)}
+                  {safeQuantity > 1
+                    ? ` + ${money(100)} per additional saree`
+                    : ""}
                 </p>
               )}
             </div>
@@ -122,7 +152,8 @@ export default function OrderSummary({
           </div>
         ) : (
           <div className="mt-5 rounded-xl border border-[#D8B46A]/30 bg-[#FFF9EC] p-3 text-xs text-[#765B2D]">
-            Add products worth {money(amountForFreeShipping)} more to unlock free shipping.
+            Free shipping is available on orders above <strong>₹5,000</strong>.
+            <Link className="ms-2 text-emerald-800" to="/products">Add More</Link>
           </div>
         )}
 
@@ -138,5 +169,25 @@ export default function OrderSummary({
         </div>
       </div>
     </aside>
+  );
+}
+
+function SummaryProductImage({ product }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const imageSrc = getImageFromId(product?.mainImageId);
+
+  return (
+    <div className="h-28 w-20 shrink-0 overflow-hidden rounded-2xl bg-[#F8F3EC]">
+      {imageSrc && !imageFailed ? (
+        <img
+          src={imageSrc}
+          alt={product?.name || "Selected saree"}
+          className="h-full w-full object-cover"
+          onError={() => setImageFailed(true)}
+        />
+      ) : (
+        <UnavailableImage />
+      )}
+    </div>
   );
 }

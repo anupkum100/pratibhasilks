@@ -7,6 +7,12 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    const clearSession = () => {
+        localStorage.removeItem("ps_token");
+        localStorage.removeItem("ps_user");
+        setUser(null);
+    };
+
     const googleLogin = async (credential) => {
         const response = await apiCall("/api/auth/google", "POST", { credential });
 
@@ -23,37 +29,58 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        localStorage.removeItem("ps_token");
-        localStorage.removeItem("ps_user");
-        setUser(null);
+        clearSession();
     };
 
     useEffect(() => {
-        const savedToken = localStorage.getItem("ps_token");
-        const savedUser = localStorage.getItem("ps_user");
+        let mounted = true;
 
-        if (savedToken && savedUser) {
-            try {
-                setUser(JSON.parse(savedUser));
-            } catch {
-                localStorage.removeItem("ps_token");
-                localStorage.removeItem("ps_user");
-                setUser(null);
+        const verifySession = async () => {
+            const savedToken = localStorage.getItem("ps_token");
+
+            if (!savedToken) {
+                if (mounted) {
+                    clearSession();
+                    setLoading(false);
+                }
+                return;
             }
-        }
 
-        setLoading(false);
+            const response = await apiCall("/api/auth/me");
+
+            if (!mounted) return;
+
+            if (response?.error || !response?.user) {
+                clearSession();
+            } else {
+                localStorage.setItem("ps_user", JSON.stringify(response.user));
+                setUser(response.user);
+            }
+
+            setLoading(false);
+        };
+
+        verifySession();
 
         const handleLogout = () => {
-            localStorage.removeItem("ps_token");
-            localStorage.removeItem("ps_user");
-            setUser(null);
+            clearSession();
+        };
+
+        const handleStorage = (event) => {
+            if (!["ps_token", "ps_user"].includes(event.key)) return;
+
+            if (!localStorage.getItem("ps_token")) {
+                clearSession();
+            }
         };
 
         window.addEventListener("ps-auth-logout", handleLogout);
+        window.addEventListener("storage", handleStorage);
 
         return () => {
+            mounted = false;
             window.removeEventListener("ps-auth-logout", handleLogout);
+            window.removeEventListener("storage", handleStorage);
         };
     }, []);
 

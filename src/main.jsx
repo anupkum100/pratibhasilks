@@ -14,8 +14,6 @@ import { initGA } from "./utils/analytics";
 initGA();
 const queryClient = new QueryClient();
 
-// console.log("origin:", window.location.origin);
-// console.log("google client:", import.meta.env.VITE_GOOGLE_CLIENT_ID);
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 const app = (

@@ -36,13 +36,12 @@ export async function apiCall(
             data = null;
         }
 
-        if (response.status === 401 && token) {
-            // localStorage.removeItem("ps_token");
+        if ((response.status === 401 || response.status === 403) && token) {
             window.dispatchEvent(new Event("ps-auth-logout"));
 
             return {
                 error: {
-                    status: 401,
+                    status: response.status,
                     message: data?.message || "Session expired. Please login again.",
                 },
             };

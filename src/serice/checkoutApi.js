@@ -1,12 +1,19 @@
 import { apiCall } from "./api";
 
 export const getProductBySku = (sku) => apiCall(`/api/products/${encodeURIComponent(sku)}`);
-export const getPublicOrder = (orderNumber, token) => apiCall(`/api/orders/public/${encodeURIComponent(orderNumber)}?token=${encodeURIComponent(token)}`);
 
 const unwrap = (res) => {
     if (res?.error) throw new Error(res.error.message);
     return res;
 };
+
+export const getPublicOrder = async (orderNumber, token) =>
+    unwrap(await apiCall(
+        `/api/orders/public/${encodeURIComponent(orderNumber)}`,
+        "GET",
+        null,
+        { "X-Public-Access-Token": token }
+    ));
 
 export const createCheckoutOrder = async (payload, idempotencyKey) =>
     unwrap(await apiCall("/api/checkout/create-order", "POST", payload, {

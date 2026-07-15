@@ -1,13 +1,14 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import CheckoutActions from "../components/checkout/CheckoutActions";
 import CheckoutPaymentSection from "../components/checkout/CheckoutPaymentSection";
 import DeliveryAddressSection from "../components/checkout/DeliveryAddressSection";
 import OrderSummary from "../components/checkout/OrderSummary";
+import { useCart } from "../components/Cart/cartContext";
+import { useDeliveryAddressForm } from "../hooks/useDeliveryAddressForm";
 
 import {
   cancelCheckoutOrder,
@@ -19,76 +20,119 @@ import {
 import { calculateShipping } from "../utils/shipping";
 import { loadRazorpayScript } from "../utils/loadRazorpayScript";
 
-const lookupPincode = async (pincode) => {
-  const response = await fetch(
-    `https://api.postalpincode.in/pincode/${encodeURIComponent(pincode)}`
-  );
+const cleanupRazorpayUi = () => {
+  window.setTimeout(() => {
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.documentElement.style.overflow = "";
 
-  if (!response.ok) {
-    throw new Error("PIN code lookup is currently unavailable.");
+    document
+      .querySelectorAll(".razorpay-container")
+      .forEach((container) => container.remove());
+  }, 300);
+};
+
+const ACTIVE_CHECKOUT_KEY = "ps_active_checkout";
+
+const trimText = (value) => String(value || "").trim();
+
+const hasPositiveAmount = (value) => {
+  const amount = Number(value);
+  return Number.isFinite(amount) && amount > 0;
+};
+
+const validateCheckoutResponse = (checkout) => {
+  if (!checkout) {
+    throw new Error("Checkout details were not returned.");
   }
 
-  const result = await response.json();
-  const lookupResult = result?.[0];
+  if (checkout.paymentRequired === false) {
+    if (!checkout.orderNumber || !checkout.publicAccessToken) {
+      throw new Error("Invalid checkout details were returned.");
+    }
+
+    return;
+  }
 
   if (
-    lookupResult?.Status !== "Success" ||
-    !Array.isArray(lookupResult?.PostOffice) ||
-    lookupResult.PostOffice.length === 0
+    checkout.paymentRequired !== true ||
+    !checkout.internalOrderId ||
+    !checkout.orderNumber ||
+    !checkout.publicAccessToken ||
+    !checkout.razorpayOrderId ||
+    !checkout.razorpayKeyId ||
+    !checkout.currency ||
+    !hasPositiveAmount(checkout.amount)
   ) {
-    throw new Error("No delivery location found for this PIN code.");
+    throw new Error("Invalid payment details were returned.");
   }
+};
 
-  return lookupResult.PostOffice;
+const validateVerifiedPayment = (verified) => {
+  if (!verified?.orderNumber || !verified?.publicAccessToken) {
+    throw new Error(
+      "Payment was received, but order confirmation details were not returned. Please contact us before retrying."
+    );
+  }
+};
+
+const readStoredCheckout = () => {
+  try {
+    const stored = sessionStorage.getItem(ACTIVE_CHECKOUT_KEY);
+    if (!stored) return null;
+
+    const checkout = JSON.parse(stored);
+    validateCheckoutResponse(checkout);
+
+    if (
+      checkout.reservationExpiresAt &&
+      new Date(checkout.reservationExpiresAt).getTime() <= Date.now()
+    ) {
+      sessionStorage.removeItem(ACTIVE_CHECKOUT_KEY);
+      return null;
+    }
+
+    return checkout.paymentRequired === true ? checkout : null;
+  } catch {
+    sessionStorage.removeItem(ACTIVE_CHECKOUT_KEY);
+    return null;
+  }
+};
+
+const storeActiveCheckout = (checkout) => {
+  try {
+    sessionStorage.setItem(ACTIVE_CHECKOUT_KEY, JSON.stringify(checkout));
+  } catch {
+    // Best-effort only; retry still works during the current page session.
+  }
+};
+
+const clearStoredCheckout = () => {
+  sessionStorage.removeItem(ACTIVE_CHECKOUT_KEY);
 };
 
 export default function CheckoutPage() {
   const { sku } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const quantity = 1;
+  const { publicCartItems, clearPublicCart, removeFromPublicCart } = useCart();
+  const isCartCheckout = !sku;
 
   const [submitting, setSubmitting] = useState(false);
   const [cancellingReservation, setCancellingReservation] = useState(false);
-  const [activeCheckout, setActiveCheckout] = useState(null);
+  const [activeCheckout, setActiveCheckout] = useState(() => readStoredCheckout());
   const [pageError, setPageError] = useState("");
-  const [showLocalities, setShowLocalities] = useState(false);
-  const [selectedLocality, setSelectedLocality] = useState(null);
-  const [manualAddressMode, setManualAddressMode] = useState(false);
+  const [idempotencyKey, setIdempotencyKey] = useState(() =>
+    crypto.randomUUID()
+  );
+  const submitInFlightRef = useRef(false);
+  const paymentFailureMessageRef = useRef("");
 
-  const idempotencyKey = useMemo(() => crypto.randomUUID(), []);
+  const addressForm = useDeliveryAddressForm();
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    clearErrors,
-    setError,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      paymentMethod: "ONLINE",
-      fullName: "",
-      phone: "",
-      email: "",
-      addressLine1: "",
-      addressLine2: "",
-      landmark: "",
-      pincode: "",
-      city: "",
-      state: "",
-      customerNotes: "",
-    },
-  });
-
-  const pincode = watch("pincode");
-  const city = watch("city");
-  const state = watch("state");
-
-  const normalizedPincode = String(pincode || "")
-    .replace(/\D/g, "")
-    .slice(0, 6);
+  useEffect(() => {
+    loadRazorpayScript();
+  }, []);
 
   const {
     data,
@@ -100,145 +144,70 @@ export default function CheckoutPage() {
     enabled: Boolean(sku),
   });
 
+  const product = data?.data;
+  const cartSkus = useMemo(
+    () =>
+      publicCartItems
+        .map((cartProduct) => cartProduct?.sku)
+        .filter(Boolean),
+    [publicCartItems]
+  );
+
   const {
-    data: postOffices = [],
-    isFetching: isLookingUpPincode,
-    error: pincodeLookupError,
+    data: refreshedCartProducts = [],
+    isLoading: isLoadingCartProducts,
+    error: cartProductsError,
   } = useQuery({
-    queryKey: ["pincode-lookup", normalizedPincode],
-    queryFn: () => lookupPincode(normalizedPincode),
-    enabled: normalizedPincode.length === 6,
-    staleTime: 1000 * 60 * 60 * 24,
-    retry: 1,
-    refetchOnWindowFocus: false,
+    queryKey: ["checkout-cart-products", cartSkus],
+    queryFn: async () => {
+      const responses = await Promise.all(
+        cartSkus.map((itemSku) => getProductBySku(itemSku))
+      );
+      const failedResponse = responses.find((response) => response?.error);
+
+      if (failedResponse) {
+        throw new Error(
+          failedResponse.error.message ||
+          "One or more cart products are unavailable."
+        );
+      }
+
+      return responses
+        .map((response) => response?.data)
+        .filter(Boolean);
+    },
+    enabled: isCartCheckout && cartSkus.length > 0,
   });
 
-  const product = data?.data;
+  const checkoutProducts = useMemo(() => {
+    if (sku) return product ? [product] : [];
 
-  useEffect(() => {
-    if (
-      normalizedPincode.length === 6 &&
-      pincodeLookupError
-    ) {
-      setManualAddressMode(true);
-      setShowLocalities(false);
-      setSelectedLocality(null);
-    }
-  }, [normalizedPincode, pincodeLookupError]);
+    return refreshedCartProducts.length ? refreshedCartProducts : publicCartItems;
+  }, [publicCartItems, product, refreshedCartProducts, sku]);
+
+  const quantity = Math.max(1, checkoutProducts.length);
+  const checkoutSkus = useMemo(
+    () =>
+      checkoutProducts
+        .map((checkoutProduct) => checkoutProduct?.sku)
+        .filter(Boolean),
+    [checkoutProducts]
+  );
 
   const shippingDetails = useMemo(
     () =>
       calculateShipping({
-        product,
-        quantity,
-        state,
-        pincode: normalizedPincode,
+        product: checkoutProducts[0],
+        products: checkoutProducts,
+        state: addressForm.state,
+        pincode: addressForm.normalizedPincode,
       }),
-    [product, quantity, state, normalizedPincode]
+    [checkoutProducts, addressForm.state, addressForm.normalizedPincode]
   );
 
-  const shippingLocation = [city, state].filter(Boolean).join(", ");
-
-  const applyLocation = (location) => {
-    if (!location) return;
-
-    const locality =
-      location.Name ||
-      location.Block ||
-      location.Division ||
-      "";
-
-    const detectedCity =
-      location.District ||
-      location.Division ||
-      location.Region ||
-      "";
-
-    setSelectedLocality(location);
-    setManualAddressMode(false);
-
-    setValue("addressLine2", locality, {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-
-    setValue("city", detectedCity, {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-
-    setValue("state", location.State || "", {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-
-    clearErrors(["pincode", "addressLine2", "city", "state"]);
-    setShowLocalities(false);
-  };
-
-  const handlePincodeChange = (event) => {
-    const value = event.target.value.replace(/\D/g, "").slice(0, 6);
-
-    setValue("pincode", value, {
-      shouldDirty: true,
-      shouldValidate: value.length === 6,
-    });
-
-    setSelectedLocality(null);
-    setManualAddressMode(false);
-    setShowLocalities(value.length === 6);
-
-    setValue("addressLine2", "", { shouldDirty: true });
-    setValue("city", "", { shouldDirty: true });
-    setValue("state", "", { shouldDirty: true });
-
-    if (value.length < 6) {
-      clearErrors("pincode");
-    }
-  };
-
-  const enableManualAddress = () => {
-    setManualAddressMode(true);
-    setSelectedLocality(null);
-    setShowLocalities(false);
-
-    clearErrors(["addressLine2", "city", "state"]);
-  };
-
-  const validateDeliveryAddress = () => {
-    if (normalizedPincode.length !== 6) {
-      setError("pincode", {
-        type: "validate",
-        message: "Enter a valid 6-digit PIN code.",
-      });
-      return false;
-    }
-
-    /*
-     * When the PIN API succeeds, the user should either select a returned
-     * locality or explicitly switch to manual entry.
-     *
-     * When the API fails, manualAddressMode is enabled automatically,
-     * so city/state/locality validation is handled by react-hook-form.
-     */
-    if (
-      !manualAddressMode &&
-      !pincodeLookupError &&
-      postOffices.length > 0 &&
-      !selectedLocality
-    ) {
-      setError("pincode", {
-        type: "validate",
-        message: "Select a locality or choose manual address entry.",
-      });
-      setShowLocalities(true);
-      return false;
-    }
-
-    return true;
-  };
-
   const openRazorpay = async (checkout) => {
+    paymentFailureMessageRef.current = "";
+
     const loaded = await loadRazorpayScript();
 
     if (!loaded || !window.Razorpay) {
@@ -264,6 +233,7 @@ export default function CheckoutPage() {
         try {
           setSubmitting(true);
           setPageError("");
+          paymentFailureMessageRef.current = "";
 
           const verified = await verifyCheckoutPayment({
             internalOrderId: checkout.internalOrderId,
@@ -271,13 +241,22 @@ export default function CheckoutPage() {
             razorpay_payment_id: payment.razorpay_payment_id,
             razorpay_signature: payment.razorpay_signature,
           });
+          validateVerifiedPayment(verified);
 
           setActiveCheckout(null);
+          clearStoredCheckout();
+
+          if (isCartCheckout) {
+            clearPublicCart();
+          }
+
+          sessionStorage.removeItem("ps_checkout_address_draft");
 
           navigate(
-            `/order-success/${verified.orderNumber}?token=${verified.publicAccessToken}`
+            `/order-success/${verified.orderNumber}#token=${encodeURIComponent(verified.publicAccessToken)}`
           );
         } catch (verificationError) {
+          cleanupRazorpayUi();
           setPageError(
             verificationError?.message ||
               "Payment was received, but verification failed. Please contact us before retrying."
@@ -289,28 +268,39 @@ export default function CheckoutPage() {
       modal: {
         ondismiss: () => {
           setSubmitting(false);
+          cleanupRazorpayUi();
           setPageError(
-            "Payment was not completed. This saree is reserved for you for a few minutes. You can retry the same payment or cancel the reservation."
+            paymentFailureMessageRef.current ||
+              "Payment was not completed. This saree is reserved for you for a few minutes. You can retry the same payment or cancel the reservation."
           );
         },
       },
     });
 
     razorpay.on("payment.failed", (response) => {
-      setSubmitting(false);
-      setPageError(
+      const failureMessage =
         response.error?.description ||
-          "Payment failed. You can retry while the saree remains reserved."
-      );
+        "Payment failed. You can retry while the saree remains reserved.";
+
+      paymentFailureMessageRef.current = failureMessage;
+      setSubmitting(false);
+      cleanupRazorpayUi();
+      setPageError(failureMessage);
     });
 
     razorpay.open();
   };
 
   const onSubmit = async (form) => {
+    if (submitInFlightRef.current) return;
+
+    submitInFlightRef.current = true;
     setPageError("");
 
-    if (!validateDeliveryAddress()) return;
+    if (!addressForm.validateDeliveryAddress()) {
+      submitInFlightRef.current = false;
+      return;
+    }
 
     setSubmitting(true);
 
@@ -320,56 +310,73 @@ export default function CheckoutPage() {
         return;
       }
 
-      const checkout = await createCheckoutOrder(
-        {
-          sku,
-          quantity,
-          paymentMethod: form.paymentMethod,
-          customer: {
-            name: form.fullName,
-            phone: form.phone,
-            email: form.email,
-          },
-          shippingAddress: {
-            fullName: form.fullName,
-            phone: form.phone,
-            addressLine1: form.addressLine1,
-            addressLine2: form.addressLine2,
-            landmark: form.landmark,
-            city: form.city,
-            state: form.state,
-            pincode: form.pincode,
-            addressSource: manualAddressMode ? "MANUAL" : "PINCODE_API",
-          },
-          customerNotes: form.customerNotes,
+      const checkoutItems = checkoutSkus.map((itemSku) => ({
+        sku: itemSku,
+        quantity: 1,
+      }));
+
+      const checkoutPayload = {
+        paymentMethod: "ONLINE",
+        customer: {
+          name: trimText(form.fullName),
+          phone: trimText(form.phone),
+          email: trimText(form.email),
         },
+        shippingAddress: {
+          fullName: trimText(form.fullName),
+          phone: trimText(form.phone),
+          addressLine1: trimText(form.addressLine1),
+          addressLine2: trimText(form.addressLine2),
+          landmark: trimText(form.landmark),
+          city: trimText(form.city),
+          state: trimText(form.state),
+          pincode: trimText(form.pincode),
+          addressSource: addressForm.manualAddressMode ? "MANUAL" : "PINCODE_API",
+        },
+        customerNotes: trimText(form.customerNotes),
+      };
+
+      if (isCartCheckout && checkoutItems.length > 1) {
+        checkoutPayload.items = checkoutItems;
+        checkoutPayload.orderType = "CART";
+      } else {
+        checkoutPayload.sku = checkoutSkus[0];
+        checkoutPayload.quantity = 1;
+        checkoutPayload.orderType = isCartCheckout ? "CART" : "BUY_NOW";
+      }
+
+      const checkout = await createCheckoutOrder(
+        checkoutPayload,
         idempotencyKey
       );
 
-      if (!checkout) {
-        throw new Error("Checkout details were not returned.");
+      try {
+        validateCheckoutResponse(checkout);
+      } catch (validationError) {
+        setIdempotencyKey(crypto.randomUUID());
+        throw validationError;
       }
-
       if (checkout.paymentRequired === false) {
+        if (isCartCheckout) {
+          clearPublicCart();
+        }
+
+        sessionStorage.removeItem("ps_checkout_address_draft");
+        clearStoredCheckout();
+
         navigate(
-          `/order-success/${checkout.orderNumber}?token=${checkout.publicAccessToken}`
+          `/order-success/${checkout.orderNumber}#token=${encodeURIComponent(checkout.publicAccessToken)}`
         );
         return;
       }
 
-      if (
-        checkout.paymentRequired !== true ||
-        !checkout.internalOrderId ||
-        !checkout.razorpayOrderId
-      ) {
-        throw new Error("Invalid payment details were returned.");
-      }
-
       setActiveCheckout(checkout);
+      storeActiveCheckout(checkout);
       await openRazorpay(checkout);
     } catch (err) {
       setPageError(err?.message || "Something went wrong.");
     } finally {
+      submitInFlightRef.current = false;
       setSubmitting(false);
     }
   };
@@ -404,13 +411,19 @@ export default function CheckoutPage() {
       });
 
       setActiveCheckout(null);
+      clearStoredCheckout();
 
-      await queryClient.invalidateQueries({
-        queryKey: ["checkout-product", sku],
-      });
+      if (sku) {
+        await queryClient.invalidateQueries({
+          queryKey: ["checkout-product", sku],
+        });
+      }
 
       await queryClient.invalidateQueries({
         queryKey: ["products"],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["checkout-cart-products"],
       });
 
       setPageError(
@@ -426,20 +439,25 @@ export default function CheckoutPage() {
     }
   };
 
-  const productIsSold =
-    Number(product?.stock) <= 0 &&
-    Number(product?.reservedStock || 0) <= 0 &&
-    Boolean(product?.soldOrder);
+  const productIsSold = checkoutProducts.some(
+    (checkoutProduct) =>
+      Number(checkoutProduct?.stock) <= 0 &&
+      Number(checkoutProduct?.reservedStock || 0) <= 0 &&
+      Boolean(checkoutProduct?.soldOrder)
+  );
 
-  const productIsReserved =
-    Number(product?.stock) <= 0 &&
-    Number(product?.reservedStock || 0) > 0 &&
-    !product?.soldOrder;
+  const productIsReserved = checkoutProducts.some(
+    (checkoutProduct) =>
+      Number(checkoutProduct?.stock) <= 0 &&
+      Number(checkoutProduct?.reservedStock || 0) > 0 &&
+      !checkoutProduct?.soldOrder
+  );
 
   const unavailableToCurrentCustomer =
-    !activeCheckout && (productIsSold || productIsReserved);
+    !activeCheckout &&
+    (checkoutProducts.length === 0 || productIsSold || productIsReserved);
 
-  if (isLoading) {
+  if (isLoading || isLoadingCartProducts) {
     return (
       <main className="min-h-screen bg-[#F8F3EC] px-5 py-16">
         <div className="mx-auto max-w-6xl animate-pulse rounded-[2rem] bg-white p-12">
@@ -449,13 +467,27 @@ export default function CheckoutPage() {
     );
   }
 
-  if (error || !product) {
+  if (
+    error ||
+    cartProductsError ||
+    (!isCartCheckout && !product) ||
+    (isCartCheckout && publicCartItems.length === 0)
+  ) {
     return (
       <main className="min-h-screen bg-[#F8F3EC] px-5 py-16">
         <div className="luxury-card mx-auto max-w-2xl p-10 text-center">
-          <h1 className="font-serif text-4xl">Saree unavailable</h1>
+          <h1 className="font-serif text-4xl">
+            {isCartCheckout
+              ? cartProductsError
+                ? "Cart item unavailable"
+                : "Your cart is empty"
+              : "Saree unavailable"}
+          </h1>
           <p className="mt-3 text-[#6B5F54]">
-            {error?.message ||
+            {isCartCheckout
+              ? cartProductsError?.message ||
+              "Add sarees to your cart before starting checkout."
+              : error?.message ||
               "This product is currently unavailable. Please explore our available saree collection."}
           </p>
           <Link
@@ -473,17 +505,17 @@ export default function CheckoutPage() {
     <main className="min-h-screen bg-[#F8F3EC] px-5 py-10 md:py-16">
       <section className="mx-auto max-w-7xl">
         <Link
-          to={`/product/${product.sku}`}
+          to={isCartCheckout ? "/products" : `/product/${product.sku}`}
           className="inline-flex items-center gap-2 text-sm text-[#6B5F54]"
         >
           <ArrowLeft size={16} />
-          Back to saree
+          {isCartCheckout ? "Continue shopping" : "Back to saree"}
         </Link>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[1.15fr_.85fr]">
           <form
             autoComplete="on"
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={addressForm.handleSubmit(onSubmit)}
             className="luxury-card p-6 md:p-9"
           >
             <p className="luxury-eyebrow">Secure Checkout</p>
@@ -496,24 +528,22 @@ export default function CheckoutPage() {
             </p>
 
             <DeliveryAddressSection
-              register={register}
-              errors={errors}
-              normalizedPincode={normalizedPincode}
-              postOffices={postOffices}
-              selectedLocality={selectedLocality}
-              showLocalities={showLocalities}
-              isLookingUpPincode={isLookingUpPincode}
-              pincodeLookupError={pincodeLookupError}
-              manualAddressMode={manualAddressMode}
-              onPincodeChange={handlePincodeChange}
-              onToggleLocalities={() =>
-                setShowLocalities((current) => !current)
-              }
-              onSelectLocality={applyLocation}
-              onUseManualAddress={enableManualAddress}
+              register={addressForm.register}
+              errors={addressForm.formState.errors}
+              normalizedPincode={addressForm.normalizedPincode}
+              postOffices={addressForm.postOffices}
+              selectedLocality={addressForm.selectedLocality}
+              showLocalities={addressForm.showLocalities}
+              isLookingUpPincode={addressForm.isLookingUpPincode}
+              pincodeLookupError={addressForm.pincodeLookupError}
+              manualAddressMode={addressForm.manualAddressMode}
+              onPincodeChange={addressForm.onPincodeChange}
+              onToggleLocalities={addressForm.onToggleLocalities}
+              onSelectLocality={addressForm.onSelectLocality}
+              onUseManualAddress={addressForm.onUseManualAddress}
             />
 
-            <CheckoutPaymentSection register={register} />
+            <CheckoutPaymentSection register={addressForm.register} />
 
             {pageError && (
               <div
@@ -532,7 +562,7 @@ export default function CheckoutPage() {
               submitting={submitting}
               cancellingReservation={cancellingReservation}
               unavailableToCurrentCustomer={unavailableToCurrentCustomer}
-              isLookingUpPincode={isLookingUpPincode}
+              isLookingUpPincode={addressForm.isLookingUpPincode}
               productIsSold={productIsSold}
               productIsReserved={productIsReserved}
               onRetryPayment={handleRetryPayment}
@@ -541,15 +571,17 @@ export default function CheckoutPage() {
           </form>
 
           <OrderSummary
-            product={product}
+            product={checkoutProducts[0]}
+            products={checkoutProducts}
             quantity={quantity}
-            pincode={normalizedPincode}
-            shippingLocation={shippingLocation}
+            pincode={addressForm.normalizedPincode}
+            shippingLocation={addressForm.shippingLocation}
             shippingCharge={shippingDetails.shippingCharge}
             baseShippingCharge={shippingDetails.baseCharge}
             isFreeShipping={shippingDetails.isFreeShipping}
-            isShippingLoading={isLookingUpPincode}
+            isShippingLoading={addressForm.isLookingUpPincode}
             canCalculateShipping={shippingDetails.canCalculate}
+            onRemoveProduct={isCartCheckout ? removeFromPublicCart : undefined}
           />
         </div>
       </section>

@@ -3,11 +3,11 @@ import {
 } from "lucide-react";
 import { getImageFromId } from "../../data/util";
 import imageCompression from "browser-image-compression";
+import { useState } from "react";
 
 const compressImage = async (file) => {
     if (!(file instanceof File || file instanceof Blob)) {
-        console.log("Invalid file passed:", file);
-        return null;
+        throw new Error("Please select a valid image file.");
     }
 
     return await imageCompression(file, {
@@ -18,10 +18,26 @@ const compressImage = async (file) => {
     });
 };
 
-export function ImageUploader({ label, imageId, onUpload, useRef }) {
+export function ImageUploader({ label, imageId, onUpload, onDelete, useRef }) {
     const inputRef = useRef(null);
+    const [error, setError] = useState("");
 
     const imageUrl = imageId ? getImageFromId(imageId) : "";
+
+    const handleUpload = async (event) => {
+        const file = event.target.files?.[0];
+        event.target.value = "";
+
+        if (!file) return;
+
+        try {
+            setError("");
+            const compressedFile = await compressImage(file);
+            onUpload(compressedFile);
+        } catch (uploadError) {
+            setError(uploadError.message || "Unable to prepare this image.");
+        }
+    };
 
     return (
         <div className="flex flex-col gap-2 md:col-span-2">
@@ -31,13 +47,22 @@ export function ImageUploader({ label, imageId, onUpload, useRef }) {
                 </span>
 
                 {imageId && (
-                    <button
-                        type="button"
-                        onClick={() => inputRef.current?.click()}
-                        className="text-xs text-[#9A7B4F] underline underline-offset-4"
-                    >
-                        Change image
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <button
+                            type="button"
+                            onClick={() => inputRef.current?.click()}
+                            className="text-xs text-[#9A7B4F] underline underline-offset-4"
+                        >
+                            Change image
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onDelete}
+                            className="text-xs text-red-700 underline underline-offset-4"
+                        >
+                            Remove image
+                        </button>
+                    </div>
                 )}
             </div>
 
@@ -96,12 +121,13 @@ export function ImageUploader({ label, imageId, onUpload, useRef }) {
                 type="file"
                 accept="image/*"
                 hidden
-                onChange={(event) => {
-                    const file = event.target.files?.[0];
-                    if (file) onUpload(file);
-                    event.target.value = "";
-                }}
+                onChange={handleUpload}
             />
+            {error && (
+                <p className="text-sm text-red-700">
+                    {error}
+                </p>
+            )}
         </div>
     );
 }
@@ -114,23 +140,21 @@ export function GalleryUploader({
     useRef
 }) {
     const inputRef = useRef(null);
+    const [error, setError] = useState("");
 
     const handleUpload = async (event) => {
         const file = event.target.files?.[0];
+        event.target.value = "";
 
         if (!file) return;
 
-        console.log("Original:", (file.size / 1024 / 1024).toFixed(2), "MB");
-
-        const compressedFile = await compressImage(file);
-
-        if (!compressedFile) return;
-
-        console.log("Compressed:", (compressedFile.size / 1024 / 1024).toFixed(2), "MB");
-
-        onUpload(compressedFile);
-
-        event.target.value = "";
+        try {
+            setError("");
+            const compressedFile = await compressImage(file);
+            onUpload(compressedFile);
+        } catch (uploadError) {
+            setError(uploadError.message || "Unable to prepare this image.");
+        }
     };
 
     return (
@@ -198,6 +222,11 @@ export function GalleryUploader({
                 hidden
                 onChange={handleUpload}
             />
+            {error && (
+                <p className="text-sm text-red-700">
+                    {error}
+                </p>
+            )}
         </div>
     );
 }

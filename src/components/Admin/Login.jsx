@@ -1,11 +1,13 @@
 import { GoogleLogin } from "@react-oauth/google";
 import { ShieldCheck, X } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContexts";
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 export default function LoginModal({ open, onClose }) {
     const { googleLogin } = useAuth();
+    const navigate = useNavigate();
     const [error, setError] = useState("");
 
     if (!open) return null;
@@ -21,6 +23,13 @@ export default function LoginModal({ open, onClose }) {
 
             await googleLogin(credentialResponse.credential);
             onClose();
+
+            const returnTo = sessionStorage.getItem("ps_admin_return_to");
+            sessionStorage.removeItem("ps_admin_return_to");
+
+            if (returnTo?.startsWith("/admin/")) {
+                navigate(returnTo, { replace: true });
+            }
         } catch (err) {
             setError(err.message || "Google login failed.");
         }

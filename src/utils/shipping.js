@@ -1,29 +1,6 @@
 export const FREE_SHIPPING_THRESHOLD = 5000;
+export const BASE_SAREE_SHIPPING = 120;
 export const ADDITIONAL_SAREE_SHIPPING = 100;
-
-const SHIPPING_ZONES = {
-  MAHARASHTRA: {
-    states: ["maharashtra"],
-    charge: 120,
-    label: "Maharashtra",
-  },
-  NEARBY: {
-    states: [
-      "goa",
-      "gujarat",
-      "madhya pradesh",
-      "karnataka",
-      "telangana",
-      "chhattisgarh",
-    ],
-    charge: 150,
-    label: "Nearby state",
-  },
-  REST_OF_INDIA: {
-    charge: 180,
-    label: "Rest of India",
-  },
-};
 
 export const getSellingPrice = (product) => {
   const listedPrice = Number(product?.price || 0);
@@ -34,36 +11,36 @@ export const getSellingPrice = (product) => {
     : listedPrice;
 };
 
-export const getShippingZone = (state) => {
-  const normalizedState = String(state || "").trim().toLowerCase();
-
-  if (!normalizedState) return null;
-
-  if (SHIPPING_ZONES.MAHARASHTRA.states.includes(normalizedState)) {
-    return SHIPPING_ZONES.MAHARASHTRA;
-  }
-
-  if (SHIPPING_ZONES.NEARBY.states.includes(normalizedState)) {
-    return SHIPPING_ZONES.NEARBY;
-  }
-
-  return SHIPPING_ZONES.REST_OF_INDIA;
-};
-
 export const calculateShipping = ({
   product,
+  products,
   quantity = 1,
   state,
   pincode,
 }) => {
-  const safeQuantity = Math.max(1, Number(quantity) || 1);
-  const sellingPrice = getSellingPrice(product);
-  const subtotal = sellingPrice * safeQuantity;
+  const cartProducts = Array.isArray(products)
+    ? products.filter(Boolean)
+    : product
+      ? [product]
+      : [];
+
+  const safeQuantity = Math.max(
+    1,
+    cartProducts.length || Number(quantity) || 1
+  );
+
+  const subtotal = cartProducts.length
+    ? cartProducts.reduce(
+      (total, cartProduct) => total + getSellingPrice(cartProduct),
+      0
+    )
+    : getSellingPrice(product) * safeQuantity;
+
   const isFreeShipping = subtotal > FREE_SHIPPING_THRESHOLD;
   const hasValidPincode = /^\d{6}$/.test(String(pincode || ""));
-  const shippingZone = getShippingZone(state);
+  const hasState = String(state || "").trim().length > 0;
 
-  if (!hasValidPincode || !shippingZone) {
+  if (!hasValidPincode || !hasState) {
     return {
       subtotal,
       baseCharge: 0,
@@ -76,7 +53,7 @@ export const calculateShipping = ({
     };
   }
 
-  const baseCharge = shippingZone.charge;
+  const baseCharge = BASE_SAREE_SHIPPING;
   const additionalCharge =
     safeQuantity > 1
       ? (safeQuantity - 1) * ADDITIONAL_SAREE_SHIPPING
@@ -93,7 +70,7 @@ export const calculateShipping = ({
     shippingCharge,
     total: subtotal + shippingCharge,
     isFreeShipping,
-    zoneLabel: shippingZone.label,
+    zoneLabel: "India",
     canCalculate: true,
   };
 };

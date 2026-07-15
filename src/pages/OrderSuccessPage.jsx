@@ -1,11 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
+import jsPDF from "jspdf";
 import {
   ArrowRight,
   BadgeCheck,
   CheckCircle2,
-  Clock3, Home,
+  Clock3,
+  Download,
+  Home,
   Mail,
   MapPin,
+  MessageCircle,
   PackageCheck,
   Phone,
   ReceiptText,
@@ -15,6 +19,7 @@ import {
   UserRound
 } from "lucide-react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
+import { PS_PHONE_WHATSAPP } from "../data/constants";
 import { getImageFromId } from "../data/util";
 import { getPublicOrder } from "../serice/checkoutApi";
 
@@ -24,6 +29,11 @@ const formatCurrency = (value) =>
     currency: "INR",
     maximumFractionDigits: 0,
   });
+
+const formatInvoiceAmount = (value) =>
+  `INR ${Number(value || 0).toLocaleString("en-IN", {
+    maximumFractionDigits: 0,
+  })}`;
 
 const formatDate = (value) => {
   if (!value) return "Not available";
@@ -43,6 +53,46 @@ const formatText = (value) => {
   return String(value)
     .replaceAll("_", " ")
     .replace(/\b\w/g, (character) => character.toUpperCase());
+};
+
+const getItemUnitPrice = (item = {}) =>
+  Number(
+    item.soldPrice ??
+      item.sellingPrice ??
+      item.price ??
+      item.offerPrice ??
+      item.listedPrice ??
+      0
+  );
+
+const getTrackingDetails = (tracking = {}) => ({
+  courierName:
+    tracking.courierName ||
+    tracking.courier ||
+    tracking.provider ||
+    "",
+  trackingNumber:
+    tracking.trackingNumber ||
+    tracking.awb ||
+    tracking.awbNumber ||
+    "",
+  trackingUrl:
+    tracking.trackingUrl ||
+    tracking.url ||
+    "",
+  status:
+    tracking.status ||
+    tracking.currentStatus ||
+    "",
+});
+
+const getHashToken = () => {
+  if (typeof window === "undefined") return "";
+
+  const hash = window.location.hash.replace(/^#/, "");
+  if (!hash) return "";
+
+  return new URLSearchParams(hash).get("token") || "";
 };
 
 function StatusBadge({ children, type = "success" }) {
@@ -84,7 +134,7 @@ function DetailItem({ icon: Icon, label, value }) {
 export default function OrderSuccessPage() {
   const { orderNumber } = useParams();
   const [params] = useSearchParams();
-  const token = params.get("token");
+  const token = getHashToken() || params.get("token");
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["public-order", orderNumber, token],
@@ -98,18 +148,25 @@ export default function OrderSuccessPage() {
   const customer = order?.customer || order?.buyer || {};
   const shippingAddress = order?.shippingAddress || {};
   const items = order?.items || [];
+  const trackingDetails = getTrackingDetails(order?.tracking);
+  const hasTracking = Boolean(
+    trackingDetails.courierName ||
+      trackingDetails.trackingNumber ||
+      trackingDetails.trackingUrl ||
+      trackingDetails.status
+  );
 
   const subtotal =
     order?.subtotal ??
     items.reduce(
-      (total, item) =>
-        total +
-        Number(
-          item.totalPrice ??
-          item.soldPrice * (item.quantity || 1) ??
-          item.price * (item.quantity || 1) ??
-          0
-        ),
+      (total, item) => {
+        const quantity = Number(item.quantity || 1);
+        const lineTotal = Number(
+          item.totalPrice ?? getItemUnitPrice(item) * quantity
+        );
+
+        return total + (Number.isFinite(lineTotal) ? lineTotal : 0);
+      },
       0
     );
 
@@ -123,6 +180,134 @@ export default function OrderSuccessPage() {
     order?.totalSoldPrice ??
     subtotal - discount + shippingCharge
   );
+
+  const whatsappUrl = order
+    ? `https://api.whatsapp.com/send?phone=${PS_PHONE_WHATSAPP}&text=${encodeURIComponent(
+      `Hello Pratibha Silks, I need help with order ${order.orderNumber}.`
+    )}`
+    : "";
+
+  const downloadInvoice = () => {
+    if (!order) return;
+
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "pt",
+      format: "a4",
+    });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 42;
+    let y = 48;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("Pratibha Silks", margin, y);
+
+    doc.setFontSize(14);
+    doc.text("Invoice", pageWidth - margin, y, { align: "right" });
+
+    y += 28;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(`Order: ${order.orderNumber}`, margin, y);
+    doc.text(`Date: ${formatDate(order.createdAt)}`, pageWidth - margin, y, {
+      align: "right",
+    });
+
+    y += 28;
+    doc.setFont("helvetica", "bold");
+    doc.text("Customer", margin, y);
+    doc.text("Delivery Address", pageWidth / 2, y);
+
+    y += 16;
+    doc.setFont("helvetica", "normal");
+    const customerLines = [
+      customer.name || customer.fullName,
+      customer.phone,
+      customer.email,
+    ].filter(Boolean);
+    const addressLines = [
+      shippingAddress.fullName,
+      shippingAddress.addressLine1,
+      shippingAddress.addressLine2,
+      shippingAddress.landmark,
+      [shippingAddress.city, shippingAddress.state, shippingAddress.pincode]
+        .filter(Boolean)
+        .join(", "),
+    ].filter(Boolean);
+
+    customerLines.forEach((line) => {
+      doc.text(String(line), margin, y);
+      y += 14;
+    });
+
+    let addressY = y - customerLines.length * 14;
+    addressLines.forEach((line) => {
+      doc.text(String(line), pageWidth / 2, addressY);
+      addressY += 14;
+    });
+
+    y = Math.max(y, addressY) + 18;
+    doc.setDrawColor(226, 214, 199);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 22;
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Item", margin, y);
+    doc.text("Qty", pageWidth - 190, y);
+    doc.text("Price", pageWidth - 140, y);
+    doc.text("Total", pageWidth - margin, y, { align: "right" });
+
+    y += 16;
+    doc.setFont("helvetica", "normal");
+    items.forEach((item) => {
+      const quantity = Number(item.quantity || 1);
+      const unitPrice = getItemUnitPrice(item);
+      const itemName = [item.name || "Pratibha Silks Saree", item.sku]
+        .filter(Boolean)
+        .join(" - ");
+      const itemLines = doc.splitTextToSize(itemName, pageWidth - 260);
+
+      doc.text(itemLines, margin, y);
+      doc.text(String(quantity), pageWidth - 190, y);
+      doc.text(formatInvoiceAmount(unitPrice), pageWidth - 140, y);
+      doc.text(formatInvoiceAmount(unitPrice * quantity), pageWidth - margin, y, {
+        align: "right",
+      });
+      y += Math.max(18, itemLines.length * 13 + 8);
+    });
+
+    y += 10;
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 22;
+
+    const totals = [
+      ["Subtotal", subtotal],
+      ...(discount > 0 ? [["Discount", -discount]] : []),
+      ["Shipping", shippingCharge],
+      ["Total Paid", totalAmount],
+    ];
+
+    totals.forEach(([label, value], index) => {
+      doc.setFont("helvetica", index === totals.length - 1 ? "bold" : "normal");
+      doc.text(label, pageWidth - 190, y);
+      doc.text(formatInvoiceAmount(value), pageWidth - margin, y, {
+        align: "right",
+      });
+      y += 16;
+    });
+
+    y += 18;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.text(
+      "Thank you for shopping with Pratibha Silks. For support, contact us on WhatsApp.",
+      margin,
+      y
+    );
+
+    doc.save(`invoice-${order.orderNumber}.pdf`);
+  };
 
   if (!orderNumber || !token) {
     return (
@@ -283,22 +468,18 @@ export default function OrderSuccessPage() {
                           Order summary
                         </p>
                         <h2 className="font-serif text-2xl text-[#302A25]">
-                          Your selected saree
+                          {items.length > 1
+                            ? "Your selected sarees"
+                            : "Your selected saree"}
                         </h2>
                       </div>
                     </div>
 
-                    <div className="mt-6 divide-y divide-[#EEE5DB]">
-                      {items.length > 0 ? (
-                        items.map((item, index) => {
-                          const quantity = Number(item.quantity || 1);
-                          const unitPrice = Number(
-                            item.soldPrice ??
-                            item.price ??
-                            item.offerPrice ??
-                            item.listedPrice ??
-                            0
-                          );
+	                    <div className="mt-6 divide-y divide-[#EEE5DB]">
+	                      {items.length > 0 ? (
+	                        items.map((item, index) => {
+	                          const quantity = Number(item.quantity || 1);
+	                          const unitPrice = getItemUnitPrice(item);
 
                           const imageUrl =
                             item.image ||
@@ -499,17 +680,47 @@ export default function OrderSuccessPage() {
                       </div>
                     </div>
 
-                    {order.paymentId && (
-                      <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4">
-                        <p className="text-[10px] uppercase tracking-[0.18em] text-white/50">
-                          Payment reference
-                        </p>
-                        <p className="mt-1 break-all text-xs text-white/80">
-                          {order.paymentId}
-                        </p>
-                      </div>
-                    )}
-                  </section>
+	                  </section>
+
+	                  <section className="rounded-3xl border border-[#EDE4DA] bg-white p-6">
+	                    <div className="flex items-start gap-3">
+	                      <ReceiptText
+	                        className="mt-0.5 shrink-0 text-[#9A7B4F]"
+	                        size={21}
+	                      />
+
+	                      <div>
+	                        <h3 className="font-serif text-xl text-[#302A25]">
+	                          Invoice and support
+	                        </h3>
+	                        <p className="mt-2 text-sm leading-6 text-[#71665C]">
+	                          Download a copy of your invoice or contact us on
+	                          WhatsApp with your order number.
+	                        </p>
+
+	                        <div className="mt-4 flex flex-col gap-3 sm:flex-row lg:flex-col">
+	                          <button
+	                            type="button"
+	                            onClick={downloadInvoice}
+	                            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#181818] px-5 py-3 text-sm font-semibold text-white transition hover:bg-black"
+	                          >
+	                            <Download size={16} />
+	                            Download invoice
+	                          </button>
+
+	                          <a
+	                            href={whatsappUrl}
+	                            target="_blank"
+	                            rel="noreferrer"
+	                            className="inline-flex items-center justify-center gap-2 rounded-full border border-[#D8C7B3] px-5 py-3 text-sm font-semibold text-[#302A25] transition hover:border-[#9A7B4F] hover:text-[#9A7B4F]"
+	                          >
+	                            <MessageCircle size={16} />
+	                            WhatsApp us
+	                          </a>
+	                        </div>
+	                      </div>
+	                    </div>
+	                  </section>
 
                   <section className="rounded-3xl border border-[#EDE4DA] bg-[#FCF9F5] p-6">
                     <div className="flex items-center gap-3">
@@ -561,13 +772,73 @@ export default function OrderSuccessPage() {
                           <p className="text-sm font-bold text-[#302A25]">
                             Dispatch and tracking
                           </p>
-                          <p className="mt-1 text-xs leading-5 text-[#71665C]">
-                            Tracking information will be shared after dispatch.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </section>
+	                          <p className="mt-1 text-xs leading-5 text-[#71665C]">
+	                            {hasTracking
+	                              ? "Tracking information is available below."
+	                              : "Tracking information will be shared after dispatch."}
+	                          </p>
+	                        </div>
+	                      </div>
+	                    </div>
+	                  </section>
+
+	                  {hasTracking && (
+	                    <section className="rounded-3xl border border-[#EDE4DA] bg-white p-6">
+	                      <div className="flex items-start gap-3">
+	                        <Truck
+	                          className="mt-0.5 shrink-0 text-[#9A7B4F]"
+	                          size={21}
+	                        />
+
+	                        <div className="min-w-0">
+	                          <h3 className="font-serif text-xl text-[#302A25]">
+	                            Tracking details
+	                          </h3>
+
+	                          <div className="mt-4 space-y-3 text-sm text-[#5F554D]">
+	                            {trackingDetails.courierName && (
+	                              <p>
+	                                <span className="font-semibold text-[#302A25]">
+	                                  Courier:
+	                                </span>{" "}
+	                                {trackingDetails.courierName}
+	                              </p>
+	                            )}
+
+	                            {trackingDetails.trackingNumber && (
+	                              <p className="break-words">
+	                                <span className="font-semibold text-[#302A25]">
+	                                  Tracking number:
+	                                </span>{" "}
+	                                {trackingDetails.trackingNumber}
+	                              </p>
+	                            )}
+
+	                            {trackingDetails.status && (
+	                              <p>
+	                                <span className="font-semibold text-[#302A25]">
+	                                  Status:
+	                                </span>{" "}
+	                                {formatText(trackingDetails.status)}
+	                              </p>
+	                            )}
+
+	                            {trackingDetails.trackingUrl && (
+	                              <a
+	                                href={trackingDetails.trackingUrl}
+	                                target="_blank"
+	                                rel="noreferrer"
+	                                className="inline-flex items-center gap-2 rounded-full bg-[#F8F3EC] px-4 py-2 text-sm font-semibold text-[#9A7B4F] transition hover:text-[#6B4F22]"
+	                              >
+	                                Track shipment
+	                                <ArrowRight size={15} />
+	                              </a>
+	                            )}
+	                          </div>
+	                        </div>
+	                      </div>
+	                    </section>
+	                  )}
 
                   <section className="rounded-3xl border border-[#EDE4DA] bg-white p-6">
                     <div className="flex items-start gap-3">

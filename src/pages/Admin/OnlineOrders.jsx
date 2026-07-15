@@ -34,6 +34,14 @@ import { apiCall } from "../../serice/api";
 
 const ORDER_LIMIT = 20;
 
+const unwrapApiResponse = (response, fallbackMessage) => {
+    if (response?.error) {
+        throw new Error(response.error.message || fallbackMessage);
+    }
+
+    return response;
+};
+
 const ORDER_STATUS_OPTIONS = [
     { label: "All Orders", value: "" },
     { label: "Pending", value: "PENDING" },
@@ -107,8 +115,11 @@ export default function OnlineOrders() {
     } = useInfiniteQuery({
         queryKey: ["admin-online-orders", queryString],
 
-        queryFn: ({ pageParam = 1 }) =>
-            apiCall(`/api/orders/public/?page=${pageParam}&${queryString}`),
+        queryFn: async ({ pageParam = 1 }) =>
+            unwrapApiResponse(
+                await apiCall(`/api/orders/public/?page=${pageParam}&${queryString}`),
+                "Failed to fetch online orders"
+            ),
 
         initialPageParam: 1,
 
@@ -973,13 +984,21 @@ function InformationRow({
 
 function CopyButton({ value }) {
     const [copied, setCopied] = useState(false);
+    const resetTimerRef = useRef(null);
+
+    useEffect(() => {
+        return () => {
+            window.clearTimeout(resetTimerRef.current);
+        };
+    }, []);
 
     const handleCopy = async () => {
         try {
             await navigator.clipboard.writeText(value);
             setCopied(true);
 
-            window.setTimeout(() => {
+            window.clearTimeout(resetTimerRef.current);
+            resetTimerRef.current = window.setTimeout(() => {
                 setCopied(false);
             }, 1500);
         } catch {
@@ -1328,7 +1347,6 @@ function formatPaymentMethod(value) {
     const labels = {
         ONLINE: "Online Payment",
         RAZORPAY: "Razorpay",
-        COD: "Cash on Delivery",
         CASH: "Cash",
         UPI: "UPI",
         BANK_TRANSFER: "Bank Transfer",
