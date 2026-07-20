@@ -98,7 +98,7 @@ export function ProductInfo({ productDetails }) {
         </p>
 
         <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-            <BuyNowButton product={productDetails} className="w-full sm:w-auto hidden" />
+            <BuyNowButton product={productDetails} className="w-full sm:w-auto" />
 
             {!!productDetails.stock && (
                 <CartActionButton
@@ -112,7 +112,7 @@ export function ProductInfo({ productDetails }) {
                         addToCart(productDetails);
                     }}
                     size="detail"
-                    className="sm:w-auto hidden"
+                    className="sm:w-auto"
                 />
             )}
         </div>

@@ -19,17 +19,17 @@ const occasions = [
     {
         title: "For Housewarming & Family Events",
         text: "Effortlessly elegant sarees that blend tradition, comfort and personal style.",
-        src: "moods1_mf9jjx.png",
+        src: "ChatGPT_Image_Jun_14_2026_10_57_13_PM_iqakqv",
     },
     {
         title: "For Gifting Someone Special",
         text: "Thoughtfully chosen drapes that carry stories, heritage and lasting memories.",
-        src: "moods2_ta60ok.png",
+        src: "a294db30-9af0-4332-ad65-0c7e72e95e24_r4zudx",
     },
     {
         title: "For Your Signature Collection",
         text: "Exclusive pieces curated for women who appreciate artistry beyond fashion.",
-        src: "moods3_n2dbym.png",
+        src: "ChatGPT_Image_Jun_15_2026_10_51_54_AM_x6hdxn",
     },
 ];
 

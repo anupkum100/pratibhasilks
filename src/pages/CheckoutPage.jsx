@@ -119,6 +119,8 @@ export default function CheckoutPage() {
   const isCartCheckout = !sku;
 
   const [submitting, setSubmitting] = useState(false);
+  const [isConfirmingPayment, setIsConfirmingPayment] = useState(false);
+
   const [cancellingReservation, setCancellingReservation] = useState(false);
   const [activeCheckout, setActiveCheckout] = useState(() => readStoredCheckout());
   const [pageError, setPageError] = useState("");
@@ -233,6 +235,8 @@ export default function CheckoutPage() {
         try {
           setSubmitting(true);
           setPageError("");
+          setIsConfirmingPayment(true);
+
           paymentFailureMessageRef.current = "";
 
           const verified = await verifyCheckoutPayment({
@@ -259,10 +263,11 @@ export default function CheckoutPage() {
           cleanupRazorpayUi();
           setPageError(
             verificationError?.message ||
-              "Payment was received, but verification failed. Please contact us before retrying."
+            "Payment was received, but verification failed. Please contact us before retrying."
           );
         } finally {
           setSubmitting(false);
+          setIsConfirmingPayment(false)
         }
       },
       modal: {
@@ -271,7 +276,7 @@ export default function CheckoutPage() {
           cleanupRazorpayUi();
           setPageError(
             paymentFailureMessageRef.current ||
-              "Payment was not completed. This saree is reserved for you for a few minutes. You can retry the same payment or cancel the reservation."
+            "Payment was not completed. This saree is reserved for you for a few minutes. You can retry the same payment or cancel the reservation."
           );
         },
       },
@@ -375,6 +380,7 @@ export default function CheckoutPage() {
       await openRazorpay(checkout);
     } catch (err) {
       setPageError(err?.message || "Something went wrong.");
+      setIdempotencyKey(crypto.randomUUID());
     } finally {
       submitInFlightRef.current = false;
       setSubmitting(false);
@@ -432,7 +438,7 @@ export default function CheckoutPage() {
     } catch (error) {
       setPageError(
         error?.message ||
-          "Unable to cancel the reservation. It will be released automatically after expiry."
+        "Unable to cancel the reservation. It will be released automatically after expiry."
       );
     } finally {
       setCancellingReservation(false);
@@ -501,8 +507,23 @@ export default function CheckoutPage() {
     );
   }
 
+  const OrderConfirmationLoader = <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white/95">
+    <div className="text-center">
+      <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-[#093C5D]" />
+
+      <h2 className="text-lg font-semibold text-gray-900">
+        Confirming your order
+      </h2>
+
+      <p className="mt-2 text-sm text-gray-600">
+        Your payment was successful. Please do not close or refresh this page.
+      </p>
+    </div>
+  </div>
+
   return (
     <main className="min-h-screen bg-[#F8F3EC] px-5 py-10 md:py-16">
+      {isConfirmingPayment && OrderConfirmationLoader}
       <section className="mx-auto max-w-7xl">
         <Link
           to={isCartCheckout ? "/products" : `/product/${product.sku}`}
@@ -547,11 +568,10 @@ export default function CheckoutPage() {
 
             {pageError && (
               <div
-                className={`mt-5 rounded-2xl p-4 text-sm ${
-                  activeCheckout
-                    ? "bg-amber-50 text-amber-800"
-                    : "bg-red-50 text-red-700"
-                }`}
+                className={`mt-5 rounded-2xl p-4 text-sm ${activeCheckout
+                  ? "bg-amber-50 text-amber-800"
+                  : "bg-red-50 text-red-700"
+                  }`}
               >
                 {pageError}
               </div>

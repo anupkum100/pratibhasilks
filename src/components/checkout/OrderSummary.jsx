@@ -149,6 +149,7 @@ export default function OrderSummary({
         {isFreeShipping ? (
           <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-800">
             You have unlocked free shipping.
+            <Link className="ms-2 text-emerald-800" to="/products">Add More</Link>
           </div>
         ) : (
           <div className="mt-5 rounded-xl border border-[#D8B46A]/30 bg-[#FFF9EC] p-3 text-xs text-[#765B2D]">

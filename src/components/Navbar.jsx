@@ -354,7 +354,7 @@ function CartButton({ cartCount, onClick, title }) {
   return (
     <button
       onClick={onClick}
-      className="hidden relative flex h-10 w-10 items-center justify-center rounded-full border border-[#d6b56d]/25 bg-black text-[#d6b56d] shadow-md transition-all duration-200 hover:scale-105 hover:border-[#d6b56d] hover:bg-[#111]"
+      className="relative flex h-10 w-10 items-center justify-center rounded-full border border-[#d6b56d]/25 bg-black text-[#d6b56d] shadow-md transition-all duration-200 hover:scale-105 hover:border-[#d6b56d] hover:bg-[#111]"
       title={title}
     >
       <ShoppingCart size={18} />

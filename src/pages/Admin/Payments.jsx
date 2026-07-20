@@ -15,7 +15,7 @@ import PremiumLoader from "../../components/PremiumLoader";
 import { formatDate, formatMoney } from "../../data/util";
 import { apiCall } from "../../serice/api";
 
-const pageSize = 8;
+const pageSize = 100;
 
 const unwrapApiResponse = (response, fallbackMessage) => {
     if (response?.error) {
@@ -250,117 +250,117 @@ export default function PaymentsPage() {
                     </div>
                 ) : (
                     <>
-                <div className="hidden md:block mt-6 bg-white rounded-[2rem] overflow-hidden shadow-[0_18px_55px_rgba(0,0,0,0.08)] border border-black/5">
-                    <table className="w-full text-sm">
-                        <thead className="bg-[#181818] text-white">
-                            <tr>
-                                <TableHead label="Type" onClick={() => handleSort("type")} />
-                                <TableHead label="Category" />
-                                <TableHead label="Payment Type" />
-                                <TableHead label="Amount" onClick={() => handleSort("amount")} />
-                                <TableHead label="Qty" />
-                                <TableHead label="Per Unit" />
-                                <TableHead label="Source" />
-                                <TableHead label="Date" onClick={() => handleSort("date")} />
-                                <TableHead label="Paid Via" />
-                                <TableHead label="Action" />
-                            </tr>
-                        </thead>
+                        <div className="hidden md:block mt-6 bg-white rounded-[2rem] overflow-hidden shadow-[0_18px_55px_rgba(0,0,0,0.08)] border border-black/5">
+                            <table className="w-full text-sm">
+                                <thead className="bg-[#181818] text-white">
+                                    <tr>
+                                        <TableHead label="Type" onClick={() => handleSort("type")} />
+                                        <TableHead label="Category" />
+                                        <TableHead label="Payment Type" />
+                                        <TableHead label="Amount" onClick={() => handleSort("amount")} />
+                                        <TableHead label="Qty" />
+                                        <TableHead label="Per Unit" />
+                                        <TableHead label="Source" />
+                                        <TableHead label="Date" onClick={() => handleSort("date")} />
+                                        <TableHead label="Paid Via" />
+                                        <TableHead label="Action" />
+                                    </tr>
+                                </thead>
 
-                        <tbody>
+                                <tbody>
+                                    {payments.map((payment) => (
+                                        <tr
+                                            key={payment._id}
+                                            className="border-b border-black/5 hover:bg-[#F8F3EC]/70 transition"
+                                        >
+                                            <td className="p-5 font-medium">
+                                                {payment.type || "-"}
+                                            </td>
+
+                                            <td className="p-5">
+                                                <CategoryBadge category={payment.category} />
+                                            </td>
+
+                                            <td className="p-5">
+                                                <PaymentTypeBadge
+                                                    paymentType={payment.paymentType || "Miscellaneous"}
+                                                />
+                                            </td>
+
+                                            <td className="p-5 font-semibold">
+                                                {formatMoney(payment.amount)}
+                                            </td>
+
+                                            <td className="p-5">{payment.quantity || "-"}</td>
+
+                                            <td className="p-5">
+                                                {payment.quantity
+                                                    ? formatMoney(payment.amount / payment.quantity)
+                                                    : "-"}
+                                            </td>
+
+                                            <td className="p-5">{payment.source || "-"}</td>
+
+                                            <td className="p-5">{formatDate(payment.date)}</td>
+
+                                            <td className="p-5">{payment.paidVia || "-"}</td>
+
+                                            <td className="p-5">
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => openEditModal(payment)}
+                                                        className="inline-flex items-center gap-2 rounded-full bg-[#181818] text-white px-4 py-2 text-xs"
+                                                    >
+                                                        <Edit size={14} />
+                                                        Edit
+                                                    </button>
+
+                                                    <button
+                                                        onClick={() => handleDeletePayment(payment)}
+                                                        className="inline-flex items-center gap-2 rounded-full bg-red-50 text-red-700 px-4 py-2 text-xs hover:bg-red-600 hover:text-white transition"
+                                                    >
+                                                        <Trash2 size={14} />
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+
+                            {!payments.length && (
+                                <div className="p-10 text-center text-[#6B5F54]">
+                                    No payments found.
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="md:hidden mt-6 space-y-4">
                             {payments.map((payment) => (
-                                <tr
+                                <PaymentMobileCard
                                     key={payment._id}
-                                    className="border-b border-black/5 hover:bg-[#F8F3EC]/70 transition"
-                                >
-                                    <td className="p-5 font-medium">
-                                        {payment.type || "-"}
-                                    </td>
-
-                                    <td className="p-5">
-                                        <CategoryBadge category={payment.category} />
-                                    </td>
-
-                                    <td className="p-5">
-                                        <PaymentTypeBadge
-                                            paymentType={payment.paymentType || "Miscellaneous"}
-                                        />
-                                    </td>
-
-                                    <td className="p-5 font-semibold">
-                                        {formatMoney(payment.amount)}
-                                    </td>
-
-                                    <td className="p-5">{payment.quantity || "-"}</td>
-
-                                    <td className="p-5">
-                                        {payment.quantity
-                                            ? formatMoney(payment.amount / payment.quantity)
-                                            : "-"}
-                                    </td>
-
-                                    <td className="p-5">{payment.source || "-"}</td>
-
-                                    <td className="p-5">{formatDate(payment.date)}</td>
-
-                                    <td className="p-5">{payment.paidVia || "-"}</td>
-
-                                    <td className="p-5">
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={() => openEditModal(payment)}
-                                                className="inline-flex items-center gap-2 rounded-full bg-[#181818] text-white px-4 py-2 text-xs"
-                                            >
-                                                <Edit size={14} />
-                                                Edit
-                                            </button>
-
-                                            <button
-                                                onClick={() => handleDeletePayment(payment)}
-                                                className="inline-flex items-center gap-2 rounded-full bg-red-50 text-red-700 px-4 py-2 text-xs hover:bg-red-600 hover:text-white transition"
-                                            >
-                                                <Trash2 size={14} />
-                                                Delete
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                    payment={payment}
+                                    onEdit={() => openEditModal(payment)}
+                                    onDelete={() => handleDeletePayment(payment)}
+                                />
                             ))}
-                        </tbody>
-                    </table>
 
-                    {!payments.length && (
-                        <div className="p-10 text-center text-[#6B5F54]">
-                            No payments found.
+                            {!payments.length && (
+                                <div className="bg-white rounded-[1.75rem] p-8 text-center text-[#6B5F54] shadow-[0_18px_55px_rgba(0,0,0,0.08)] border border-black/5">
+                                    No payments found.
+                                </div>
+                            )}
                         </div>
-                    )}
-                </div>
 
-                <div className="md:hidden mt-6 space-y-4">
-                    {payments.map((payment) => (
-                        <PaymentMobileCard
-                            key={payment._id}
-                            payment={payment}
-                            onEdit={() => openEditModal(payment)}
-                            onDelete={() => handleDeletePayment(payment)}
+                        <Pagination
+                            page={pagination.page || page}
+                            totalPages={pagination.totalPages || 1}
+                            onPrev={() => setPage((prev) => Math.max(prev - 1, 1))}
+                            onNext={() =>
+                                setPage((prev) => Math.min(prev + 1, pagination.totalPages || 1))
+                            }
                         />
-                    ))}
-
-                    {!payments.length && (
-                        <div className="bg-white rounded-[1.75rem] p-8 text-center text-[#6B5F54] shadow-[0_18px_55px_rgba(0,0,0,0.08)] border border-black/5">
-                            No payments found.
-                        </div>
-                    )}
-                </div>
-
-                <Pagination
-                    page={pagination.page || page}
-                    totalPages={pagination.totalPages || 1}
-                    onPrev={() => setPage((prev) => Math.max(prev - 1, 1))}
-                    onNext={() =>
-                        setPage((prev) => Math.min(prev + 1, pagination.totalPages || 1))
-                    }
-                />
                     </>
                 )}
             </section>

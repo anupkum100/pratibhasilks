@@ -1303,16 +1303,6 @@ function getShippingCharge(order) {
     );
 }
 
-// function getProductImage(item) {
-//     return (
-//         item?.image ||
-//         item?.mainImage ||
-//         item?.mainImageUrl ||
-//         item?.productImage ||
-//         ""
-//     );
-// }
-
 function getTotalQuantity(items) {
     return items.reduce(
         (total, item) =>

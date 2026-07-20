@@ -4,9 +4,7 @@ import {
   useQueryClient
 } from "@tanstack/react-query";
 import {
-  ChevronDown, SlidersHorizontal,
-  Search,
-  X
+  Search, SlidersHorizontal, X
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -16,6 +14,7 @@ import ProductModal from "../components/Modal/ProductModal";
 import { SoldModal } from "../components/Modal/SoldModal";
 import PremiumLoader from "../components/PremiumLoader";
 import ProductCard from "../components/ProductCard";
+import LuxurySortSelect from "../components/ProductFilter/LuxurySortSelect";
 import { PremiumFilterPanel } from "../components/ProductFilter/PremiumFilterPanel";
 import { useDelayedLoader } from "../data/util";
 import { apiCall } from "../serice/api";
@@ -515,7 +514,11 @@ export default function Products() {
                     Clear all filters
                   </button>
                 )}
-                <SortDropdown value={sort} onChange={setSort} />
+                <LuxurySortSelect
+                  value={sort}
+                  onChange={setSort}
+                  SORT_OPTIONS={SORT_OPTIONS}
+                />
               </div>
             </div>
 
@@ -613,8 +616,8 @@ export default function Products() {
 
                 <p className="text-[#6B5F54] mt-4">
                   {searchTerm.trim()
-                      ? "Try a different search or remove some filters."
-                      : "Try removing some filters to discover more pieces."}
+                    ? "Try a different search or remove some filters."
+                    : "Try removing some filters to discover more pieces."}
                 </p>
 
                 <button
@@ -649,31 +652,6 @@ export default function Products() {
         onSubmit={createOrder}
       />
     </main>
-  );
-}
-
-function SortDropdown({ value, onChange }) {
-  return (
-    <label className="relative block min-w-[220px]">
-      <span className="sr-only">Sort Products</span>
-
-      <select
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="w-full appearance-none rounded-full bg-white border border-black/10 px-5 py-3 pr-11 text-sm text-[#181818] shadow-sm outline-none focus:border-[#9A7B4F]"
-      >
-        {SORT_OPTIONS.map((option) => (
-          <option key={option.value} value={option.value}>
-            Sort: {option.label}
-          </option>
-        ))}
-      </select>
-
-      <ChevronDown
-        size={16}
-        className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9A7B4F] pointer-events-none"
-      />
-    </label>
   );
 }
 

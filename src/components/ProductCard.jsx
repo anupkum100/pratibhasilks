@@ -133,24 +133,24 @@ export default function ProductCard({
       </Link>
 
       {/* TODO: Remove this permission when changes for user is deployed */}
-      <PermissionRenderer>
-        {product.stock > 0 && (
-          <div className="px-3 md:px-4 pb-4">
-            <CartActionButton
-              added={added}
-              onClick={() => {
-                if (added) {
-                  removeFromCart(product);
-                  return;
-                }
+      {/* <PermissionRenderer> */}
+      {product.stock > 0 && (
+        <div className="px-3 md:px-4 pb-4">
+          <CartActionButton
+            added={added}
+            onClick={() => {
+              if (added) {
+                removeFromCart(product);
+                return;
+              }
 
-                addToCart(product);
-              }}
-              size="card"
-            />
-          </div>
-        )}
-      </PermissionRenderer>
+              addToCart(product);
+            }}
+            size="card"
+          />
+        </div>
+      )}
+      {/* </PermissionRenderer> */}
 
       <PermissionRenderer>
         {product.stock > 0 && (onEdit || onDelete) && (

@@ -58,31 +58,32 @@ const formatText = (value) => {
 const getItemUnitPrice = (item = {}) =>
   Number(
     item.soldPrice ??
-      item.sellingPrice ??
-      item.price ??
-      item.offerPrice ??
-      item.listedPrice ??
-      0
+    item.sellingPrice ??
+    item.price ??
+    item.offerPrice ??
+    item.listedPrice ??
+    0
   );
 
+// TODO: Work on tracking details from admin side 
 const getTrackingDetails = (tracking = {}) => ({
   courierName:
-    tracking.courierName ||
-    tracking.courier ||
-    tracking.provider ||
+    tracking?.courierName ||
+    tracking?.courier ||
+    tracking?.provider ||
     "",
   trackingNumber:
-    tracking.trackingNumber ||
-    tracking.awb ||
-    tracking.awbNumber ||
+    tracking?.trackingNumber ||
+    tracking?.awb ||
+    tracking?.awbNumber ||
     "",
   trackingUrl:
-    tracking.trackingUrl ||
-    tracking.url ||
+    tracking?.trackingUrl ||
+    tracking?.url ||
     "",
   status:
-    tracking.status ||
-    tracking.currentStatus ||
+    tracking?.status ||
+    tracking?.currentStatus ||
     "",
 });
 
@@ -151,9 +152,9 @@ export default function OrderSuccessPage() {
   const trackingDetails = getTrackingDetails(order?.tracking);
   const hasTracking = Boolean(
     trackingDetails.courierName ||
-      trackingDetails.trackingNumber ||
-      trackingDetails.trackingUrl ||
-      trackingDetails.status
+    trackingDetails.trackingNumber ||
+    trackingDetails.trackingUrl ||
+    trackingDetails.status
   );
 
   const subtotal =
@@ -475,17 +476,13 @@ export default function OrderSuccessPage() {
                       </div>
                     </div>
 
-	                    <div className="mt-6 divide-y divide-[#EEE5DB]">
-	                      {items.length > 0 ? (
-	                        items.map((item, index) => {
-	                          const quantity = Number(item.quantity || 1);
-	                          const unitPrice = getItemUnitPrice(item);
+                    <div className="mt-6 divide-y divide-[#EEE5DB]">
+                      {items.length > 0 ? (
+                        items.map((item, index) => {
+                          const quantity = Number(item.quantity || 1);
+                          const unitPrice = getItemUnitPrice(item);
 
-                          const imageUrl =
-                            item.image ||
-                            item.imageUrl ||
-                            item.mainImageUrl ||
-                            item.mainImage;
+                          const imageUrl = item.mainImageId;
 
                           return (
                             <article
@@ -680,47 +677,47 @@ export default function OrderSuccessPage() {
                       </div>
                     </div>
 
-	                  </section>
+                  </section>
 
-	                  <section className="rounded-3xl border border-[#EDE4DA] bg-white p-6">
-	                    <div className="flex items-start gap-3">
-	                      <ReceiptText
-	                        className="mt-0.5 shrink-0 text-[#9A7B4F]"
-	                        size={21}
-	                      />
+                  <section className="rounded-3xl border border-[#EDE4DA] bg-white p-6">
+                    <div className="flex items-start gap-3">
+                      <ReceiptText
+                        className="mt-0.5 shrink-0 text-[#9A7B4F]"
+                        size={21}
+                      />
 
-	                      <div>
-	                        <h3 className="font-serif text-xl text-[#302A25]">
-	                          Invoice and support
-	                        </h3>
-	                        <p className="mt-2 text-sm leading-6 text-[#71665C]">
-	                          Download a copy of your invoice or contact us on
-	                          WhatsApp with your order number.
-	                        </p>
+                      <div>
+                        <h3 className="font-serif text-xl text-[#302A25]">
+                          Invoice and support
+                        </h3>
+                        <p className="mt-2 text-sm leading-6 text-[#71665C]">
+                          Download a copy of your invoice or contact us on
+                          WhatsApp with your order number.
+                        </p>
 
-	                        <div className="mt-4 flex flex-col gap-3 sm:flex-row lg:flex-col">
-	                          <button
-	                            type="button"
-	                            onClick={downloadInvoice}
-	                            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#181818] px-5 py-3 text-sm font-semibold text-white transition hover:bg-black"
-	                          >
-	                            <Download size={16} />
-	                            Download invoice
-	                          </button>
+                        <div className="mt-4 flex flex-col gap-3 sm:flex-row lg:flex-col">
+                          <button
+                            type="button"
+                            onClick={downloadInvoice}
+                            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#181818] px-5 py-3 text-sm font-semibold text-white transition hover:bg-black"
+                          >
+                            <Download size={16} />
+                            Download invoice
+                          </button>
 
-	                          <a
-	                            href={whatsappUrl}
-	                            target="_blank"
-	                            rel="noreferrer"
-	                            className="inline-flex items-center justify-center gap-2 rounded-full border border-[#D8C7B3] px-5 py-3 text-sm font-semibold text-[#302A25] transition hover:border-[#9A7B4F] hover:text-[#9A7B4F]"
-	                          >
-	                            <MessageCircle size={16} />
-	                            WhatsApp us
-	                          </a>
-	                        </div>
-	                      </div>
-	                    </div>
-	                  </section>
+                          <a
+                            href={whatsappUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center justify-center gap-2 rounded-full border border-[#D8C7B3] px-5 py-3 text-sm font-semibold text-[#302A25] transition hover:border-[#9A7B4F] hover:text-[#9A7B4F]"
+                          >
+                            <MessageCircle size={16} />
+                            WhatsApp us
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
 
                   <section className="rounded-3xl border border-[#EDE4DA] bg-[#FCF9F5] p-6">
                     <div className="flex items-center gap-3">
@@ -772,73 +769,73 @@ export default function OrderSuccessPage() {
                           <p className="text-sm font-bold text-[#302A25]">
                             Dispatch and tracking
                           </p>
-	                          <p className="mt-1 text-xs leading-5 text-[#71665C]">
-	                            {hasTracking
-	                              ? "Tracking information is available below."
-	                              : "Tracking information will be shared after dispatch."}
-	                          </p>
-	                        </div>
-	                      </div>
-	                    </div>
-	                  </section>
+                          <p className="mt-1 text-xs leading-5 text-[#71665C]">
+                            {hasTracking
+                              ? "Tracking information is available below."
+                              : "Tracking information will be shared after dispatch."}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
 
-	                  {hasTracking && (
-	                    <section className="rounded-3xl border border-[#EDE4DA] bg-white p-6">
-	                      <div className="flex items-start gap-3">
-	                        <Truck
-	                          className="mt-0.5 shrink-0 text-[#9A7B4F]"
-	                          size={21}
-	                        />
+                  {hasTracking && (
+                    <section className="rounded-3xl border border-[#EDE4DA] bg-white p-6">
+                      <div className="flex items-start gap-3">
+                        <Truck
+                          className="mt-0.5 shrink-0 text-[#9A7B4F]"
+                          size={21}
+                        />
 
-	                        <div className="min-w-0">
-	                          <h3 className="font-serif text-xl text-[#302A25]">
-	                            Tracking details
-	                          </h3>
+                        <div className="min-w-0">
+                          <h3 className="font-serif text-xl text-[#302A25]">
+                            Tracking details
+                          </h3>
 
-	                          <div className="mt-4 space-y-3 text-sm text-[#5F554D]">
-	                            {trackingDetails.courierName && (
-	                              <p>
-	                                <span className="font-semibold text-[#302A25]">
-	                                  Courier:
-	                                </span>{" "}
-	                                {trackingDetails.courierName}
-	                              </p>
-	                            )}
+                          <div className="mt-4 space-y-3 text-sm text-[#5F554D]">
+                            {trackingDetails.courierName && (
+                              <p>
+                                <span className="font-semibold text-[#302A25]">
+                                  Courier:
+                                </span>{" "}
+                                {trackingDetails.courierName}
+                              </p>
+                            )}
 
-	                            {trackingDetails.trackingNumber && (
-	                              <p className="break-words">
-	                                <span className="font-semibold text-[#302A25]">
-	                                  Tracking number:
-	                                </span>{" "}
-	                                {trackingDetails.trackingNumber}
-	                              </p>
-	                            )}
+                            {trackingDetails.trackingNumber && (
+                              <p className="break-words">
+                                <span className="font-semibold text-[#302A25]">
+                                  Tracking number:
+                                </span>{" "}
+                                {trackingDetails.trackingNumber}
+                              </p>
+                            )}
 
-	                            {trackingDetails.status && (
-	                              <p>
-	                                <span className="font-semibold text-[#302A25]">
-	                                  Status:
-	                                </span>{" "}
-	                                {formatText(trackingDetails.status)}
-	                              </p>
-	                            )}
+                            {trackingDetails.status && (
+                              <p>
+                                <span className="font-semibold text-[#302A25]">
+                                  Status:
+                                </span>{" "}
+                                {formatText(trackingDetails.status)}
+                              </p>
+                            )}
 
-	                            {trackingDetails.trackingUrl && (
-	                              <a
-	                                href={trackingDetails.trackingUrl}
-	                                target="_blank"
-	                                rel="noreferrer"
-	                                className="inline-flex items-center gap-2 rounded-full bg-[#F8F3EC] px-4 py-2 text-sm font-semibold text-[#9A7B4F] transition hover:text-[#6B4F22]"
-	                              >
-	                                Track shipment
-	                                <ArrowRight size={15} />
-	                              </a>
-	                            )}
-	                          </div>
-	                        </div>
-	                      </div>
-	                    </section>
-	                  )}
+                            {trackingDetails.trackingUrl && (
+                              <a
+                                href={trackingDetails.trackingUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-2 rounded-full bg-[#F8F3EC] px-4 py-2 text-sm font-semibold text-[#9A7B4F] transition hover:text-[#6B4F22]"
+                              >
+                                Track shipment
+                                <ArrowRight size={15} />
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+                  )}
 
                   <section className="rounded-3xl border border-[#EDE4DA] bg-white p-6">
                     <div className="flex items-start gap-3">
