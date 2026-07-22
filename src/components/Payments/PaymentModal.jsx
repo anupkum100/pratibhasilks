@@ -1,9 +1,15 @@
 import { X } from "lucide-react";
 import { useState, useEffect } from "react";
-import { PAYMENT_TYPE_OPTIONS } from "./constants";
+import {
+    PAID_VIA_OPTIONS,
+    PAYMENT_CATEGORY_OPTIONS,
+    PAYMENT_TYPE_OPTIONS,
+    withCurrentOption,
+} from "./constants";
 import { Field, SelectField } from "./FormFields";
 
 const emptyPayment = {
+    type: "",
     category: "Expense",
     paymentType: "Miscellaneous",
     amount: "",
@@ -70,12 +76,20 @@ export function PaymentModal({ open, payment, onClose, onSubmit }) {
                 </div>
 
                 <div className="p-6 grid md:grid-cols-2 gap-4">
+                    <Field
+                        label="Type"
+                        name="type"
+                        value={form.type}
+                        onChange={handleChange}
+                        placeholder="Saree Lot 5, Courier, Website..."
+                    />
+
                     <SelectField
                         label="Category"
                         name="category"
                         value={form.category}
                         onChange={handleChange}
-                        options={["Expense", "Inventory"]}
+                        options={withCurrentOption(PAYMENT_CATEGORY_OPTIONS, form.category)}
                     />
 
                     <SelectField
@@ -83,7 +97,7 @@ export function PaymentModal({ open, payment, onClose, onSubmit }) {
                         name="paymentType"
                         value={form.paymentType}
                         onChange={handleChange}
-                        options={PAYMENT_TYPE_OPTIONS}
+                        options={withCurrentOption(PAYMENT_TYPE_OPTIONS, form.paymentType)}
                     />
 
                     <Field
@@ -110,11 +124,13 @@ export function PaymentModal({ open, payment, onClose, onSubmit }) {
                         onChange={handleChange}
                     />
 
-                    <Field
+                    <SelectField
                         label="Paid Via"
                         name="paidVia"
                         value={form.paidVia}
                         onChange={handleChange}
+                        options={withCurrentOption(PAID_VIA_OPTIONS, form.paidVia)}
+                        placeholder="Select paid via"
                     />
 
                     <Field

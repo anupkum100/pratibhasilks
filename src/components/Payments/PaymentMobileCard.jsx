@@ -11,7 +11,7 @@ export function PaymentMobileCard({ payment, onEdit, onDelete }) {
                     <CategoryBadge category={payment.category} />
 
                     <h3 className="font-serif text-3xl mt-3 leading-none">
-                        {payment.type}
+                        {payment.type || "Untitled payment"}
                     </h3>
                 </div>
 
@@ -22,7 +22,7 @@ export function PaymentMobileCard({ payment, onEdit, onDelete }) {
 
             <div className="grid grid-cols-2 gap-3 mt-5 text-sm text-[#6B5F54]">
                 <MobileMeta
-                    label="Type"
+                    label="Payment Type"
                     value={payment.paymentType || "Miscellaneous"}
                 />
                 <MobileMeta label="Source" value={payment.source || "-"} />

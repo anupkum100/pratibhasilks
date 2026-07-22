@@ -1,5 +1,5 @@
-// const URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
-const URL = "https://721gb6ymy1.execute-api.us-east-2.amazonaws.com";
+const URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL : "http://localhost:4000";
+// const URL = "https://721gb6ymy1.execute-api.us-east-2.amazonaws.com";
 
 export async function apiCall(
     url,
@@ -36,13 +36,12 @@ export async function apiCall(
             data = null;
         }
 
-        if (response.status === 401 && token) {
-            // localStorage.removeItem("ps_token");
+        if ((response.status === 401 || response.status === 403) && token) {
             window.dispatchEvent(new Event("ps-auth-logout"));
 
             return {
                 error: {
-                    status: 401,
+                    status: response.status,
                     message: data?.message || "Session expired. Please login again.",
                 },
             };

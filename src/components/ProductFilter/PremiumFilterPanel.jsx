@@ -5,6 +5,7 @@ import { PremiumOptionWrap } from "./PremiumOptionWrap";
 export function PremiumFilterPanel({
     filters,
     filterOptions,
+    filterError,
     expandedSections,
     activeFilterCount,
     toggleFilter,
@@ -34,6 +35,12 @@ export function PremiumFilterPanel({
                     </button>
                 )}
             </div>
+
+            {filterError && (
+                <div className="mb-5 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-xs leading-5 text-red-700">
+                    {filterError}
+                </div>
+            )}
 
             <FilterSection
                 title="Colours"

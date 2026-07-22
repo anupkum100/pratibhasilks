@@ -5,9 +5,14 @@ import {
 import { Link } from "react-router-dom";
 import { PS_PHONE_WHATSAPP } from "../../data/constants";
 import { normalised } from "../../data/util";
+import BuyNowButton from "../BuyNowButton";
+import CartActionButton from "../Cart/CartActionButton";
+import { useCart } from "../Cart/cartContext";
 import MiniTrust from "./MiniTrust";
 
 export function ProductInfo({ productDetails }) {
+    const { addToCart, removeFromCart, isInCart } = useCart();
+    const added = isInCart(productDetails);
 
     const createWhatsappMessage = () => {
         const message = `Hello Pratibha Silks,
@@ -58,11 +63,7 @@ export function ProductInfo({ productDetails }) {
                     Out of Stock
                 </span>
             ) : (
-                productDetails.limitedStock ? (
-                    <span className="bg-[#FFF4E5] text-[#A15C00] px-4 py-2 rounded-full">
-                        Limited Stock
-                    </span>
-                ) : <span className="bg-green-50 text-green-700 px-4 py-2 rounded-full">
+                <span className="bg-green-50 text-green-700 px-4 py-2 rounded-full">
                     In Stock
                 </span>
             )}
@@ -96,18 +97,44 @@ export function ProductInfo({ productDetails }) {
             {productDetails.description}
         </p>
 
-        <a
-            target="_blank"
-            rel="noreferrer"
-            href={createWhatsappMessage()}
-            className={`mt-8 w-full rounded-full py-4 text-sm md:text-base font-medium flex items-center justify-center gap-3 transition ${!productDetails.stock
-                ? "bg-gray-300 text-gray-500 pointer-events-none"
-                : "bg-[#181818] text-white hover:opacity-90"
-                }`}
-        >
-            <MessageCircle size={18} />
-            Order on WhatsApp
-        </a>
+        <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+            <BuyNowButton product={productDetails} className="w-full sm:w-auto" />
+
+            {!!productDetails.stock && (
+                <CartActionButton
+                    added={added}
+                    onClick={() => {
+                        if (added) {
+                            removeFromCart(productDetails);
+                            return;
+                        }
+
+                        addToCart(productDetails);
+                    }}
+                    size="detail"
+                    className="sm:w-auto"
+                />
+            )}
+        </div>
+
+
+        {!!productDetails.stock &&
+            <a
+                target="_blank"
+                rel="noreferrer"
+                href={createWhatsappMessage()}
+                className={`group mt-4 flex w-full items-center justify-center gap-3 rounded-full border px-6 py-4 text-sm md:text-base font-semibold transition-all duration-300 ${!productDetails.stock
+                    ? "pointer-events-none border-gray-200 bg-gray-100 text-gray-400"
+                    : "border-[#25D366]/25 bg-white text-[#181818] hover:border-[#25D366] hover:bg-[#F5FFF8] hover:-translate-y-1 hover:shadow-lg"
+                    }`}
+            >
+                <MessageCircle
+                    size={19}
+                    className="text-[#25D366] transition-transform duration-300 group-hover:scale-110"
+                />
+
+                <span>Ask about this Saree</span>
+            </a>}
 
         <div className="grid grid-cols-3 gap-3 mt-6">
             <MiniTrust
@@ -139,7 +166,7 @@ export function ProductInfo({ productDetails }) {
                         {productDetails.categories.map((category) => (
                             <Link
                                 key={category}
-                                to="/products"
+                                to={`/products?categories=${encodeURIComponent(category)}`}
                                 className="
                             px-5 py-2.5
                             rounded-full
@@ -171,7 +198,7 @@ export function ProductInfo({ productDetails }) {
                         {productDetails.occasions.map((occasion) => (
                             <Link
                                 key={occasion}
-                                to="/products"
+                                to={`/products?occasions=${encodeURIComponent(occasion)}`}
                                 className="
                             px-5 py-2.5
                             rounded-full

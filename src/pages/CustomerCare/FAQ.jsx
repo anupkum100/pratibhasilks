@@ -11,9 +11,9 @@ export default function FAQ() {
                 "Slight colour variation may occur due to lighting and screen settings.",
         },
         {
-            question: "Do you offer Cash on Delivery?",
+            question: "Which payment options are available?",
             answer:
-                "Availability depends on delivery location and order value.",
+                "We currently accept secure online payments through supported payment options.",
         },
         {
             question: "How do I care for silk sarees?",
