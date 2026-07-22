@@ -256,9 +256,11 @@ export default function CheckoutPage() {
 
           sessionStorage.removeItem("ps_checkout_address_draft");
 
-          navigate(
-            `/order-success/${verified.orderNumber}#token=${encodeURIComponent(verified.publicAccessToken)}`
-          );
+          // navigate(
+          //   `/order-success/${verified.orderNumber}#token=${encodeURIComponent(verified.publicAccessToken)}`
+          // );
+          // This forces a clean page load, which matches the behavior you already confirmed works after manually refreshing.
+          window.location.href = `/order-success/${verified.orderNumber}#token=${encodeURIComponent(verified.publicAccessToken)}`;
         } catch (verificationError) {
           cleanupRazorpayUi();
           setPageError(
