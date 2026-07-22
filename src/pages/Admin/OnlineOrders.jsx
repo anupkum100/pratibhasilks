@@ -409,9 +409,9 @@ function OrderCard({ order, onOpen }) {
         >
             <div className="grid md:grid-cols-[150px_1fr_auto]">
                 <div className="relative min-h-[190px] overflow-hidden bg-[#EEE5DA] md:min-h-full">
-                    {getImageFromId(firstItem.image) ? (
+                    {getImageFromId(firstItem.mainImageId) ? (
                         <img
-                            src={getImageFromId(firstItem.image)}
+                            src={getImageFromId(firstItem.mainImageId)}
                             alt={firstItem?.name || "Ordered saree"}
                             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
@@ -870,9 +870,9 @@ function OrderItem({ item }) {
     return (
         <div className="grid grid-cols-[90px_1fr] gap-4 rounded-[1.5rem] border border-black/5 bg-[#F8F3EC] p-3 md:grid-cols-[110px_1fr_auto] md:items-center">
             <div className="aspect-[4/5] overflow-hidden rounded-[1.1rem] bg-[#EDE4D8]">
-                {getImageFromId(item.image) ? (
+                {getImageFromId(item.mainImageId) ? (
                     <img
-                        src={getImageFromId(item.image)}
+                        src={getImageFromId(item.mainImageId)}
                         alt={item.name || "Ordered saree"}
                         className="h-full w-full object-cover"
                     />

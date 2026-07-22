@@ -39,7 +39,7 @@ export default function ShippingPolicy() {
                         </h2>
 
                         <p>
-                            We currently offer FREE shipping across India on all orders.
+                            We currently offer FREE shipping across India on all orders on order above 5000.
                         </p>
                     </div>
 

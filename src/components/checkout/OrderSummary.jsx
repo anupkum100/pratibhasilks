@@ -7,7 +7,7 @@ import {
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { getImageFromId } from "../../data/util";
-import { FREE_SHIPPING_THRESHOLD, getSellingPrice } from "../../utils/shipping";
+import { getSellingPrice } from "../../utils/shipping";
 import UnavailableImage from "../UnavailableImage";
 
 const money = (value) =>

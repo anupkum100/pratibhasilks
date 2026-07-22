@@ -1,4 +1,4 @@
-export const FREE_SHIPPING_THRESHOLD = 5000;
+export const FREE_SHIPPING_THRESHOLD = 5000; // TODO: Configure this from .env
 export const BASE_SAREE_SHIPPING = 120;
 export const ADDITIONAL_SAREE_SHIPPING = 100;
 

@@ -13,12 +13,12 @@ const SoldProducts = lazy(() => import("./pages/Admin/SoldProducts"));
 const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
 const Contact = lazy(() => import("./pages/Contact"));
 const FAQ = lazy(() => import("./pages/CustomerCare/FAQ"));
-const InvoiceVerification = lazy(() => import("./pages/CustomerCare/InvoiceVerification"));
+// const InvoiceVerification = lazy(() => import("./pages/CustomerCare/InvoiceVerification"));
 const ReturnsExchanges = lazy(() => import("./pages/CustomerCare/ReturnsExchanges"));
 const ShippingPolicy = lazy(() => import("./pages/CustomerCare/ShippingPolicy"));
 const TrackOrder = lazy(() => import("./pages/CustomerCare/TrackOrder"));
 const Home = lazy(() => import("./pages/Home"));
-const InvoicePage = lazy(() => import("./pages/InvoicePage"));
+// const InvoicePage = lazy(() => import("./pages/InvoicePage"));
 const OrderSuccessPage = lazy(() => import("./pages/OrderSuccessPage"));
 const PageNotFound = lazy(() => import("./pages/PageNotFound"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
@@ -39,7 +39,7 @@ export default function App() {
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/saree-types" element={<SareeTypes />} />
-            <Route path="/invoice/:invoiceId" element={<InvoicePage />} />
+            {/* <Route path="/invoice/:invoiceId" element={<InvoicePage />} /> */}
 
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/checkout/:sku" element={<CheckoutPage />} />
@@ -48,7 +48,7 @@ export default function App() {
             <Route path="/shipping-policy" element={<ShippingPolicy />} />
             <Route path="/returns-exchanges" element={<ReturnsExchanges />} />
             <Route path="/track-order" element={<TrackOrder />} />
-            <Route path="/invoice-verification" element={<InvoiceVerification />} />
+            {/* <Route path="/invoice-verification" element={<InvoiceVerification />} /> */}
             <Route path="/faq" element={<FAQ />} />
 
             <Route element={<ProtectedAdminRoute />}>

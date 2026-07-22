@@ -273,7 +273,7 @@ export default function CheckoutPage() {
       modal: {
         ondismiss: () => {
           setSubmitting(false);
-          cleanupRazorpayUi();
+          // cleanupRazorpayUi();
           setPageError(
             paymentFailureMessageRef.current ||
             "Payment was not completed. This saree is reserved for you for a few minutes. You can retry the same payment or cancel the reservation."
@@ -289,7 +289,7 @@ export default function CheckoutPage() {
 
       paymentFailureMessageRef.current = failureMessage;
       setSubmitting(false);
-      cleanupRazorpayUi();
+      // cleanupRazorpayUi();
       setPageError(failureMessage);
     });
 
@@ -418,6 +418,7 @@ export default function CheckoutPage() {
 
       setActiveCheckout(null);
       clearStoredCheckout();
+      setIdempotencyKey(crypto.randomUUID());
 
       if (sku) {
         await queryClient.invalidateQueries({

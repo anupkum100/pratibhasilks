@@ -96,9 +96,9 @@ export default function Footer() {
             <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/track-order"><span>Track Order</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
               →
             </span></Link></li>
-            <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/invoice-verification"><span>Invoice Verification</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+            {/* <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/invoice-verification"><span>Invoice Verification</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
               →
-            </span></Link></li>
+            </span></Link></li> */}
             <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/faq"><span>FAQ</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
               →
             </span></Link></li>
