@@ -575,7 +575,8 @@ export default function Products() {
             ) : products.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-7">
-                  {products.map((product) => (
+                  {/* TODO: Remove this filter  */}
+                  {products.filter(el => el.sku !== "TEST_0001").map((product) => (
                     <ProductCard
                       key={product._id || product.sku || product.id}
                       product={product}
