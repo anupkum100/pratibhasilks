@@ -490,7 +490,7 @@ export default function Products() {
                     className="w-full rounded-full bg-white border border-black/10 py-3 pl-3 pr-11 text-sm text-[#181818] shadow-sm outline-none focus:border-[#9A7B4F]"
                   />
                   <button
-                    disabled={!searchString}
+                    // disabled={!searchString}
                     type="button"
                     onClick={() => setSearchTerm(searchString)}
                     aria-label="Clear search"
