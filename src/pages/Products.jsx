@@ -105,13 +105,39 @@ export default function Products() {
     categories: true,
   });
 
+  const syncingFromUrlRef = useRef(false);
+
   useEffect(() => {
-    setFilters(urlState.filters);
-    setSort(urlState.sort);
-    setSearchTerm(urlState.search);
+    syncingFromUrlRef.current = true;
+
+    setFilters((previousFilters) => {
+      const previousValue = JSON.stringify(previousFilters);
+      const nextValue = JSON.stringify(urlState.filters);
+
+      return previousValue === nextValue
+        ? previousFilters
+        : urlState.filters;
+    });
+
+    setSort((previousSort) =>
+      previousSort === urlState.sort ? previousSort : urlState.sort
+    );
+
+    setSearchTerm((previousSearch) =>
+      previousSearch === urlState.search ? previousSearch : urlState.search
+    );
+
+    setSearchString((previousSearch) =>
+      previousSearch === urlState.search ? previousSearch : urlState.search
+    );
   }, [urlState]);
 
   useEffect(() => {
+    if (syncingFromUrlRef.current) {
+      syncingFromUrlRef.current = false;
+      return;
+    }
+
     const nextParams = new URLSearchParams();
     const trimmedSearch = searchTerm.trim();
 
@@ -143,7 +169,9 @@ export default function Products() {
       nextParams.set("sort", sort);
     }
 
-    if (nextParams.toString() !== currentSearch) {
+    const nextSearch = nextParams.toString();
+
+    if (nextSearch !== currentSearch) {
       setSearchParams(nextParams, { replace: true });
     }
   }, [currentSearch, filters, searchTerm, setSearchParams, sort]);
