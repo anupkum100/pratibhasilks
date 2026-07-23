@@ -70,6 +70,7 @@ function getParamList(searchParams, keys) {
 
 export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [searchString, setSearchString] = useState("");
   const queryClient = useQueryClient();
   const { createOrder } = useCart();
 
@@ -481,27 +482,22 @@ export default function Products() {
 
                 <label className="relative block w-full max-w-md">
                   <span className="sr-only">Search sarees</span>
-                  <Search
-                    size={17}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9A7B4F]"
-                  />
                   <input
                     type="search"
-                    value={searchTerm}
-                    onChange={(event) => setSearchTerm(event.target.value)}
+                    value={searchString}
+                    onChange={(event) => setSearchString(event.target.value)}
                     placeholder="Search by name, SKU, fabric..."
-                    className="w-full rounded-full bg-white border border-black/10 py-3 pl-11 pr-11 text-sm text-[#181818] shadow-sm outline-none focus:border-[#9A7B4F]"
+                    className="w-full rounded-full bg-white border border-black/10 py-3 pl-3 pr-11 text-sm text-[#181818] shadow-sm outline-none focus:border-[#9A7B4F]"
                   />
-                  {searchTerm && (
-                    <button
-                      type="button"
-                      onClick={clearSearch}
-                      aria-label="Clear search"
-                      className="absolute right-3 top-1/2 h-7 w-7 -translate-y-1/2 rounded-full bg-[#F8F3EC] text-[#6B5F54] flex items-center justify-center"
-                    >
-                      <X size={14} />
-                    </button>
-                  )}
+                  <button
+                    disabled={!searchString}
+                    type="button"
+                    onClick={() => setSearchTerm(searchString)}
+                    aria-label="Clear search"
+                    className="absolute right-3 top-1/2 h-7 w-7 -translate-y-1/2 rounded-full bg-[#F8F3EC] text-[#6B5F54] flex items-center justify-center"
+                  >
+                    <Search size={14} />
+                  </button>
                 </label>
               </div>
 
