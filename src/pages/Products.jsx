@@ -458,7 +458,8 @@ export default function Products() {
         </div>
       )}
 
-      <section className="max-w-7xl mx-auto px-5 pb-20">
+      {/* Removed max-w-7xl class for full width  */}
+      <section className="mx-auto px-5 pb-20">
         <PermissionRenderer>
           <div className="text-end">
             <button
