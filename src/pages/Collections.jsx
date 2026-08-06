@@ -13,6 +13,8 @@ const collections = [
     to: "/products?arrival=New&sort=latest",
     palette: "bg-[#e7efe9] text-[#171717]",
     overlay: "from-[#061719]/75 via-[#0c3e41]/10 to-transparent",
+    focalPoint: "right center",
+    mobileFocalPoint: "70% center",
   },
   {
     label: "Professional",
@@ -23,6 +25,8 @@ const collections = [
     to: "/products?occasions=Work,Office&categories=Office Wear",
     palette: "bg-[#f0e8dc] text-[#171717]",
     overlay: "from-[#111]/70 via-[#111]/10 to-transparent",
+    focalPoint: "right center",
+    mobileFocalPoint: "70% center",
   },
   {
     label: "Festive",
@@ -33,6 +37,8 @@ const collections = [
     to: "/products?occasions=Festive",
     palette: "bg-[#250f08] text-white",
     overlay: "from-[#2b0d03]/80 via-[#8a390e]/20 to-transparent",
+    focalPoint: "right center",
+    mobileFocalPoint: "70% center",
   },
   {
     label: "Occasion",
@@ -43,6 +49,8 @@ const collections = [
     to: "/products?occasions=Wedding,Party&categories=Wedding Collection,Luxury",
     palette: "bg-[#130f16] text-white",
     overlay: "from-[#110711]/80 via-[#3c1735]/20 to-transparent",
+    focalPoint: "right center",
+    mobileFocalPoint: "70% center",
   },
 ];
 
@@ -69,7 +77,6 @@ export default function Collections() {
 
         <div className="relative z-10 flex min-h-[calc(100vh-60px)] flex-col justify-between px-5 py-8 md:px-10 md:py-12 lg:px-14">
           <div className="flex items-start justify-between gap-6 text-xs uppercase tracking-[0.38em] text-white/65">
-            {/* <span>Pratibha Silks</span> */}
             <span className="hidden md:block">Curated Saree Stories</span>
           </div>
 
@@ -111,67 +118,65 @@ export default function Collections() {
 }
 
 function CollectionBlock({ collection, index }) {
-  const isReverse = index % 2 === 1;
-  const layoutClass = isReverse
-    ? "lg:grid-cols-2 lg:[&>*:first-child]:order-2"
-    : "lg:grid-cols-2";
-
   return (
-    <section className={`collection-block relative w-full ${collection.palette}`}>
-      <div className={`grid min-h-screen ${layoutClass}`}>
-        <Link
-          to={collection.to}
-          className="group collection-image-panel relative min-h-[64vh] overflow-hidden lg:min-h-screen"
-        >
-          <img
-            src={getImageFromId(collection.imageId)}
-            alt={collection.title}
-            className="collection-image absolute inset-0 h-full w-full object-cover transition duration-1000"
-          />
-          <div className={`absolute inset-0 bg-gradient-to-t ${collection.overlay}`} />
-          <span className="absolute right-5 top-5 hidden max-w-[12rem] border border-white/25 bg-black/15 px-4 py-3 text-[10px] uppercase tracking-[0.34em] text-white/75 backdrop-blur md:block">
-            Pratibha Silks
-          </span>
-          <span className="collection-buy-look absolute bottom-5 right-5 flex max-w-[15rem] items-center gap-3 rounded-full border border-white/35 bg-white px-4 py-3 text-[#171717] shadow-2xl transition md:bottom-8 md:right-8 md:px-5 md:py-4">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#171717] text-white">
-              <ArrowUpRight size={18} />
-            </span>
-            <span className="min-w-0 text-left">
-              <span className="block text-sm font-semibold leading-none">
-                Get the look
-              </span>
-              <span className="mt-1 block text-[10px] uppercase tracking-[0.24em] text-black/50">
-                View sarees
-              </span>
-            </span>
-          </span>
-        </Link>
+    <section className="collection-block w-full bg-[#08070a]">
+      <Link
+        to={collection.to}
+        className="group collection-image-panel relative block min-h-[calc(100svh-60px)] overflow-hidden text-white md:min-h-[130vh] lg:min-h-[2200px]"
+        style={{
+          "--collection-focal": collection.focalPoint,
+          "--collection-mobile-focal": collection.mobileFocalPoint,
+        }}
+      >
+        <img
+          src={getImageFromId(collection.imageId)}
+          alt={collection.title}
+          className="collection-image absolute inset-0 h-full w-full object-cover transition duration-1000"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.78),rgba(0,0,0,0.28)_42%,rgba(0,0,0,0.08)_70%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/65 to-transparent" />
 
-        <div className="collection-copy-panel relative flex min-h-[72vh] flex-col justify-between px-5 py-10 md:px-10 md:py-14 lg:min-h-screen lg:px-10 xl:px-14">
-          <div className="pointer-events-none absolute inset-y-10 left-5 w-px bg-current/10 md:left-10 lg:left-8 xl:left-12" />
-          <div className="flex items-center justify-between gap-5">
-            <p className="text-xs uppercase tracking-[0.42em] opacity-60">
-              {collection.label}
-            </p>
-            <span className="h-px flex-1 bg-current opacity-15" />
+        <div className="relative z-10 flex min-h-[calc(100vh-60px)] flex-col justify-between px-5 py-8 md:px-10 md:py-12 lg:px-14">
+          <div className="flex items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.42em] text-white/70">
+                  {collection.label}
+                </p>
+                <p className="mt-3 hidden text-xs uppercase tracking-[0.28em] text-white/45 md:block">
+                  {collection.kicker}
+                </p>
+              </div>
+            </div>
+            <span className="hidden max-w-[12rem] border border-white/25 bg-black/15 px-4 py-3 text-[10px] uppercase tracking-[0.34em] text-white/75 backdrop-blur md:block">
+              Pratibha Silks
+            </span>
           </div>
 
-          <div>
-            <p className="mb-5 text-xs uppercase tracking-[0.32em] opacity-55">
-              {collection.kicker}
-            </p>
-            <h2 className="collection-title font-serif text-[4.2rem] leading-[0.82] md:text-[7.5rem] lg:text-[clamp(4.8rem,5.3vw,7.25rem)]">
+          <div className="max-w-4xl">
+            <h2 className="collection-title font-serif text-5xl leading-[0.86] md:text-8xl lg:text-[clamp(6rem,9vw,12rem)]">
               {collection.title}
             </h2>
-          </div>
-
-          <div className="border-t border-current/15 pt-7">
-            <p className="max-w-xl text-base leading-8 opacity-70 md:text-lg">
+            <p className="mt-6 max-w-xl text-base leading-8 text-white/72 md:text-lg">
               {collection.text}
             </p>
           </div>
         </div>
-      </div>
+
+        <span className="collection-buy-look absolute bottom-4 right-4 z-20 flex max-w-[15rem] items-center gap-3 rounded-full border border-white/35 bg-white px-4 py-3 text-[#171717] shadow-2xl transition md:bottom-6 md:right-6 md:px-5 md:py-4">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#171717] text-white">
+            <ArrowUpRight size={18} />
+          </span>
+          <span className="min-w-0 text-left">
+            <span className="block text-sm font-semibold leading-none">
+              Get the look
+            </span>
+            <span className="mt-1 block text-[10px] uppercase tracking-[0.24em] text-black/50">
+              View sarees
+            </span>
+          </span>
+        </span>
+      </Link>
     </section>
   );
 }

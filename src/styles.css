@@ -359,11 +359,11 @@ h4 {
 }
 
 .collection-image {
-  object-position: center center;
+  object-position: var(--collection-focal, center center);
 }
 
 .collection-image-panel:hover .collection-image {
-  transform: scale(1.04);
+  transform: scale(1.015);
 }
 
 .collection-buy-look {
@@ -413,6 +413,14 @@ h4 {
     overflow-wrap: anywhere;
   }
 
+  .collection-image {
+    object-position: var(--collection-mobile-focal, center center);
+  }
+
+  .collection-image-panel:hover .collection-image {
+    transform: none;
+  }
+
   .collection-buy-look {
     bottom: 0.875rem;
     right: 0.875rem;
@@ -442,6 +450,7 @@ h4 {
     font-size: 0.55rem;
     letter-spacing: 0.16em;
   }
+
 }
 
 @media (min-aspect-ratio: 21 / 9) and (min-width: 1800px) {
