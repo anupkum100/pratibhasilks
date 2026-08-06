@@ -11,6 +11,7 @@ const Orders = lazy(() => import("./pages/Admin/Orders"));
 const PaymentsPage = lazy(() => import("./pages/Admin/Payments"));
 const SoldProducts = lazy(() => import("./pages/Admin/SoldProducts"));
 const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
+const Collections = lazy(() => import("./pages/Collections"));
 const Contact = lazy(() => import("./pages/Contact"));
 const FAQ = lazy(() => import("./pages/CustomerCare/FAQ"));
 // const InvoiceVerification = lazy(() => import("./pages/CustomerCare/InvoiceVerification"));
@@ -33,6 +34,7 @@ export default function App() {
         <Suspense fallback={<PremiumLoader />}>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/collections" element={<Collections />} />
             <Route path="/products" element={<Products />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/cart" element={<Navigate to="/checkout" replace />} />

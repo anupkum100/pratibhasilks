@@ -10,7 +10,7 @@ export function PremiumOptionWrap({ children }) {
 
     return (
         <div>
-            <div className="flex flex-wrap gap-2">{visibleItems}</div>
+            <div style={{ maxHeight: "200px", overflow: "auto" }} className="flex flex-wrap gap-2">{visibleItems}</div>
 
             {remainingCount > 0 && (
                 <button

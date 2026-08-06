@@ -17,7 +17,8 @@ import { SoldModal } from "./Modal/SoldModal";
 
 const navLinks = [
   { label: "Home", to: "/" },
-  { label: "Collections", to: "/products" },
+  { label: "Collections", to: "/collections" },
+  { label: "Shop", to: "/products" },
   { label: "Heritage", to: "/saree-types" },
   { label: "About", to: "/about" },
   { label: "Contact", to: "/contact" },

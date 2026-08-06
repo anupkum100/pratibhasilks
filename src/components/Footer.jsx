@@ -60,6 +60,9 @@ export default function Footer() {
           </h4>
 
           <ul className="space-y-3 text-white/70">
+            <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/collections"><span>Curated Collections</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+              →
+            </span></Link></li>
             <li><Link className="group flex items-center gap-2 hover:text-white transition-all" to="/products?fabric=Pure Silk"><span>Pure Silk</span> <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
               →
             </span></Link></li>
