@@ -6,51 +6,23 @@ import { getImageFromId } from "../data/util";
 const collections = [
   {
     label: "New",
-    kicker: "Fresh arrivals",
-    title: "First look. First choice.",
-    text: "Recently added sarees, selected for women who like finding the next signature drape before everyone else.",
     imageId: "hero3_wmp0og",
     to: "/products?arrival=New&sort=latest",
-    palette: "bg-[#e7efe9] text-[#171717]",
-    overlay: "from-[#061719]/75 via-[#0c3e41]/10 to-transparent",
-    focalPoint: "right center",
-    mobileFocalPoint: "70% center",
   },
   {
     label: "Professional",
-    kicker: "Doctors / Teachers / Lawyers",
-    title: "Authority, softened in silk.",
-    text: "Composed sarees for clinics, classrooms, chambers and every room where presence matters before words do.",
     imageId: "ChatGPT_Image_Aug_6_2026_10_59_17_AM_qvfkn2.png",
     to: "/products?occasions=Work,Office&categories=Office Wear",
-    palette: "bg-[#f0e8dc] text-[#171717]",
-    overlay: "from-[#111]/70 via-[#111]/10 to-transparent",
-    focalPoint: "right center",
-    mobileFocalPoint: "70% center",
   },
   {
     label: "Festive",
-    kicker: "Ganpati / Dussehra / Diwali",
-    title: "The season arrives in colour.",
-    text: "Temple mornings, lit evenings, family rituals and sarees that hold the brightness of the day.",
     imageId: "ChatGPT_Image_Aug_6_2026_11_14_09_AM_joh94s.png",
     to: "/products?occasions=Festive",
-    palette: "bg-[#250f08] text-white",
-    overlay: "from-[#2b0d03]/80 via-[#8a390e]/20 to-transparent",
-    focalPoint: "right center",
-    mobileFocalPoint: "70% center",
   },
   {
-    label: "Occasion",
-    kicker: "Marriage / Party / Office outing",
-    title: "Dressed for being remembered.",
-    text: "A sharper edit for celebrations, evening plans and work gatherings that deserve a little ceremony.",
+    label: "Party",
     imageId: "ChatGPT_Image_Aug_6_2026_11_19_59_AM_gltkdp.png",
     to: "/products?occasions=Wedding,Party&categories=Wedding Collection,Luxury",
-    palette: "bg-[#130f16] text-white",
-    overlay: "from-[#110711]/80 via-[#3c1735]/20 to-transparent",
-    focalPoint: "right center",
-    mobileFocalPoint: "70% center",
   },
 ];
 
@@ -106,76 +78,53 @@ export default function Collections() {
         </div>
       </section>
 
-      {collections.map((collection, index) => (
+      {collections.map((collection) => (
         <CollectionBlock
           key={collection.label}
           collection={collection}
-          index={index}
         />
       ))}
     </main>
   );
 }
 
-function CollectionBlock({ collection, index }) {
+function CollectionBlock({ collection }) {
   return (
-    <section className="collection-block w-full bg-[#08070a]">
+    <section className="collection-block relative w-full bg-[#08070a] text-white">
       <Link
         to={collection.to}
-        className="group collection-image-panel relative block min-h-[calc(100svh-60px)] overflow-hidden text-white md:min-h-[130vh] lg:min-h-[2200px]"
-        style={{
-          "--collection-focal": collection.focalPoint,
-          "--collection-mobile-focal": collection.mobileFocalPoint,
-        }}
+        className="group collection-image-panel collection-editorial-panel relative block min-h-[105svh] overflow-hidden text-white md:min-h-[118vh] lg:min-h-[125vh]"
       >
         <img
           src={getImageFromId(collection.imageId)}
-          alt={collection.title}
-          className="collection-image absolute inset-0 h-full w-full object-cover transition duration-1000"
+          alt=""
+          aria-hidden="true"
+          className="collection-backdrop absolute inset-0 h-full w-full scale-110 object-cover opacity-70 blur-2xl saturate-125"
         />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.78),rgba(0,0,0,0.28)_42%,rgba(0,0,0,0.08)_70%)]" />
-        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/65 to-transparent" />
+        <img
+          src={getImageFromId(collection.imageId)}
+          alt={`${collection.label} collection`}
+          className="collection-image collection-primary-image absolute inset-0 h-full w-full object-contain transition duration-1000"
+        />
+        <div className="collection-fade-layer absolute inset-y-0 left-0 w-[58%] bg-gradient-to-r from-[#08070a]/95 via-[#08070a]/58 to-transparent" />
+        <div className="collection-fade-layer absolute inset-y-0 right-0 w-[34%] bg-gradient-to-l from-[#08070a]/82 via-[#08070a]/26 to-transparent" />
+        <div className="collection-fade-layer absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-black/46 to-transparent" />
+        <div className="collection-fade-layer absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/68 to-transparent" />
+        <div className="collection-fade-layer absolute inset-0 bg-[radial-gradient(circle_at_70%_45%,rgba(255,255,255,0.08),transparent_34%),linear-gradient(90deg,rgba(0,0,0,0.18),rgba(0,0,0,0.02)_52%,rgba(0,0,0,0.18))]" />
 
-        <div className="relative z-10 flex min-h-[calc(100vh-60px)] flex-col justify-between px-5 py-8 md:px-10 md:py-12 lg:px-14">
-          <div className="flex items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-[0.42em] text-white/70">
-                  {collection.label}
-                </p>
-                <p className="mt-3 hidden text-xs uppercase tracking-[0.28em] text-white/45 md:block">
-                  {collection.kicker}
-                </p>
-              </div>
-            </div>
-            <span className="hidden max-w-[12rem] border border-white/25 bg-black/15 px-4 py-3 text-[10px] uppercase tracking-[0.34em] text-white/75 backdrop-blur md:block">
-              Pratibha Silks
-            </span>
-          </div>
+        <div className="collection-editorial-content relative z-10 flex min-h-[105svh] flex-col justify-between px-5 py-8 md:min-h-[118vh] md:px-10 md:py-12 lg:min-h-[125vh] lg:px-14">
+          <div className="flex items-start justify-between gap-6" />
 
-          <div className="max-w-4xl">
-            <h2 className="collection-title font-serif text-5xl leading-[0.86] md:text-8xl lg:text-[clamp(6rem,9vw,12rem)]">
-              {collection.title}
-            </h2>
-            <p className="mt-6 max-w-xl text-base leading-8 text-white/72 md:text-lg">
-              {collection.text}
+          <div className="collection-editorial-copy max-w-[32rem] border-l border-white/20 pl-5 md:pl-7">
+            <p className="text-sm uppercase tracking-[0.42em] text-[#E7C982]">
+              {collection.label}
             </p>
+            <span className="collections-pill mt-8 inline-flex w-fit items-center gap-3 rounded-full bg-white px-5 py-3 text-sm font-medium text-[#171717] transition group-hover:bg-[#E7C982]">
+              View sarees
+              <ArrowUpRight size={17} />
+            </span>
           </div>
         </div>
-
-        <span className="collection-buy-look absolute bottom-4 right-4 z-20 flex max-w-[15rem] items-center gap-3 rounded-full border border-white/35 bg-white px-4 py-3 text-[#171717] shadow-2xl transition md:bottom-6 md:right-6 md:px-5 md:py-4">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#171717] text-white">
-            <ArrowUpRight size={18} />
-          </span>
-          <span className="min-w-0 text-left">
-            <span className="block text-sm font-semibold leading-none">
-              Get the look
-            </span>
-            <span className="mt-1 block text-[10px] uppercase tracking-[0.24em] text-black/50">
-              View sarees
-            </span>
-          </span>
-        </span>
       </Link>
     </section>
   );
