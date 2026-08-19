@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useDeferredValue } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Check, Search, X, Trash2 } from "lucide-react";
 import { apiCall } from "../../serice/api";
@@ -308,13 +308,21 @@ export function SoldModal({ open, product, products, onClose, onSubmit, onRemove
 
 function BuyerAutocomplete({ value, selectedBuyer, onChange, onSelect }) {
     const [open, setOpen] = useState(false);
-    const deferredSearch = useDeferredValue(value.trim());
+    const [debouncedSearch, setDebouncedSearch] = useState(value.trim());
+
+    useEffect(() => {
+        const timeoutId = window.setTimeout(() => {
+            setDebouncedSearch(value.trim());
+        }, 350);
+
+        return () => window.clearTimeout(timeoutId);
+    }, [value]);
 
     const { data, isFetching } = useQuery({
-        queryKey: ["buyers", deferredSearch],
+        queryKey: ["buyers", debouncedSearch],
         queryFn: async () => {
             const response = await apiCall(
-                `/api/buyers?search=${encodeURIComponent(deferredSearch)}&limit=10`
+                `/api/buyers?search=${encodeURIComponent(debouncedSearch)}&limit=10`
             );
             if (response?.error) {
                 throw new Error(response.error.message || "Failed to fetch buyers");
