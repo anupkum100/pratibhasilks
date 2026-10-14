@@ -74,6 +74,8 @@ export default function OnlineOrders() {
     const [paymentStatus, setPaymentStatus] = useState("");
     const [sort, setSort] = useState("latest");
     const [selectedOrder, setSelectedOrder] = useState(null);
+    const [sendingConfirmationOrder, setSendingConfirmationOrder] = useState("");
+    const [confirmationNotice, setConfirmationNotice] = useState(null);
 
     useEffect(() => {
         const timer = window.setTimeout(() => {
@@ -198,6 +200,41 @@ export default function OnlineOrders() {
             fetchNextPage();
         }
     }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+    const sendConfirmationEmail = useCallback(async (order) => {
+        const orderNumber = order?.orderNumber;
+
+        if (!orderNumber) return;
+
+        setSendingConfirmationOrder(orderNumber);
+        setConfirmationNotice(null);
+
+        try {
+            const response = unwrapApiResponse(
+                await apiCall(
+                    `/api/orders/public/${encodeURIComponent(orderNumber)}/resend-buyer-email`,
+                    "POST"
+                ),
+                "Unable to send confirmation email"
+            );
+
+            setConfirmationNotice({
+                type: "success",
+                orderNumber,
+                message: `Confirmation email sent to ${response.recipient || getCustomer(order).email}.`,
+            });
+        } catch (sendError) {
+            setConfirmationNotice({
+                type: "error",
+                orderNumber,
+                message:
+                    sendError?.message ||
+                    "Unable to send confirmation email.",
+            });
+        } finally {
+            setSendingConfirmationOrder("");
+        }
+    }, []);
 
     return (
         <main className="min-h-screen bg-[#F8F3EC] text-[#181818]">
@@ -341,6 +378,17 @@ export default function OnlineOrders() {
                     )}
                 </div>
 
+                {confirmationNotice && (
+                    <div
+                        className={`mb-5 rounded-[1.25rem] border px-5 py-4 text-sm font-medium ${confirmationNotice.type === "success"
+                            ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                            : "border-red-200 bg-red-50 text-red-700"
+                            }`}
+                    >
+                        {confirmationNotice.message}
+                    </div>
+                )}
+
                 {error ? (
                     <ErrorState />
                 ) : orders.length > 0 ? (
@@ -355,6 +403,10 @@ export default function OnlineOrders() {
                                     }
                                     order={order}
                                     onOpen={() => setSelectedOrder(order)}
+                                    onSendConfirmation={sendConfirmationEmail}
+                                    sendingConfirmation={
+                                        sendingConfirmationOrder === order.orderNumber
+                                    }
                                 />
                             ))}
                         </div>
@@ -395,12 +447,26 @@ export default function OnlineOrders() {
     );
 }
 
-function OrderCard({ order, onOpen }) {
+function OrderCard({
+    order,
+    onOpen,
+    onSendConfirmation,
+    sendingConfirmation = false,
+}) {
     const customer = getCustomer(order);
     const items = getOrderItems(order);
     const firstItem = items[0];
     const remainingItems = Math.max(0, items.length - 1);
     const address = getShippingAddress(order);
+    const canSendConfirmation = Boolean(customer.email && customer.email !== "Not available");
+
+    const handleSendConfirmation = (event) => {
+        event.stopPropagation();
+
+        if (!canSendConfirmation || sendingConfirmation) return;
+
+        onSendConfirmation?.(order);
+    };
 
     return (
         <article
@@ -479,6 +545,28 @@ function OrderCard({ order, onOpen }) {
                                     order.paymentMethod
                                 )}
                             </p>
+
+                            <button
+                                type="button"
+                                onClick={handleSendConfirmation}
+                                disabled={
+                                    !canSendConfirmation ||
+                                    sendingConfirmation
+                                }
+                                className="mt-4 inline-flex items-center justify-center gap-2 rounded-full border border-[#D8C7B3] bg-white px-4 py-2.5 text-xs font-semibold text-[#302A25] transition hover:border-[#9A7B4F] hover:text-[#9A7B4F] disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                {sendingConfirmation ? (
+                                    <LoaderCircle
+                                        size={14}
+                                        className="animate-spin"
+                                    />
+                                ) : (
+                                    <Mail size={14} />
+                                )}
+                                {sendingConfirmation
+                                    ? "Sending..."
+                                    : "Send Confirmation"}
+                            </button>
                         </div>
                     </div>
 
