@@ -172,9 +172,7 @@ export default function OrderSuccessPage() {
     );
 
   const discount = Number(order?.discountAmount || order?.discount || 0);
-  const shippingCharge = Number(
-    order?.shippingAmount || order?.shippingCharge || 0
-  );
+  const shippingCharge = Number(order?.shippingCharge || 0);
 
   const totalAmount = Number(
     order?.totalAmount ??
